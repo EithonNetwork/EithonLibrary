@@ -144,12 +144,6 @@ public class Debug {
 		}
 	}
 
-	private String formatMessageWithPluginName(String type, String format, Object... args) {
-		return String.format("[%s] %s", 
-				this._plugin.getJavaPlugin().getName(),
-				formatMessage(type, format, args));
-	}
-
 	private String formatMessage(String type, String format, Object... args) {
 		return String.format("(%s) %s", 
 				type,

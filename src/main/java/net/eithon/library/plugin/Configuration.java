@@ -2,7 +2,6 @@ package net.eithon.library.plugin;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -57,14 +56,12 @@ public class Configuration {
 
 	public double getDouble(String path, double defaultValue)
 	{
-		String defaultAsString = Double.toString(defaultValue);
-		String valueAsString = getString(path, defaultAsString);
 		double value;
 		try {
-			value = Double.parseDouble(valueAsString);
+			value = this._config.getDouble(path, defaultValue);
 		} catch (Exception ex) {
-			this._plugin.getDebug().warning("Could not parse \"%s: %s\" into a double. Will use the default value (%s).",
-					path, valueAsString, defaultAsString);
+			this._plugin.getDebug().warning("Failed to read configuration \"%s\", will use default value (%.2f).",
+					path, defaultValue);
 			this._plugin.getDebug().debug(DebugPrintLevel.MAJOR, "Exception: %s", ex.getMessage());
 			value = defaultValue;
 		}
@@ -74,14 +71,12 @@ public class Configuration {
 
 	public int getInt(String path, int defaultValue)
 	{
-		String defaultAsString = Integer.toString(defaultValue);
-		String valueAsString = getString(path, defaultAsString);
 		int value;
 		try {
-			value = Integer.parseInt(valueAsString);
+			value = this._config.getInt(path, defaultValue);
 		} catch (Exception ex) {
-			this._plugin.getDebug().warning("Could not parse \"%s: %s\" into an integer. Will use the default value (%s).",
-					path, valueAsString, defaultAsString);
+			this._plugin.getDebug().warning("Failed to read configuration \"%s\", will use default value (%d).",
+					path, defaultValue);
 			this._plugin.getDebug().debug(DebugPrintLevel.MAJOR, "Exception: %s", ex.getMessage());
 			value = defaultValue;
 		}
@@ -167,14 +162,6 @@ public class Configuration {
 		try {
 			this._config.load(this._configFile);
 		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void save() {
-		try {
-			this._config.save(this._configFile);
-		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
