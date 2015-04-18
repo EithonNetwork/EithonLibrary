@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 
+import org.bukkit.plugin.java.JavaPlugin;
+
 public class FileMisc {
 	public static void makeSureParentDirectoryExists(File file){
 		File directory = file.getParentFile();
@@ -11,6 +13,10 @@ public class FileMisc {
 		{
 			directory.mkdirs();
 		}
+	}
+	
+	public static File getPluginDataFile(JavaPlugin plugin, String fileName) {
+		return new File(plugin.getDataFolder(), fileName);
 	}
 
 	public static String [] getFileNames(File folder) {

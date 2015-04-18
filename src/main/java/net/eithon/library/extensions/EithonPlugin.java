@@ -1,7 +1,9 @@
 package net.eithon.library.extensions;
 
+import java.io.File;
 import java.util.HashMap;
 
+import net.eithon.library.file.FileMisc;
 import net.eithon.library.misc.Debug;
 import net.eithon.library.plugin.ConfigurableCommand;
 import net.eithon.library.plugin.ConfigurableMessage;
@@ -53,5 +55,9 @@ public class EithonPlugin {
 	
 	public ConfigurableCommand getConfigurableCommand(String path, int parameters, String defaultValue) {
 		return this._config.getConfigurableCommand(path, parameters, defaultValue);
+	}
+	
+	public File getDataFile(String fileName) {
+		return FileMisc.getPluginDataFile(this._plugin, fileName);
 	}
 }
