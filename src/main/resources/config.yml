@@ -1,0 +1,18 @@
+#
+# Debug level
+#	0 = NONE (no debug messages)
+#	1 = MAJOR (only major messages)
+#	2 = MINOR (also minor messages)
+#	3 = VERBOSE (all messages)
+#
+EithonDebugLevel: 3
+
+
+#
+# General messages that are valid over all plugins
+#
+messages:
+  
+  # Message sent to the player if he/she hasn't a required permission.
+  # Arguments: <permission path> (%s)
+  RequiredPermission: You must have permission %s.

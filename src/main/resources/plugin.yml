@@ -1,0 +1,15 @@
+name: EithonLibrary
+main: net.eithon.plugin.eithonlibrary.Plugin
+version: 1.0
+author: vanbrayne
+depend: [Essentials]
+description: A Minecraft plugin for the Eithon Java library which supports plugin development
+commands:
+  eithonlibrary:
+    description: Should not need to be used?
+    usage: /eithonfixes
+    permission-message: You don't have <permission>
+permissions:
+  eithonlibrary.*:
+    description: Gives access to all eithonlibrary commands
+    default: op
