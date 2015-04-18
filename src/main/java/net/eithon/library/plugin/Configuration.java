@@ -32,11 +32,11 @@ public class Configuration {
 	}
 
 	public ConfigurableMessage getConfigurableMessage(String path, int parameters, String defaultValue) {
-		return new ConfigurableMessage(this, path, parameters, defaultValue);
+		return new ConfigurableMessage(this._plugin, path, parameters, defaultValue);
 	}
 
 	public ConfigurableCommand getConfigurableCommand(String path, int parameters, String defaultValue) {
-		return new ConfigurableCommand(this, path, parameters, defaultValue);
+		return new ConfigurableCommand(this._plugin, path, parameters, defaultValue);
 	}
 
 	public String getString(String path, String defaultValue)
