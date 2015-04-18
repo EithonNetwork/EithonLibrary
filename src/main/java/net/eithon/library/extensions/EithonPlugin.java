@@ -4,22 +4,22 @@ import java.io.File;
 import java.util.HashMap;
 
 import net.eithon.library.file.FileMisc;
-import net.eithon.library.misc.Debug;
 import net.eithon.library.plugin.ConfigurableCommand;
 import net.eithon.library.plugin.ConfigurableMessage;
 import net.eithon.library.plugin.Configuration;
+import net.eithon.library.plugin.Logger;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class EithonPlugin {
 	private JavaPlugin _plugin;
 	private static HashMap<String, EithonPlugin> instances = new HashMap<String, EithonPlugin>();
-	private Debug _debug;
+	private Logger _logger;
 	private Configuration _config;
 
 	private EithonPlugin(JavaPlugin plugin) { 
 		this._plugin = plugin;
-		this._debug = new Debug(this);
+		this._logger = new Logger(this);
 		this._config = new Configuration(this);
 		instances.put(plugin.getName(), this);
 	}
@@ -36,7 +36,7 @@ public class EithonPlugin {
 
 	public void enable() {
 		this._config.enable();
-		this._debug.enable();
+		this._logger.enable();
 	}
 
 
@@ -47,7 +47,7 @@ public class EithonPlugin {
 
 	public Configuration getConfiguration() { return this._config; }
 
-	public Debug getDebug() { return this._debug; }
+	public Logger getLogger() { return this._logger; }
 
 	public ConfigurableMessage getConfigurableMessage(String path, int parameters, String defaultValue) {
 		return this._config.getConfigurableMessage(path, parameters, defaultValue);

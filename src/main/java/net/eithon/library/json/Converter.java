@@ -11,8 +11,8 @@ import java.util.UUID;
 
 import net.eithon.library.extensions.EithonPlugin;
 import net.eithon.library.file.FileMisc;
-import net.eithon.library.misc.Debug;
-import net.eithon.library.misc.Debug.DebugPrintLevel;
+import net.eithon.library.plugin.Logger;
+import net.eithon.library.plugin.Logger.DebugPrintLevel;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -174,11 +174,11 @@ public class Converter {
 			Writer writer = new FileWriter(file);
 			data.writeJSONString(writer);
 			writer.close();
-			Debug.libraryDebug(DebugPrintLevel.MAJOR, "Saved \"%s\".", file.getName());
+			Logger.libraryDebug(DebugPrintLevel.MAJOR, "Saved \"%s\".", file.getName());
 		} catch (IOException e) {
-			Debug.libraryWarning("Can't create file \"%s\" for save: %s", file.getName(), e.getMessage());
+			Logger.libraryWarning("Can't create file \"%s\" for save: %s", file.getName(), e.getMessage());
 		} catch (Exception e) {
-			Debug.libraryError("Failed to save file \"%s\": %s", file.getName(), e.getMessage());
+			Logger.libraryError("Failed to save file \"%s\": %s", file.getName(), e.getMessage());
 		}
 	}
 
@@ -190,20 +190,20 @@ public class Converter {
 			reader = new FileReader(file);
 			Object o = JSONValue.parseWithException(reader);
 			if (o == null) {
-				Debug.libraryDebug(DebugPrintLevel.MINOR, "Load; parse returned null.");
+				Logger.libraryDebug(DebugPrintLevel.MINOR, "Load; parse returned null.");
 				return null;
 			}
 			if (!(o instanceof JSONObject)) {
-				Debug.libraryError("Could not cast content of file \"%s\" to a JSONObject.");
+				Logger.libraryError("Could not cast content of file \"%s\" to a JSONObject.");
 				return null;
 			}
 			data = (JSONObject) o;
 			reader.close();
-			Debug.libraryDebug(DebugPrintLevel.MAJOR, "Loaded \"%s\".", file.getName());
+			Logger.libraryDebug(DebugPrintLevel.MAJOR, "Loaded \"%s\".", file.getName());
 		} catch (FileNotFoundException e) {
-			Debug.libraryWarning("Can't open file \"%s\" for load: %s", file.getName(), e.getMessage());
+			Logger.libraryWarning("Can't open file \"%s\" for load: %s", file.getName(), e.getMessage());
 		} catch (Exception e) {
-			Debug.libraryError("Failed to load file \"%s\": %s", file.getName(), e.getMessage());
+			Logger.libraryError("Failed to load file \"%s\": %s", file.getName(), e.getMessage());
 		} finally {
 			if (reader != null) try { reader.close(); } catch (IOException e) {}
 		}

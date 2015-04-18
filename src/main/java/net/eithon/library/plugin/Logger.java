@@ -1,10 +1,10 @@
-package net.eithon.library.misc;
+package net.eithon.library.plugin;
 
 import net.eithon.library.core.CoreMisc;
 import net.eithon.library.extensions.EithonPlugin;
 
-public class Debug {
-	private static Debug defaultDebug = null;
+public class Logger {
+	private static Logger defaultDebug = null;
 	private static DebugPrintLevel[] debugLevelValues = null;
 	private EithonPlugin _plugin = null;
 	private DebugPrintLevel _debugLevel = DebugPrintLevel.NONE;
@@ -26,11 +26,11 @@ public class Debug {
 		return 0;
 	}
 	
-	public static void setDefaultDebug(Debug debug) {
+	public static void setDefaultDebug(Logger debug) {
 		defaultDebug = debug;
 	}
 	
-	public Debug(EithonPlugin plugin) { 
+	public Logger(EithonPlugin plugin) { 
 		this._plugin = plugin; 
 	}
 	

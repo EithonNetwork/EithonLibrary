@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import net.eithon.library.core.IFactory;
 import net.eithon.library.core.IUuidAndName;
-import net.eithon.library.misc.Debug;
+import net.eithon.library.plugin.Logger;
 
 import org.json.simple.JSONArray;
 
@@ -33,7 +33,7 @@ implements Iterable<T>, IJson<PlayerCollection<T>>, Serializable
 		JSONArray json = new JSONArray();
 		for (T value : this.playerInfo.values()) {
 			if (!(value instanceof IJson<?>)) {
-				Debug.libraryError("%s must implement interface J", value.toString());
+				Logger.libraryError("%s must implement interface J", value.toString());
 				return null;
 			}
 			IJson<T> info = (IJson<T>) value;

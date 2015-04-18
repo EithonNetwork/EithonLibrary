@@ -1,7 +1,7 @@
 package net.eithon.library.plugin;
 
 import net.eithon.library.extensions.EithonPlugin;
-import net.eithon.library.misc.Debug.DebugPrintLevel;
+import net.eithon.library.plugin.Logger.DebugPrintLevel;
 
 import org.bukkit.Bukkit;
 
@@ -14,7 +14,7 @@ public class ConfigurableCommand extends ConfigurableFormat{
 	
 	public void execute(Object... args) {
 		String command = getMessage(args);
-		this._eithonPlugin.getDebug().debug(DebugPrintLevel.MAJOR, "/%s", command);
+		this._eithonPlugin.getLogger().debug(DebugPrintLevel.MAJOR, "/%s", command);
 		this._eithonPlugin.getJavaPlugin().getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
 	}
 }
