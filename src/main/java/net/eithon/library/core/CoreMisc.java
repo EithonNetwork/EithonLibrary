@@ -15,4 +15,24 @@ public class CoreMisc {
 		}
 		return message;
 	}
+
+	public static String arrayToString(String[] stringList) {
+		String s = "[";
+		for (String string : stringList) {
+			if (!s.equalsIgnoreCase("[")) s += ", ";
+			s += string;
+		}
+		s +="]";
+		return s;
+	}
+
+	public static String arrayToString(Integer[] integerList) {
+		String s = "[";
+		for (Integer integer : integerList) {
+			if (!s.equalsIgnoreCase("[")) s += ", ";
+			s += integer.toString();
+		}
+		s +="]";
+		return s;
+	}
 }

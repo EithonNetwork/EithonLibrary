@@ -5,7 +5,7 @@ import net.eithon.library.core.CoreMisc;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
-public abstract class ConfigurableFormat {
+abstract class ConfigurableFormat {
 	private String _path;
 	private int _parameters;
 	private String _formatValue;
