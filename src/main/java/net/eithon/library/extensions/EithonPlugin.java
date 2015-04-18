@@ -37,6 +37,10 @@ public class EithonPlugin {
 		this._debug.enable();
 	}
 
+
+	public void disable() {
+	}
+
 	public JavaPlugin getJavaPlugin() { return this._plugin; }
 
 	public Configuration getConfiguration() { return this._config; }
