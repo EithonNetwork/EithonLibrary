@@ -26,7 +26,7 @@ public class Configuration {
 	}
 
 	public void enable() {
-		this._configFile = initializeConfigFile(this._plugin.getJavaPlugin(), "config.yml");
+		this._configFile = initializeConfigFile(this._plugin, "config.yml");
 		this._config = new YamlConfiguration();
 		load();
 	}
@@ -45,12 +45,12 @@ public class Configuration {
 		try {
 			result = this._config.getString(path, defaultValue);
 		} catch (Exception ex) {
-			this._plugin.getLogger().warning("Failed to read configuration \"%s\", will use default value (%s).",
+			this._plugin.getEithonLogger().warning("Failed to read configuration \"%s\", will use default value (%s).",
 					path, defaultValue);
-			this._plugin.getLogger().debug(DebugPrintLevel.MAJOR, "Exception: %s", ex.getMessage());
+			this._plugin.getEithonLogger().debug(DebugPrintLevel.MAJOR, "Exception: %s", ex.getMessage());
 			result = defaultValue;
 		}
-		this._plugin.getLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = %s" , path, result);
+		this._plugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = %s" , path, result);
 		return result;
 	}
 
@@ -60,12 +60,12 @@ public class Configuration {
 		try {
 			value = this._config.getDouble(path, defaultValue);
 		} catch (Exception ex) {
-			this._plugin.getLogger().warning("Failed to read configuration \"%s\", will use default value (%.2f).",
+			this._plugin.getEithonLogger().warning("Failed to read configuration \"%s\", will use default value (%.2f).",
 					path, defaultValue);
-			this._plugin.getLogger().debug(DebugPrintLevel.MAJOR, "Exception: %s", ex.getMessage());
+			this._plugin.getEithonLogger().debug(DebugPrintLevel.MAJOR, "Exception: %s", ex.getMessage());
 			value = defaultValue;
 		}
-		this._plugin.getLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = %.2f" , path, value);
+		this._plugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = %.2f" , path, value);
 		return value;
 	}
 
@@ -75,12 +75,12 @@ public class Configuration {
 		try {
 			value = this._config.getInt(path, defaultValue);
 		} catch (Exception ex) {
-			this._plugin.getLogger().warning("Failed to read configuration \"%s\", will use default value (%d).",
+			this._plugin.getEithonLogger().warning("Failed to read configuration \"%s\", will use default value (%d).",
 					path, defaultValue);
-			this._plugin.getLogger().debug(DebugPrintLevel.MAJOR, "Exception: %s", ex.getMessage());
+			this._plugin.getEithonLogger().debug(DebugPrintLevel.MAJOR, "Exception: %s", ex.getMessage());
 			value = defaultValue;
 		}
-		this._plugin.getLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = %d" , path, value);
+		this._plugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = %d" , path, value);
 		return value;
 	}
 
@@ -90,12 +90,12 @@ public class Configuration {
 		try {
 			result = this._config.getIntegerList(path);
 		} catch (Exception ex) {
-			this._plugin.getLogger().warning("Failed to read configuration \"%s\".", path);
-			this._plugin.getLogger().debug(DebugPrintLevel.MAJOR, "Exception: %s", ex.getMessage());
+			this._plugin.getEithonLogger().warning("Failed to read configuration \"%s\".", path);
+			this._plugin.getEithonLogger().debug(DebugPrintLevel.MAJOR, "Exception: %s", ex.getMessage());
 			result = new ArrayList<Integer>();
 		}
 
-		if (this._plugin.getLogger().shouldDebug(DebugPrintLevel.MINOR)) {
+		if (this._plugin.getEithonLogger().shouldDebug(DebugPrintLevel.MINOR)) {
 			String s = "";
 			boolean first = true;
 			for (Integer integer : result) {
@@ -103,7 +103,7 @@ public class Configuration {
 				else s += ", ";
 				s += integer.toString();
 			}
-			this._plugin.getLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = [%s]" , path, s);
+			this._plugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = [%s]" , path, s);
 		}
 		return result;
 	}
@@ -114,12 +114,12 @@ public class Configuration {
 		try {
 			result = this._config.getStringList(path);
 		} catch (Exception ex) {
-			this._plugin.getLogger().warning("Failed to read configuration \"%s\".", path);
-			this._plugin.getLogger().debug(DebugPrintLevel.MAJOR, "Exception: %s", ex.getMessage());
+			this._plugin.getEithonLogger().warning("Failed to read configuration \"%s\".", path);
+			this._plugin.getEithonLogger().debug(DebugPrintLevel.MAJOR, "Exception: %s", ex.getMessage());
 			result = new ArrayList<String>();
 		}
 		
-		if (this._plugin.getLogger().shouldDebug(DebugPrintLevel.MINOR)) {
+		if (this._plugin.getEithonLogger().shouldDebug(DebugPrintLevel.MINOR)) {
 			String s = "";
 			boolean first = true;
 			for (String string : result) {
@@ -127,7 +127,7 @@ public class Configuration {
 				else s += ", ";
 				s += string;
 			}
-			this._plugin.getLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = [%s]" , path, s);
+			this._plugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = [%s]" , path, s);
 		}
 		return result;
 	}

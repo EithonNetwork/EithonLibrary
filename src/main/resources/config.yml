@@ -13,6 +13,10 @@ EithonDebugLevel: 3
 #
 messages:
   
+  # Warning when we expect an entity to be an instance of Player
+  # Arguments: <name> (%s)
+  ExpectedToBePlayer: Expected %s to be a Player.
+  
   # Message sent to the player if he/she hasn't a required permission.
   # Arguments: <permission path> (%s)
   RequiredPermission: You must have permission %s.

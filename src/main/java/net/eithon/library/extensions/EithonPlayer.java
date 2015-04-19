@@ -16,21 +16,25 @@ public class EithonPlayer {
 	public Player getPlayer() { return this._player; }	
 
 	@SuppressWarnings("deprecation")
-	public static Player getFromString(String playerIdOrName) {
+	public static EithonPlayer getFromString(String playerIdOrName) {
 		Player player = null;
 		try {
 			UUID id = UUID.fromString(playerIdOrName);
 			player = Bukkit.getPlayer(id);
-		} catch (Exception e) {
-		}
-		if (player == null) player = Bukkit.getPlayer(playerIdOrName);
-		return player;
+		} catch (Exception e) { }
+		if (player == null) try { player = Bukkit.getPlayer(playerIdOrName); } catch (Exception e) { }
+		if (player == null) return null;
+		return new EithonPlayer(player);
 	}
 
-	public boolean hasPermissionOrWarn(String permission)
+	public boolean hasPermissionOrInformPlayer(String permission)
 	{
-		if (this._player.hasPermission(permission)) return true;
+		if (hasPermission(permission)) return true;
 		GeneralMessage.requiredPermission.sendMessage(this._player, permission);
 		return false;
+	}
+
+	public boolean hasPermission(String permission) {
+		return this._player.hasPermission(permission);
 	}
 }

@@ -20,6 +20,6 @@ public class ConfigurableMessage extends ConfigurableFormat{
 	
 	public void broadcastMessage(Object... args) {
 		String message = getMessage(args);
-		this._eithonPlugin.getJavaPlugin().getServer().broadcastMessage(message);
+		this._eithonPlugin.getServer().broadcastMessage(message);
 	}
 }
