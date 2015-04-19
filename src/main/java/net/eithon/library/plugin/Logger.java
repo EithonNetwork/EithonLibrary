@@ -138,7 +138,7 @@ public class Logger {
 	{
 		String message = formatMessage("error", format, args);
 		try {
-			this._plugin.getLogger().warning(message);
+			this._plugin.getLogger().severe(message);
 		} catch (Exception e) {
 			consolePrint(message);
 		}
