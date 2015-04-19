@@ -16,7 +16,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class EithonPlugin extends JavaPlugin {
+public class EithonPlugin extends JavaPlugin implements Listener {
 	private static HashMap<String, EithonPlugin> instances = new HashMap<String, EithonPlugin>();
 	private Logger _logger;
 	private Configuration _config;
@@ -27,7 +27,11 @@ public class EithonPlugin extends JavaPlugin {
 	
 	@Override
 	public void onEnable() {
-		enable(null, null);
+		this._logger = new Logger(this);
+		this._config = new Configuration(this);
+		this._config.enable();
+		this._logger.enable();
+		instances.put(getName(), this);
 	}
 
 	@Override
@@ -36,14 +40,10 @@ public class EithonPlugin extends JavaPlugin {
 		return commandParser.execute();
 	}
 
-	public void enable(ICommandHandler commandHandler, Listener eventListener) {
-		this._logger = new Logger(this);
-		this._config = new Configuration(this);
-		this._config.enable();
-		this._logger.enable();
-		instances.put(getName(), this);
+	public void activate(ICommandHandler commandHandler, Listener eventListener) {
 		this._commandHandler = commandHandler;
 		this._eventListener = eventListener;
+		if (this._eventListener == null) this._eventListener = this;
 		getServer().getPluginManager().registerEvents(this._eventListener, this);
 	}
 

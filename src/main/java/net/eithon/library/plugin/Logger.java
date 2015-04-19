@@ -80,7 +80,7 @@ public class Logger {
 		if (!shouldDebug(level)) return;
 		String message = formatMessage("debug", format, args);
 		try {
-			this._plugin.getEithonLogger().info(message);
+			this._plugin.getLogger().info(message);
 		} catch (Exception e) {
 			consolePrint(message);
 		}
@@ -99,7 +99,7 @@ public class Logger {
 	{
 		String message = formatMessage("info", format, args);
 		try {
-			this._plugin.getEithonLogger().info(message);
+			this._plugin.getLogger().info(message);
 		} catch (Exception e) {
 			consolePrint(message);
 		}
@@ -118,7 +118,7 @@ public class Logger {
 	{
 		String message = formatMessage("warning", format, args);
 		try {
-			this._plugin.getEithonLogger().warning(message);
+			this._plugin.getLogger().warning(message);
 		} catch (Exception e) {
 			consolePrint(message);
 		}
@@ -138,7 +138,7 @@ public class Logger {
 	{
 		String message = formatMessage("error", format, args);
 		try {
-			this._plugin.getEithonLogger().warning(message);
+			this._plugin.getLogger().warning(message);
 		} catch (Exception e) {
 			consolePrint(message);
 		}
