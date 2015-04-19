@@ -26,6 +26,7 @@ import org.json.simple.JSONValue;
 
 public class Converter {
 	@SuppressWarnings("unchecked")
+	@Deprecated // Use EithonLocation instead
 	public static JSONObject fromLocation(Location location, boolean withWorld)
 	{
 		JSONObject json = new JSONObject();
@@ -38,6 +39,7 @@ public class Converter {
 		return json;
 	}
 
+	@Deprecated // Use EithonLocation instead
 	public static Location toLocation(JSONObject json, World world)
 	{
 		if (world == null) {
@@ -52,6 +54,7 @@ public class Converter {
 	}
 
 	@SuppressWarnings("unchecked")
+	@Deprecated // Use EithonBlock instead
 	public static JSONObject fromBlock(Block block, boolean withWorld)
 	{
 		JSONObject json = new JSONObject();
@@ -62,6 +65,7 @@ public class Converter {
 		return json;
 	}
 
+	@Deprecated // Use EithonBlock instead
 	public static Block toBlock(JSONObject json, World world)
 	{
 		if (world == null) {
@@ -74,6 +78,7 @@ public class Converter {
 	}
 
 	@SuppressWarnings("unchecked")
+	@Deprecated // Use EithonPlayer instead
 	public static JSONObject fromPlayer(Player player)
 	{
 		JSONObject json = new JSONObject();
@@ -83,6 +88,7 @@ public class Converter {
 	}
 
 	@SuppressWarnings("unchecked")
+	@Deprecated // Use EithonPlayer instead
 	public static JSONObject fromPlayer(UUID id, String name)
 	{
 		JSONObject json = new JSONObject();
@@ -91,7 +97,7 @@ public class Converter {
 		return json;
 	}
 
-	@SuppressWarnings("deprecation")
+	@Deprecated // Use EithonPlayer instead
 	public static Player toPlayer(JSONObject json)
 	{
 		UUID id = UUID.fromString((String) json.get("id"));
@@ -103,17 +109,20 @@ public class Converter {
 		return player;
 	}
 
+	@Deprecated // Use EithonPlayer instead
 	public static UUID toPlayerId(JSONObject json)
 	{
 		return UUID.fromString((String) json.get("id"));
 	}
 
+	@Deprecated // Use EithonPlayer instead
 	public static String toPlayerName(JSONObject json)
 	{
 		return (String) json.get("name");
 	}
 
 	@SuppressWarnings("unchecked")
+	@Deprecated // Use EithonWorld instead
 	public static JSONObject fromWorld(World world)
 	{
 		JSONObject json = new JSONObject();
@@ -122,6 +131,7 @@ public class Converter {
 		return json;
 	}
 
+	@Deprecated // Use EithonWorld instead
 	public static World toWorld(JSONObject json)
 	{
 		UUID id = UUID.fromString((String) json.get("id"));
@@ -133,17 +143,20 @@ public class Converter {
 		return world;
 	}
 
+	@Deprecated // Use EithonWorld instead
 	public static UUID toWorldId(JSONObject json)
 	{
 		return (UUID) UUID.fromString((String) json.get("id"));
 	}
 
+	@Deprecated // Use EithonWorld instead
 	public static String toWorldName(JSONObject json)
 	{
 		return (String) json.get("name");
 	}
 
 	@SuppressWarnings("unchecked")
+	@Deprecated // Use json.FileContent instead
 	public static JSONObject fromBody(String name, int version, Object payload)
 	{
 		JSONObject json = new JSONObject();
@@ -153,21 +166,25 @@ public class Converter {
 		return json;
 	}
 
+	@Deprecated // Use json.FileContent instead
 	public static Object toBodyPayload(JSONObject json)
 	{
 		return json.get("payload");
 	}
 
+	@Deprecated // Use json.FileContent instead
 	public static String toBodyName(JSONObject json)
 	{
 		return (String) json.get("name");
 	}
 
+	@Deprecated // Use json.FileContent instead
 	public static int toBodyVersion(JSONObject json)
 	{
 		return (int) json.get("version");
 	}
 
+	@Deprecated // Use json.FileContent instead
 	public static void save(File file, JSONObject data) {
 		FileMisc.makeSureParentDirectoryExists(file);
 		try {
@@ -182,6 +199,7 @@ public class Converter {
 		}
 	}
 
+	@Deprecated // Use json.FileContent instead
 	public static JSONObject load(EithonPlugin plugin, File file) {
 		FileMisc.makeSureParentDirectoryExists(file);
 		JSONObject data = null;
@@ -210,6 +228,7 @@ public class Converter {
 		return data;
 	}
 
+	@Deprecated // Use json.FileContent instead
 	public static void delayedSave(File file, JSONObject data, JavaPlugin plugin) {
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		scheduler.scheduleSyncDelayedTask(plugin, new Runnable() {
