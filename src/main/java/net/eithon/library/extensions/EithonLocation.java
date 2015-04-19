@@ -9,9 +9,9 @@ public class EithonLocation {
 
 	private Location _location;
 	
-	public EithonLocation(Location block) { this._location = block; }
+	public EithonLocation(Location location) { this._location = location; }
 	
-	public Location getBlock() { return this._location; }
+	public Location getLocation() { return this._location; }
 	
 	public Block searchForFirstBlockOfMaterial(Material material, int maxDistance) {
 		int x1 = this._location.getBlockX(); 
