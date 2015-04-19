@@ -21,6 +21,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.util.Vector;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
@@ -51,6 +52,24 @@ public class Converter {
 		float yaw = (float) (double) json.get("yaw");
 		float pitch = (float) (double) json.get("pitch");
 		return new Location(world, x, y, z, yaw, pitch);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static JSONObject fromVector(Vector vector)
+	{
+		JSONObject json = new JSONObject();
+		json.put("x", vector.getX());
+		json.put("y", vector.getY());
+		json.put("z", vector.getZ());
+		return json;
+	}
+
+	public static Vector toVector(JSONObject json)
+	{
+		double x = (double) json.get("x");
+		double y = (double) json.get("y");
+		double z = (double) json.get("z");
+		return new Vector(x, y, z);
 	}
 
 	@SuppressWarnings("unchecked")
