@@ -12,18 +12,20 @@ public class CommandParser {
 	private String[] _args;
 	private ICommandHandler _commandHandler;
 	private String _currentCommand;
+	private int _nextArgument;
 
 	public CommandParser(ICommandHandler commandHandler, CommandSender sender, Command cmd, String label, String[] args) {
 		this._sender = sender;
 		this._args = args;
+		this._nextArgument = 0;
 		this._commandHandler = commandHandler;
 		this._currentCommand = null;
 	}
 
-	public void setCurrentCommand(String command) {
-		this._currentCommand = command;
-	}
-	
+	public void setCurrentCommand(String command) { this._currentCommand = command;	}
+
+	public void setNextArgument(int nextArgument) { this._nextArgument = nextArgument; }
+
 	public CommandSender getSender() { return this._sender; }
 
 	public Player getPlayer() {
@@ -70,9 +72,17 @@ public class CommandParser {
 		return hasCorrectNumberOfArguments(min, Integer.MAX_VALUE);
 	}
 
+	public String getArgumentStringAsLowercase() {
+		return getArgumentStringAsLowercase(this._nextArgument++);
+	}
+
 	public String getArgumentStringAsLowercase(int index) {
 		if (this._args.length <= index) return null;
 		return this._args[index].toLowerCase();
+	}
+
+	public int getArgumentInteger(int defaultValue) {
+		return getArgumentInteger(this._nextArgument++, defaultValue);
 	}
 
 	public int getArgumentInteger(int index, int defaultValue) {
@@ -86,6 +96,10 @@ public class CommandParser {
 		}
 	}
 
+	public double getArgumentDouble(double defaultValue) {
+		return getArgumentDouble(this._nextArgument++,defaultValue);
+	}
+
 	public double getArgumentDouble(int index, double defaultValue) {
 		if (this._args.length <= index) return defaultValue;
 		try {
@@ -97,12 +111,21 @@ public class CommandParser {
 		}
 	}
 
+	public EithonPlayer getArgumentEithonPlayer(EithonPlayer defaultValue) {
+		return getArgumentEithonPlayer(this._nextArgument++, defaultValue);
+	}
+
 	public EithonPlayer getArgumentEithonPlayer(int index, EithonPlayer defaultValue) {
 		String playerIdOrName =  getArgumentStringAsLowercase(index);
 		if (playerIdOrName == null) return defaultValue;
 		EithonPlayer eithonPlayer = EithonPlayer.getFromString(playerIdOrName);
 		return eithonPlayer;
 	}
+
+	public EithonPlayer getArgumentEithonPlayerOrInformSender(EithonPlayer defaultValue) {
+		return getArgumentEithonPlayerOrInformSender(this._nextArgument++, defaultValue);
+	}
+
 
 	public EithonPlayer getArgumentEithonPlayerOrInformSender(int index, EithonPlayer defaultValue) {
 		EithonPlayer eithonPlayer = getArgumentEithonPlayer(index, defaultValue);
@@ -116,12 +139,20 @@ public class CommandParser {
 		return eithonPlayer;
 	}
 
+	public Player getArgumentPlayer(Player defaultValue) {
+		return getArgumentPlayer(this._nextArgument++, defaultValue);
+	}
+
 	public Player getArgumentPlayer(int index, Player defaultValue) {
 		EithonPlayer defaultEithonPlayer = null;
 		if (defaultValue != null) defaultEithonPlayer = new EithonPlayer(defaultValue);
 		EithonPlayer eithonPlayer = getArgumentEithonPlayer(index, defaultEithonPlayer);
 		if (eithonPlayer == null) return defaultValue;
 		return eithonPlayer.getPlayer();
+	}
+
+	public Player getArgumentPlayerOrInformSender(Player defaultValue) {
+		return getArgumentPlayerOrInformSender(this._nextArgument++, defaultValue);
 	}
 
 	public Player getArgumentPlayerOrInformSender(int index, Player defaultValue) {
@@ -149,7 +180,7 @@ public class CommandParser {
 	public void showCommandSyntax() {
 		this._commandHandler.showCommandSyntax(this._sender, this._currentCommand);
 	}
-	
+
 	public boolean execute() {
 		return this._commandHandler.onCommand(this);
 	}
