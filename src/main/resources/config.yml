@@ -23,4 +23,4 @@ messages:
   
   # 
   # Arguments: <current world> (%s) <world name list> (%s)
-  ExpectedWorlds_2: You are in world %s, but was expected to be in one of the following worlds: [%s].
+  ExpectedWorlds_2: You are in world %s, but was expected to be in one of [%s].
