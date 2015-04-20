@@ -111,6 +111,16 @@ public class CommandParser {
 		}
 	}
 
+	public String getArgumentCommand() {
+		return getArgumentCommand(this._nextArgument++);
+	}
+
+	public String getArgumentCommand(int index) {
+		String command =  getArgumentStringAsLowercase(index);
+		setCurrentCommand(command);
+		return command;
+	}
+
 	public EithonPlayer getArgumentEithonPlayer(EithonPlayer defaultValue) {
 		return getArgumentEithonPlayer(this._nextArgument++, defaultValue);
 	}
@@ -125,7 +135,6 @@ public class CommandParser {
 	public EithonPlayer getArgumentEithonPlayerOrInformSender(EithonPlayer defaultValue) {
 		return getArgumentEithonPlayerOrInformSender(this._nextArgument++, defaultValue);
 	}
-
 
 	public EithonPlayer getArgumentEithonPlayerOrInformSender(int index, EithonPlayer defaultValue) {
 		EithonPlayer eithonPlayer = getArgumentEithonPlayer(index, defaultValue);
