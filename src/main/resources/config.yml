@@ -20,3 +20,7 @@ messages:
   # Message sent to the player if he/she hasn't a required permission.
   # Arguments: <permission path> (%s)
   RequiredPermission: You must have permission %s.
+  
+  # 
+  # Arguments: <current world> (%s) <world name list> (%s)
+  ExpectedWorlds_2: You are in world %s, but was expected to be in one of the following worlds: [%s].
