@@ -1,10 +1,14 @@
 package net.eithon.plugin.eithonlibrary;
 
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerMoveEvent;
+
 import net.eithon.library.extensions.EithonPlugin;
+import net.eithon.library.move.MoveEventHandler;
 import net.eithon.library.plugin.GeneralMessage;
 import net.eithon.library.plugin.Logger;
 
-public final class Plugin extends EithonPlugin {
+public final class Plugin extends EithonPlugin implements Listener {
 	@Override
 	public void onEnable() {
 		super.onEnable();
@@ -17,5 +21,9 @@ public final class Plugin extends EithonPlugin {
 	@Override
 	public void onDisable() {
 		super.onDisable();
+	}
+	
+	public void onPlayerMoveEvent(PlayerMoveEvent event) {
+		MoveEventHandler.handle(event);
 	}
 }
