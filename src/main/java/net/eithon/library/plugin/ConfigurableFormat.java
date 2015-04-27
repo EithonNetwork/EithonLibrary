@@ -4,6 +4,7 @@ import net.eithon.library.core.CoreMisc;
 import net.eithon.library.extensions.EithonPlugin;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 abstract class ConfigurableFormat {
@@ -27,6 +28,11 @@ abstract class ConfigurableFormat {
 
 	public String getMessage(Object... args) {
 		return CoreMisc.safeFormat(this._formatValue, args);
+	}
+
+	public String getMessageWithColorCoding(Object... args) {
+		String beforeColors = CoreMisc.safeFormat(this._formatValue, args);
+		return ChatColor.translateAlternateColorCodes('&', beforeColors);
 	}
 
 	public void reportFailure(CommandSender sender, Exception e) {

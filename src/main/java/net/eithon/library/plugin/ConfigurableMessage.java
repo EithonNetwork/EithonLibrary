@@ -12,14 +12,14 @@ public class ConfigurableMessage extends ConfigurableFormat{
 	}
 	
 	public boolean sendMessage(CommandSender sender, Object... args) {
-		String message = getMessage(args);
+		String message = getMessageWithColorCoding(args);
 		if (message == null) return false;
 		sender.sendMessage(message);
 		return true;
 	}
 	
 	public void broadcastMessage(Object... args) {
-		String message = getMessage(args);
+		String message = getMessageWithColorCoding(args);
 		this._eithonPlugin.getServer().broadcastMessage(message);
 	}
 }

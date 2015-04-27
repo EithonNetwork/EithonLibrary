@@ -3,6 +3,8 @@ package net.eithon.library.textwrap;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.eithon.library.plugin.Logger;
+
 import org.bukkit.ChatColor;
 
 /**
@@ -38,7 +40,7 @@ public class Paginator {
 	 * @return A single chat page.
 	 */
 	public static ChatPage paginate(String unpaginatedString, int pageNumber, String ignoreCharacters, String ignoreAlsoFollowingCharacter, int lineLength, int pageHeight) {
-		String[] lines = wordWrap(unpaginatedString, lineLength, ignoreCharacters, ignoreAlsoFollowingCharacter);
+		String[] lines = wordWrap(unpaginatedString, lineLength, ignoreCharacters, ignoreAlsoFollowingCharacter, pageHeight);
 
 		int totalPages = lines.length / pageHeight + (lines.length % pageHeight == 0 ? 0 : 1);
 		int actualPageNumber = pageNumber <= totalPages ? pageNumber : totalPages;
@@ -59,9 +61,15 @@ public class Paginator {
 	 *
 	 * @param rawString The raw string to break.
 	 * @param lineLength The length of a line of text.
+	 * @param pageHeight 
 	 * @return An array of word-wrapped lines.
 	 */
-	public static String[] wordWrap(String rawString, int lineLength, String ignoreCharacters, String ignoreAlsoFollowingCharacter) {
+	public static String[] wordWrap(
+			String rawString, 
+			int lineLength, 
+			String ignoreCharacters,
+			String ignoreAlsoFollowingCharacter,
+			int pageHeight) {
 		// A null string is a single line
 		if (rawString == null) {
 			return new String[] {""};
@@ -71,6 +79,7 @@ public class Paginator {
 		StringBuilder word = new StringBuilder();
 		StringBuilder line = new StringBuilder();
 		List<String> lines = new LinkedList<String>();
+		int pageLineCount = 0;
 		int lineInPixels = 0;
 		int wordInPixels = 0;
 		int lineVisibleCharacters = 0;
@@ -113,8 +122,22 @@ public class Paginator {
 					wordInPixels = 0;
 					wordVisibleCharacters = 0;
 				}
-				lines.add(line.toString());
+				String lineToAdd = line.toString();
 				line = new StringBuilder();
+				
+				if (lineToAdd.endsWith("[break]") && (lineVisibleCharacters == 7))  {
+					while (pageLineCount < pageHeight) {
+						lines.add("");
+						pageLineCount++;
+					}
+					pageLineCount = 0;
+				} else {
+					if ((pageLineCount > 0) || (lineVisibleCharacters > 0)) {
+						lines.add(lineToAdd);
+						pageLineCount++;
+						if (pageLineCount >= pageHeight) pageLineCount = 0;
+					}
+				}
 				lineInPixels = 0;
 				lineVisibleCharacters = 0;
 			}
@@ -156,8 +179,6 @@ public class Paginator {
 			lineVisibleCharacters += wordVisibleCharacters;
 		}
 		if (lineVisibleCharacters > 0) lines.add(line.toString());
-		
-
 
         // Iterate over the wrapped lines, applying the last color from one line to the beginning of the next
         if (lines.get(0).length() == 0 || lines.get(0).charAt(0) != ChatColor.COLOR_CHAR) {
@@ -172,7 +193,7 @@ public class Paginator {
                 lines.set(i, ChatColor.getByChar(color) + subLine);
             }
         }
-
+		
 		return lines.toArray(new String[lines.size()]);
 	}
 }

@@ -1,8 +1,11 @@
 package net.eithon.library.extensions;
 
+import java.util.List;
 import java.util.UUID;
 
+import net.eithon.library.core.CoreMisc;
 import net.eithon.library.core.IUuidAndName;
+import net.eithon.library.core.Config;
 import net.eithon.library.json.IJson;
 import net.eithon.library.plugin.GeneralMessage;
 
@@ -63,6 +66,16 @@ public class EithonPlayer implements IJson<EithonPlayer>, IUuidAndName{
 
 	public boolean hasPermission(String permission) {
 		return this._player.hasPermission(permission);
+	}
+	
+	public boolean isInAcceptableWorldOrInformPlayer(List<String> acceptableWorlds) {
+		String worldName = getPlayer().getWorld().getName();
+		for (String acceptableWorldName : acceptableWorlds) {
+			if (worldName.equalsIgnoreCase(acceptableWorldName)) return true;
+		}
+		Config.M.expectedWorlds.sendMessage(getPlayer(), worldName,
+				CoreMisc.arrayToString((String[]) acceptableWorlds.toArray()));
+		return false;
 	}
 
 	@Override

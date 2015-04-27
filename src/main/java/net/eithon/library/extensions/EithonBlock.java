@@ -1,6 +1,5 @@
 package net.eithon.library.extensions;
 
-import net.eithon.library.json.Converter;
 import net.eithon.library.json.IJson;
 
 import org.bukkit.Location;
@@ -37,7 +36,8 @@ public class EithonBlock implements IJson<EithonBlock>{
 	@Override
 	public Object toJson() {
 		JSONObject json = new JSONObject();
-		json.put("world", Converter.fromWorld(this._block.getWorld()));
+		EithonWorld world = new EithonWorld(this._block.getWorld());
+		json.put("world", world.toJson());
 		json.put("x", this._block.getX());
 		json.put("y", this._block.getY());
 		json.put("z", this._block.getZ());
@@ -47,7 +47,7 @@ public class EithonBlock implements IJson<EithonBlock>{
 	@Override
 	public void fromJson(Object json) {
 		JSONObject jsonObject = (JSONObject) json;
-		World world = Converter.toWorld((JSONObject) jsonObject.get("world"));
+		World world = EithonWorld.newFromJson(jsonObject.get("world")).getWorld();
 		int x = (int) jsonObject.get("x");
 		int y = (int) jsonObject.get("y");
 		int z = (int) jsonObject.get("z");
