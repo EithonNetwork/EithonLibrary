@@ -1,5 +1,6 @@
 package net.eithon.library.chat;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -42,29 +43,42 @@ public class Paginator {
 	 */
 	public static Page[] paginate(String[] inputLines, int lineLength, int pageHeight) {
 		List<Page> pages = new LinkedList<Page>();
-		List<String> pageLines = new LinkedList<String>();
+		ArrayList<String> pageLines = new ArrayList<String>();
 		String pageBreak = Character.toString(LineWrapper.PAGE_BREAK);
 		int pageNumber = 1;
-		int lineCount = 0;
 		for (String inputLine : inputLines) {
-			LineWrapper lineWrapper = new LineWrapper(inputLine);
+			LineWrapper lineWrapper = new LineWrapper(inputLine, lineLength);
 			String[] outputLines = lineWrapper.getOutputLines();
 			for (String outputLine : outputLines) {
+				if ((pageLines.size() == 0) && (outputLine.length() == 0)) continue;
 				boolean newPage = false;
 				if (outputLine.equalsIgnoreCase(pageBreak)) newPage = true;
 				else {
 					pageLines.add(outputLine);
-					lineCount++;
-					if (lineCount >= pageHeight) newPage = true;
+					if (pageLines.size() >= pageHeight) newPage = true;
 				}
 				if (newPage) {
+					trimEmptyLines(pageLines);
 					Page page = new Page(pageLines.toArray(new String[0]), pageNumber);
 					pages.add(page);
 					pageNumber++;
-					lineCount = 0;
+					pageLines = new ArrayList<String>();
 				}
 			}
 		}
+		if (pageLines.size() > 0) {
+			trimEmptyLines(pageLines);
+			Page page = new Page(pageLines.toArray(new String[0]), pageNumber);
+			pages.add(page);
+			pageNumber++;
+		}
 		return pages.toArray(new Page[0]);
+	}
+
+	private static void trimEmptyLines(ArrayList<String> pageLines) {
+		for (int i = pageLines.size()-1; i >= 0; i--) {
+			if (!pageLines.get(i).isEmpty()) return;
+			pageLines.remove(i);
+		}
 	}
 }

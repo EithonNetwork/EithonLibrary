@@ -63,21 +63,24 @@ public class SimpleMarkUp {
 	private String parseLine(String line, boolean firstLine) {
 		String parsedLine = "";
 		StringTokenizer st = new StringTokenizer(line, "[]", true);
-		boolean isCode = false;
+		boolean isInsideBrackets = false;
 		boolean firstToken = true;
+		boolean hasContent = false;
 		while (st.hasMoreElements()) {
+			boolean specialCharacter = false;
 			String token = st.nextToken();
 			if (token.equalsIgnoreCase("[")) {
-				isCode = true;
+				isInsideBrackets = true;
 				continue;
 			} else if (token.equalsIgnoreCase("]")) {
-				if (isCode) {
-					isCode = false;
+				if (isInsideBrackets) {
+					isInsideBrackets = false;
+					parsedLine += activeCodes();
 					continue;
 				}
 			}
 
-			if (isCode) {
+			if (isInsideBrackets) {
 				if (token.startsWith("color="))
 				{
 					String color = token.substring(6);
@@ -89,8 +92,10 @@ public class SimpleMarkUp {
 					}
 				} else if (token.equalsIgnoreCase("break")) {
 					token = Character.toString((char) 12) ; // FF (Form feed), Page break
+					specialCharacter = true;
 				} else if (token.equalsIgnoreCase("-")) {
 					token = Character.toString((char) 31) ; // US (Unit separator), Optional hyphen
+					specialCharacter = true;
 				} else if (token.equalsIgnoreCase("b")) {
 					this._isBold = true;
 				} else if (token.equalsIgnoreCase("s")) {
@@ -112,16 +117,20 @@ public class SimpleMarkUp {
 				} else if (token.equalsIgnoreCase("/m")) {
 					this._isMagic = false;
 				} else {
-					isCode = false;
+					isInsideBrackets = false;
 					token = "[" + token;
 				}
 			}
 
-			if (firstLine || firstToken || isCode) parsedLine += activeCodes();
-			if (!isCode) parsedLine += token;
+			if (firstToken) parsedLine += activeCodes();
+			if (!isInsideBrackets || specialCharacter) {
+				hasContent = true;
+				parsedLine += token;
+			}
 			firstToken = false;
 		}
 
+		if (!hasContent) return "";
 		return parsedLine;
 	}
 

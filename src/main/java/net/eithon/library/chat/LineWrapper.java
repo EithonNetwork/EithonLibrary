@@ -3,6 +3,9 @@ package net.eithon.library.chat;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.eithon.library.plugin.Logger;
+import net.eithon.library.plugin.Logger.DebugPrintLevel;
+
 import org.bukkit.ChatColor;
 
 class LineWrapper {
@@ -19,7 +22,8 @@ class LineWrapper {
 
 	private List<String> _outputLines = new LinkedList<String>();
 
-	public LineWrapper(String inputLine) {
+	public LineWrapper(String inputLine, int chatLineWidthInPixels) {
+		this._chatLineWidthInPixels = chatLineWidthInPixels;
 		String[] inputLines = makeHardBreaksEasier(inputLine);
 		for (String line : inputLines) {
 			if ((line.length() < 1) || (line.charAt(0) == PAGE_BREAK)) {
@@ -35,6 +39,7 @@ class LineWrapper {
 
 	private void wrap(String inputLine)
 	{
+		Logger.libraryDebug(DebugPrintLevel.MINOR, "Input line: %s", inputLine);
 		this._line = new Line();
 		this._nextWord = new Word();	
 		final char[] rawChars = (inputLine + ' ').toCharArray(); // add a trailing space to trigger wrapping
@@ -64,6 +69,7 @@ class LineWrapper {
 			// Before we break the line, add a hyphen
 			this._line.add(HARD_HYPHEN, hardHyphenPixels, true);
 		}
+		Logger.libraryDebug(DebugPrintLevel.MINOR, "outputLine: %s", this._line);
 		this._outputLines.add(this._line.toString());
 		this._line.reset();
 	}
