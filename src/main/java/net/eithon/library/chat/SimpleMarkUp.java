@@ -10,11 +10,7 @@ import java.util.List;
 import java.util.Stack;
 import java.util.StringTokenizer;
 
-import net.eithon.library.chat.Page;
-import net.eithon.library.chat.Paginator;
-
 import org.bukkit.ChatColor;
-import org.hamcrest.core.IsInstanceOf;
 
 public class SimpleMarkUp {
 	private Stack<String> _colorStack = null;

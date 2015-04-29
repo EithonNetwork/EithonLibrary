@@ -1,11 +1,7 @@
 package net.eithon.library.chat;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
-
-import org.bukkit.ChatColor;
 
 /**
  * The ChatPaginator takes a raw string of arbitrary length and breaks it down
@@ -45,27 +41,30 @@ public class Paginator {
 	 * @return A single chat page.
 	 */
 	public static Page[] paginate(String[] inputLines, int lineLength, int pageHeight) {
-		inputLines = makeHardBreaksEasier(inputLines);
-		List<Page> pages = new ArrayList<Page>();
-		List<String> outputLines = new LinkedList<String>();
+		List<Page> pages = new LinkedList<Page>();
+		List<String> pageLines = new LinkedList<String>();
+		String pageBreak = Character.toString(LineWrapper.PAGE_BREAK);
+		int pageNumber = 1;
+		int lineCount = 0;
 		for (String inputLine : inputLines) {
+			LineWrapper lineWrapper = new LineWrapper(inputLine);
+			String[] outputLines = lineWrapper.getOutputLines();
+			for (String outputLine : outputLines) {
+				boolean newPage = false;
+				if (outputLine.equalsIgnoreCase(pageBreak)) newPage = true;
+				else {
+					pageLines.add(outputLine);
+					lineCount++;
+					if (lineCount >= pageHeight) newPage = true;
+				}
+				if (newPage) {
+					Page page = new Page(pageLines.toArray(new String[0]), pageNumber);
+					pages.add(page);
+					pageNumber++;
+					lineCount = 0;
+				}
+			}
 		}
-
-		if (outputLines.size() > 0) {
-			pages.add(new Page(outputLines.toArray(new String[outputLines.size()]), 1, 1));
-		}
-
 		return pages.toArray(new Page[0]);
 	}
-	
-	if ((outputLines.size() >= pageHeight) || (c == PAGE_BREAK)) {
-		pages.add(new Page(outputLines.toArray(new String[outputLines.size()]), 1, 1));
-		outputLines = new LinkedList<String>();
-	}
-	if (outputLines.size() >= pageHeight) {
-		pages.add(new Page(outputLines.toArray(new String[outputLines.size()]), 1, 1));
-		outputLines = new LinkedList<String>();
-	}
-
-
 }
