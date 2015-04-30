@@ -3,9 +3,6 @@ package net.eithon.library.chat;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
-
-import org.bukkit.ChatColor;
 
 /**
  * The ChatPaginator takes a raw string of arbitrary length and breaks it down
@@ -45,27 +42,43 @@ public class Paginator {
 	 * @return A single chat page.
 	 */
 	public static Page[] paginate(String[] inputLines, int lineLength, int pageHeight) {
-		inputLines = makeHardBreaksEasier(inputLines);
-		List<Page> pages = new ArrayList<Page>();
-		List<String> outputLines = new LinkedList<String>();
+		List<Page> pages = new LinkedList<Page>();
+		ArrayList<String> pageLines = new ArrayList<String>();
+		String pageBreak = Character.toString(LineWrapper.PAGE_BREAK);
+		int pageNumber = 1;
 		for (String inputLine : inputLines) {
+			LineWrapper lineWrapper = new LineWrapper(inputLine, lineLength);
+			String[] outputLines = lineWrapper.getOutputLines();
+			for (String outputLine : outputLines) {
+				if ((pageLines.size() == 0) && (outputLine.length() == 0)) continue;
+				boolean newPage = false;
+				if (outputLine.equalsIgnoreCase(pageBreak)) newPage = true;
+				else {
+					pageLines.add(outputLine);
+					if (pageLines.size() >= pageHeight) newPage = true;
+				}
+				if (newPage) {
+					trimEmptyLines(pageLines);
+					Page page = new Page(pageLines.toArray(new String[0]), pageNumber);
+					pages.add(page);
+					pageNumber++;
+					pageLines = new ArrayList<String>();
+				}
+			}
 		}
-
-		if (outputLines.size() > 0) {
-			pages.add(new Page(outputLines.toArray(new String[outputLines.size()]), 1, 1));
+		if (pageLines.size() > 0) {
+			trimEmptyLines(pageLines);
+			Page page = new Page(pageLines.toArray(new String[0]), pageNumber);
+			pages.add(page);
+			pageNumber++;
 		}
-
 		return pages.toArray(new Page[0]);
 	}
-	
-	if ((outputLines.size() >= pageHeight) || (c == PAGE_BREAK)) {
-		pages.add(new Page(outputLines.toArray(new String[outputLines.size()]), 1, 1));
-		outputLines = new LinkedList<String>();
-	}
-	if (outputLines.size() >= pageHeight) {
-		pages.add(new Page(outputLines.toArray(new String[outputLines.size()]), 1, 1));
-		outputLines = new LinkedList<String>();
-	}
 
-
+	private static void trimEmptyLines(ArrayList<String> pageLines) {
+		for (int i = pageLines.size()-1; i >= 0; i--) {
+			if (!pageLines.get(i).isEmpty()) return;
+			pageLines.remove(i);
+		}
+	}
 }
