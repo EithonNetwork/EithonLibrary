@@ -1,6 +1,5 @@
 package net.eithon.library.extensions;
 
-import net.eithon.library.json.Converter;
 import net.eithon.library.json.IJson;
 
 import org.bukkit.Location;
