@@ -1,6 +1,9 @@
 package net.eithon.library.plugin;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 import net.eithon.library.core.CoreMisc;
 import net.eithon.library.extensions.EithonPlugin;
@@ -15,7 +18,7 @@ abstract class ConfigurableFormat {
 	private String _formatValue;
 	protected EithonPlugin _eithonPlugin;
 	String[] _parameterNames;
-	
+
 	ConfigurableFormat(EithonPlugin eithonPlugin, String path, int parameters, String defaultValue, String... parameterNames) {
 		this._eithonPlugin = eithonPlugin;
 		this._path = path;
@@ -36,13 +39,18 @@ abstract class ConfigurableFormat {
 
 	public String getMessage(Object... args) {
 		if (!hasContent()) return "";
-		return CoreMisc.safeFormat(this._formatValue, args);
-	}
-
-	public String getMessage(HashMap<String,String> namedArguments, Object... positionalArguments) {
-		if (!hasContent()) return "";
-		if (this._parameterNames == null) return getMessage(positionalArguments);
-		String formatValue = replaceParameters(this._formatValue, namedArguments);
+		if (this._parameterNames == null) return CoreMisc.safeFormat(this._formatValue, args);
+		String formatValue;
+		Object[] positionalArguments;
+		if (args[0] instanceof HashMap<?, ?>) {
+			@SuppressWarnings("unchecked")
+			HashMap<String, String> namedArguments = (HashMap<String, String>) args[0];
+			formatValue = replaceParameters(this._formatValue, namedArguments);
+			positionalArguments = Arrays.copyOfRange(args, 1, args.length);
+		} else {
+			formatValue = this._formatValue;
+			positionalArguments = args;
+		}
 		return CoreMisc.safeFormat(formatValue, positionalArguments);
 	}
 
@@ -57,11 +65,6 @@ abstract class ConfigurableFormat {
 
 	public String getMessageWithColorCoding(Object... args) {
 		String beforeColors = getMessage(args);
-		return ChatColor.translateAlternateColorCodes('&', beforeColors);
-	}
-
-	public String getMessageWithColorCoding(HashMap<String,String> namedArguments, Object... positionalArguments) {
-		String beforeColors = getMessage(namedArguments, positionalArguments);
 		return ChatColor.translateAlternateColorCodes('&', beforeColors);
 	}
 

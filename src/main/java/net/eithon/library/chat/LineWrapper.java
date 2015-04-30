@@ -40,7 +40,6 @@ class LineWrapper {
 
 	private void wrap(String inputLine)
 	{
-		Logger.libraryDebug(DebugPrintLevel.MINOR, "Input line: %s", inputLine);
 		this._line = new Line(this._chatLineWidthInPixels);
 		this._nextWord = new Word();	
 		final char[] rawChars = (inputLine + ' ').toCharArray(); // add a trailing space to trigger wrapping
@@ -51,8 +50,9 @@ class LineWrapper {
 				continue;
 			}
 			final char c = rawChars[i];
-			if ((i == 0) && (c == HORIZONTAL_TAB)) {
+			if (c == HORIZONTAL_TAB) {
 				this._line.setShouldBeCentered(true);
+				continue;
 			}
 
 			int characterWidthInPixels = characterWidthInPixels(c);
@@ -73,7 +73,6 @@ class LineWrapper {
 			// Before we break the line, add a hyphen
 			this._line.add(HARD_HYPHEN, hardHyphenPixels, true);
 		}
-		Logger.libraryDebug(DebugPrintLevel.MINOR, "outputLine: %s", this._line);
 		this._outputLines.add(this._line.toString());
 		this._line.reset();
 	}
