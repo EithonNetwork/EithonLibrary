@@ -10,6 +10,7 @@ import org.bukkit.ChatColor;
 
 class LineWrapper {
 	public static final char LINE_BREAK = '\n';
+	public static final char HORIZONTAL_TAB = '\t';
 	public static final char PAGE_BREAK = (char) 12;
 	public static final char SOFT_HYPHEN = (char) 31;
 	public static final char HARD_HYPHEN = '-';
@@ -17,7 +18,7 @@ class LineWrapper {
 	static final int hardHyphenPixels = FontPixels.get().pixelWidth(HARD_HYPHEN);
 
 	private int _chatLineWidthInPixels;
-	private Line _line = new Line();
+	private Line _line = new Line(this._chatLineWidthInPixels);
 	private Word _nextWord = new Word();
 
 	private List<String> _outputLines = new LinkedList<String>();
@@ -40,7 +41,7 @@ class LineWrapper {
 	private void wrap(String inputLine)
 	{
 		Logger.libraryDebug(DebugPrintLevel.MINOR, "Input line: %s", inputLine);
-		this._line = new Line();
+		this._line = new Line(this._chatLineWidthInPixels);
 		this._nextWord = new Word();	
 		final char[] rawChars = (inputLine + ' ').toCharArray(); // add a trailing space to trigger wrapping
 		for (int i = 0; i < rawChars.length; i++) {
@@ -49,8 +50,11 @@ class LineWrapper {
 				this._nextWord.add(rawChars[i]);
 				continue;
 			}
-
 			final char c = rawChars[i];
+			if ((i == 0) && (c == HORIZONTAL_TAB)) {
+				this._line.setShouldBeCentered(true);
+			}
+
 			int characterWidthInPixels = characterWidthInPixels(c);
 			if (wrapNeeded(characterWidthInPixels)) wrapLine(c);
 			if (isWordDelimiter(c))  handleWordDelimiter(c, characterWidthInPixels);

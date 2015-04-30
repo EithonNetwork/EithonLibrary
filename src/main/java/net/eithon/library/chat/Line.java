@@ -4,19 +4,28 @@ import java.util.Stack;
 
 import org.bukkit.ChatColor;
 
+import com.sun.jna.platform.unix.X11.Font;
+
 class Line {
 	private StringBuilder _content;
+	private int _maxWidthInPixels;
 	private int _widthInPixels;
 	private int _numberOfVisibleCharacters;
 	private boolean _hasPendingSoftHyphen;
+	private boolean _shouldBeCentered;
 	private String _activeChatColorCharacters;
 	private boolean _isFirstLine;
 
-	Line()  {
+	Line(int maxWidthInPixels)  {
+		this._maxWidthInPixels = maxWidthInPixels;
 		this._activeChatColorCharacters = "";
 		reset();
 		this._isFirstLine = true;
 	}
+
+	boolean shouldBeCentered() { return this._shouldBeCentered; }
+
+	void setShouldBeCentered(boolean value) { this._shouldBeCentered = value; }
 
 	boolean hasPendingSoftHyphen() { return this._hasPendingSoftHyphen; }
 
@@ -29,7 +38,22 @@ class Line {
 	public boolean hasBeenWrapped() { return !this._isFirstLine; }
 	
 	@Override
-	public String toString() { return this._content.toString(); }
+	public String toString() {
+		if (!this.hasContent()) return "";
+		return centeredPrefix() + this._content.toString();
+	}
+	
+	private String centeredPrefix() {
+		if (!shouldBeCentered()) return "";
+		String prefix = "";
+		long prefixPixelsNeeded = (this._maxWidthInPixels-this._widthInPixels)/2;
+		int spaceWidth = FontPixels.get().pixelWidth(' ');
+		while (prefixPixelsNeeded-spaceWidth > 0) {
+			prefix += " ";
+			prefixPixelsNeeded -= spaceWidth;
+		}
+		return prefix;
+	}
 
 	void reset() {
 		this._content = new StringBuilder();
