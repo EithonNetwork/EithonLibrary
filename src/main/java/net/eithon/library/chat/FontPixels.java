@@ -90,7 +90,7 @@ public class FontPixels
 		pixelWidths.put ("↑", new Integer(7));
 		pixelWidths.put ("↓", new Integer(7));
 		pixelWidths.put ("→", new Integer(8));
-		pixelWidths.put ("�?", new Integer(8));
+		pixelWidths.put ("←", new Integer(8));
 		pixelWidths.put ("∟", new Integer(8));
 		pixelWidths.put ("↔", new Integer(9));
 		pixelWidths.put ("▲", new Integer(9));
@@ -232,7 +232,7 @@ public class FontPixels
 		pixelWidths.put ("ª", new Integer(6));
 		pixelWidths.put ("º", new Integer(6));
 		pixelWidths.put ("¿", new Integer(6));
-		pixelWidths.put ("�?", new Integer(7));
+		pixelWidths.put ("¬", new Integer(7));
 		pixelWidths.put ("¬", new Integer(6));
 		pixelWidths.put ("½", new Integer(6));
 		pixelWidths.put ("¼", new Integer(6));
@@ -251,10 +251,10 @@ public class FontPixels
 		pixelWidths.put ("╣", new Integer(8));
 		pixelWidths.put ("║", new Integer(6));
 		pixelWidths.put ("╗", new Integer(8));
-		pixelWidths.put ("�?", new Integer(8));
+		pixelWidths.put ("╝", new Integer(8));
 		pixelWidths.put ("╜", new Integer(9));
 		pixelWidths.put ("╛", new Integer(9));
-		pixelWidths.put ("�?", new Integer(9));
+		pixelWidths.put ("┐", new Integer(9));
 		
 		pixelWidths.put ("└", new Integer(6));
 		pixelWidths.put ("┴", new Integer(9));
@@ -270,7 +270,7 @@ public class FontPixels
 		pixelWidths.put ("╩", new Integer(9));
 		pixelWidths.put ("╦", new Integer(9));
 		pixelWidths.put ("╠", new Integer(7));
-		pixelWidths.put ("�?", new Integer(9));
+		pixelWidths.put ("═", new Integer(9));
 		pixelWidths.put ("╬", new Integer(9));
 		pixelWidths.put ("╧", new Integer(9));
 		
@@ -288,7 +288,7 @@ public class FontPixels
 		pixelWidths.put ("█", new Integer(9));
 		pixelWidths.put ("▄", new Integer(9));
 		pixelWidths.put ("▌", new Integer(5));
-		pixelWidths.put ("�?", new Integer(5));
+		pixelWidths.put ("▐", new Integer(5));
 		pixelWidths.put ("▀", new Integer(9));
 		
 		pixelWidths.put ("α", new Integer(8));
@@ -320,7 +320,7 @@ public class FontPixels
 		pixelWidths.put ("∙", new Integer(3));
 		pixelWidths.put ("·", new Integer(3));
 		pixelWidths.put ("√", new Integer(9));
-		pixelWidths.put ("�?�", new Integer(6));
+		pixelWidths.put ("ⁿ", new Integer(6));
 		pixelWidths.put ("²", new Integer(5));
 		pixelWidths.put ("■", new Integer(5));
 		pixelWidths.put (" ", new Integer(5));

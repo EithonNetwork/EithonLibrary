@@ -3,6 +3,9 @@ package net.eithon.library.chat;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.eithon.library.plugin.Logger;
+import net.eithon.library.plugin.Logger.DebugPrintLevel;
+
 import org.bukkit.ChatColor;
 
 class LineWrapper {
@@ -19,7 +22,8 @@ class LineWrapper {
 
 	private List<String> _outputLines = new LinkedList<String>();
 
-	public LineWrapper(String inputLine) {
+	public LineWrapper(String inputLine, int chatLineWidthInPixels) {
+		this._chatLineWidthInPixels = chatLineWidthInPixels;
 		String[] inputLines = makeHardBreaksEasier(inputLine);
 		for (String line : inputLines) {
 			if ((line.length() < 1) || (line.charAt(0) == PAGE_BREAK)) {
@@ -35,6 +39,7 @@ class LineWrapper {
 
 	private void wrap(String inputLine)
 	{
+		Logger.libraryDebug(DebugPrintLevel.MINOR, "Input line: %s", inputLine);
 		this._line = new Line();
 		this._nextWord = new Word();	
 		final char[] rawChars = (inputLine + ' ').toCharArray(); // add a trailing space to trigger wrapping
@@ -44,7 +49,7 @@ class LineWrapper {
 				this._nextWord.add(rawChars[i]);
 				continue;
 			}
-			
+
 			final char c = rawChars[i];
 			int characterWidthInPixels = characterWidthInPixels(c);
 			if (wrapNeeded(characterWidthInPixels)) wrapLine(c);
@@ -64,24 +69,28 @@ class LineWrapper {
 			// Before we break the line, add a hyphen
 			this._line.add(HARD_HYPHEN, hardHyphenPixels, true);
 		}
+		Logger.libraryDebug(DebugPrintLevel.MINOR, "outputLine: %s", this._line);
 		this._outputLines.add(this._line.toString());
 		this._line.reset();
 	}
 
 	private void handleWordDelimiter(char c, int characterWidthInPixels) {
 		switch (c) {
-		case SPACE:
 		case HARD_HYPHEN:
-			// Ignore leading space and hyphens on newly wrapped lines
-			if ((this._nextWord.hasContent()) || this._line.isFirstLine()) {
-				// This word brake is after an earlier word or the start of a new line
-				this._nextWord.add(c, characterWidthInPixels, false);
-				this._line.addAndResetWord(this._nextWord);
-			}
+			this._nextWord.add(c, characterWidthInPixels, false);
+			this._line.addAndResetWord(this._nextWord);
 			break;
 		case SOFT_HYPHEN:
 			this._line.addAndResetWord(this._nextWord);
 			this._line.setHasPendingSoftHyphen(true);
+			break;
+		case SPACE:
+			// After a wrap, we will ignore leading spaces.
+			if (!this._line.hasBeenWrapped() || this._nextWord.hasContent()) {
+				// This space is the start of a new line or after an earlier word, so make it count.
+				this._nextWord.add(c, characterWidthInPixels, false);
+				this._line.addAndResetWord(this._nextWord);
+			}
 			break;
 		default:
 			break;
