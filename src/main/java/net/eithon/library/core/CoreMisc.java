@@ -10,8 +10,9 @@ public class CoreMisc {
 			message = String.format(format, args);
 		} catch (IllegalFormatException e) {
 			String errorMessage = e.getMessage();
-			message = String.format("String.format(\"%s\", %d arguments) throw IllegalFormatException: %s",
+			message = String.format("String.format(\"%s\", %d arguments) throw IllegalFormatException: %s\n",
 					format, args.length, errorMessage);
+			e.printStackTrace();
 		}
 		return message;
 	}

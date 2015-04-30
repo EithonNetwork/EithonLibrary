@@ -1,5 +1,10 @@
 package net.eithon.library.plugin;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+
 import net.eithon.library.core.CoreMisc;
 import net.eithon.library.extensions.EithonPlugin;
 
@@ -12,26 +17,54 @@ abstract class ConfigurableFormat {
 	private int _parameters;
 	private String _formatValue;
 	protected EithonPlugin _eithonPlugin;
-	
-	ConfigurableFormat(EithonPlugin eithonPlugin, String path, int parameters, String defaultValue) {
-		this._path = path;
-		this._parameters = parameters;
+	String[] _parameterNames;
+
+	ConfigurableFormat(EithonPlugin eithonPlugin, String path, int parameters, String defaultValue, String... parameterNames) {
 		this._eithonPlugin = eithonPlugin;
+		this._path = path;
 		Configuration config = eithonPlugin.getConfiguration();
 		String value = config.getString(path, defaultValue);
 		this._formatValue = value;
+		this._parameters = parameters;
+		this._parameterNames = parameterNames;
 	}
 
 	public String getFormat() {
 		return this._formatValue;
 	}
 
+	public boolean hasContent() {
+		return (this._formatValue != null) && (this._formatValue.length() > 0);
+	}
+
 	public String getMessage(Object... args) {
-		return CoreMisc.safeFormat(this._formatValue, args);
+		if (!hasContent()) return "";
+		if (this._parameterNames == null) return CoreMisc.safeFormat(this._formatValue, args);
+		String formatValue;
+		Object[] positionalArguments;
+		if (args[0] instanceof HashMap<?, ?>) {
+			@SuppressWarnings("unchecked")
+			HashMap<String, String> namedArguments = (HashMap<String, String>) args[0];
+			formatValue = replaceParameters(this._formatValue, namedArguments);
+			positionalArguments = Arrays.copyOfRange(args, 1, args.length);
+		} else {
+			formatValue = this._formatValue;
+			positionalArguments = args;
+		}
+		return CoreMisc.safeFormat(formatValue, positionalArguments);
+	}
+
+	private String replaceParameters(String format,
+			HashMap<String, String> arguments) {
+		for (String parameterName : arguments.keySet()) {
+			String formalName = "%" + parameterName + "%";
+			format = format.replace(formalName, arguments.get(parameterName));
+		}
+		return format;
 	}
 
 	public String getMessageWithColorCoding(Object... args) {
-		String beforeColors = CoreMisc.safeFormat(this._formatValue, args);
+		String beforeColors = getMessage(args);
 		return ChatColor.translateAlternateColorCodes('&', beforeColors);
 	}
 
