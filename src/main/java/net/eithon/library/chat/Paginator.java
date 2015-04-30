@@ -27,9 +27,9 @@ public class Paginator {
 	 * @param pageNumber The page number to fetch.
 	 * @return A single chat page.
 	 */
-	public static Page[] paginate(String[] inputLines, int pageWidth) {
+	public static Page[] paginate(String[] inputLines, int lineWidthInPixels) {
 		return  paginate(inputLines, 
-				pageWidth, CLOSED_CHAT_PAGE_HEIGHT);
+				lineWidthInPixels, CLOSED_CHAT_PAGE_HEIGHT);
 	}
 
 	/**
@@ -37,17 +37,17 @@ public class Paginator {
 	 *
 	 * @param unpaginatedString The raw string to break.
 	 * @param pageNumber The page number to fetch.
-	 * @param lineLength The desired width of a chat line.
-	 * @param pageHeight The desired number of lines in a page.
+	 * @param lineWidthInPixels The desired width of a chat line.
+	 * @param pageHeightInLines The desired number of lines in a page.
 	 * @return A single chat page.
 	 */
-	public static Page[] paginate(String[] inputLines, int lineLength, int pageHeight) {
+	public static Page[] paginate(String[] inputLines, int lineWidthInPixels, int pageHeightInLines) {
 		List<Page> pages = new LinkedList<Page>();
 		ArrayList<String> pageLines = new ArrayList<String>();
 		String pageBreak = Character.toString(LineWrapper.PAGE_BREAK);
 		int pageNumber = 1;
 		for (String inputLine : inputLines) {
-			LineWrapper lineWrapper = new LineWrapper(inputLine, lineLength);
+			LineWrapper lineWrapper = new LineWrapper(inputLine, lineWidthInPixels);
 			String[] outputLines = lineWrapper.getOutputLines();
 			for (String outputLine : outputLines) {
 				if ((pageLines.size() == 0) && (outputLine.length() == 0)) continue;
@@ -55,7 +55,7 @@ public class Paginator {
 				if (outputLine.equalsIgnoreCase(pageBreak)) newPage = true;
 				else {
 					pageLines.add(outputLine);
-					if (pageLines.size() >= pageHeight) newPage = true;
+					if (pageLines.size() >= pageHeightInLines) newPage = true;
 				}
 				if (newPage) {
 					trimEmptyLines(pageLines);
