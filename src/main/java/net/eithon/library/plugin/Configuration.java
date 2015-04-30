@@ -31,8 +31,8 @@ public class Configuration {
 		load();
 	}
 
-	public ConfigurableMessage getConfigurableMessage(String path, int parameters, String defaultValue) {
-		return new ConfigurableMessage(this._plugin, path, parameters, defaultValue);
+	public ConfigurableMessage getConfigurableMessage(String path, int parameters, String defaultValue, String... parameterNames) {
+		return new ConfigurableMessage(this._plugin, path, parameters, defaultValue, parameterNames);
 	}
 
 	public ConfigurableCommand getConfigurableCommand(String path, int parameters, String defaultValue) {
