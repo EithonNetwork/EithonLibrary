@@ -44,7 +44,7 @@ class LineWrapper {
 				this._nextWord.add(rawChars[i]);
 				continue;
 			}
-			
+
 			final char c = rawChars[i];
 			int characterWidthInPixels = characterWidthInPixels(c);
 			if (wrapNeeded(characterWidthInPixels)) wrapLine(c);
@@ -70,18 +70,21 @@ class LineWrapper {
 
 	private void handleWordDelimiter(char c, int characterWidthInPixels) {
 		switch (c) {
-		case SPACE:
 		case HARD_HYPHEN:
-			// Ignore leading space and hyphens on newly wrapped lines
-			if ((this._nextWord.hasContent()) || this._line.isFirstLine()) {
-				// This word brake is after an earlier word or the start of a new line
-				this._nextWord.add(c, characterWidthInPixels, false);
-				this._line.addAndResetWord(this._nextWord);
-			}
+			this._nextWord.add(c, characterWidthInPixels, false);
+			this._line.addAndResetWord(this._nextWord);
 			break;
 		case SOFT_HYPHEN:
 			this._line.addAndResetWord(this._nextWord);
 			this._line.setHasPendingSoftHyphen(true);
+			break;
+		case SPACE:
+			// After a wrap, we will ignore leading spaces.
+			if (!this._line.hasBeenWrapped() || this._nextWord.hasContent()) {
+				// This space is the start of a new line or after an earlier word, so make it count.
+				this._nextWord.add(c, characterWidthInPixels, false);
+				this._line.addAndResetWord(this._nextWord);
+			}
 			break;
 		default:
 			break;

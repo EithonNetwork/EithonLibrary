@@ -26,7 +26,7 @@ class Line {
 
 	int getWidthInPixels() { return this._widthInPixels; }	
 
-	public boolean isFirstLine() { return this._isFirstLine; }
+	public boolean hasBeenWrapped() { return !this._isFirstLine; }
 	
 	@Override
 	public String toString() { return this._content.toString(); }
