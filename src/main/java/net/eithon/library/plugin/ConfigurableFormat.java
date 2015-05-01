@@ -2,8 +2,6 @@ package net.eithon.library.plugin;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 
 import net.eithon.library.chat.SimpleMarkUp;
 import net.eithon.library.core.CoreMisc;

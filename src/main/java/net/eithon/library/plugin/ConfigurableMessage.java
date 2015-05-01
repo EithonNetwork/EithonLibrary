@@ -1,7 +1,5 @@
 package net.eithon.library.plugin;
 
-import java.util.HashMap;
-
 import net.eithon.library.chat.LineWrapper;
 import net.eithon.library.extensions.EithonPlugin;
 
