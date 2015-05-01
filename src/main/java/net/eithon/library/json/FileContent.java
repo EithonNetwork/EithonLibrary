@@ -20,7 +20,7 @@ import org.json.simple.JSONValue;
 
 public class FileContent implements IJson<FileContent>{
 	private String _name;
-	private int _version;
+	private long _version;
 	private Object _payload;
 	
 	FileContent() {
@@ -33,7 +33,7 @@ public class FileContent implements IJson<FileContent>{
 	}
 	
 	public String getName() { return this._name; }
-	public int getVersion() { return this._version; }
+	public long getVersion() { return this._version; }
 	public Object getPayload() { return this._payload; }
 
 	@Override
@@ -55,7 +55,7 @@ public class FileContent implements IJson<FileContent>{
 	public FileContent fromJson(Object json) {
 		JSONObject jsonObject = (JSONObject) json;
 		this._name = (String) jsonObject.get("name");
-		this._version = (int) jsonObject.get("version");
+		this._version = (long) jsonObject.get("version");
 		this._payload = jsonObject.get("payload");
 		return this;
 	}

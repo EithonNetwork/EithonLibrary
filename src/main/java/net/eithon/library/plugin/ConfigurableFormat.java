@@ -43,7 +43,7 @@ abstract class ConfigurableFormat {
 		if (this._parameterNames == null) return CoreMisc.safeFormat(this._formatValue, args);
 		String formatValue;
 		Object[] positionalArguments;
-		if (args[0] instanceof HashMap<?, ?>) {
+		if ((args.length > 0) && (args[0] instanceof HashMap<?, ?>)) {
 			@SuppressWarnings("unchecked")
 			HashMap<String, String> namedArguments = (HashMap<String, String>) args[0];
 			formatValue = replaceParameters(this._formatValue, namedArguments);

@@ -56,6 +56,7 @@ public class FileMisc {
 
 	public static File[] getFilesOrderByLastModified(File folder, String extension, boolean ascending) {
 		File[] files = getFiles(folder, extension);
+		if ((files == null) || (files.length < 2)) return files;
 		int factor = ascending ? 1 : -1;
 
 		Arrays.sort(files, new Comparator<File>(){

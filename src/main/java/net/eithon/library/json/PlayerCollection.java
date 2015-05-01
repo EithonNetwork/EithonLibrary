@@ -16,16 +16,15 @@ import org.json.simple.JSONArray;
 
 public class PlayerCollection<T extends IJson<T> & IUuidAndName>
 extends net.eithon.library.core.PlayerCollection<T> 
-implements Iterable<T>, IJson<PlayerCollection<T>>, Serializable
+implements Iterable<T>, IJsonDelta<PlayerCollection<T>>, Serializable
 {
 	private static final long serialVersionUID = 1L;
-	private HashMap<UUID, T> _playerInfo = null;
 	private T _infoInstance;
 	private File _deltaFolder;
 	private int _nextDelta;
 
 	public PlayerCollection(T instance, File deltaFolder) {
-		this._playerInfo = new HashMap<UUID, T>();
+		this.playerInfo = new HashMap<UUID, T>();
 		this._infoInstance = instance;
 		this._deltaFolder = deltaFolder;
 		this._nextDelta = 0;
@@ -41,15 +40,36 @@ implements Iterable<T>, IJson<PlayerCollection<T>>, Serializable
 
 	@SuppressWarnings("unchecked")
 	public Object toJson() {
+		return toJsonDelta(true);
+	}
+
+	@Override
+	public Object toJsonDelta(boolean saveAll) {
+		Logger.libraryDebug(DebugPrintLevel.VERBOSE, "Entered PlayerCollection.toJson: %d info items.", this.playerInfo.size());
 		JSONArray json = new JSONArray();
-		for (T value : this._playerInfo.values()) {
+		for (T value : this.playerInfo.values()) {
 			if (!(value instanceof IJson<?>)) {
-				Logger.libraryError("%s must implement interface J", value.toString());
+				Logger.libraryError("%s must implement interface IJson", value.toString());
 				return null;
 			}
-			IJson<T> info = (IJson<T>) value;
-			Object infoAsJson = info.toJson();
-			if (infoAsJson != null) json.add(infoAsJson);
+			Object infoAsJson = null;
+			if (saveAll) {
+				IJson<T> info = (IJson<T>) value;
+				Logger.libraryDebug(DebugPrintLevel.VERBOSE, "PlayerCollection.toJson: ", info.toString());
+				infoAsJson = info.toJson();
+			} else {
+				if (!(value instanceof IJsonDelta<?>)) {
+					Logger.libraryError("%s must implement interface IJsonDelta", value.toString());
+					return null;
+				}
+				IJsonDelta<T> info = (IJsonDelta<T>) value;
+				Logger.libraryDebug(DebugPrintLevel.VERBOSE, "PlayerCollection.toJson: ", info.toString());
+				info.toJsonDelta(false);			
+			}
+			if (infoAsJson != null) {
+				Logger.libraryDebug(DebugPrintLevel.VERBOSE, "PlayerCollection.toJson: info was not null");
+				json.add(infoAsJson);
+			}
 		}
 		return json;
 	}
@@ -63,7 +83,7 @@ implements Iterable<T>, IJson<PlayerCollection<T>>, Serializable
 			info.fromJson(o);
 			playerInfo.put(info.getUniqueId(), info);
 		}
-		this._playerInfo = playerInfo;
+		this.playerInfo = playerInfo;
 		return this;
 	}
 
@@ -82,11 +102,11 @@ implements Iterable<T>, IJson<PlayerCollection<T>>, Serializable
 
 	public void consolidateDelta(EithonPlugin eithonPlugin)
 	{
-		this._playerInfo = new HashMap<UUID, T>();
+		this.playerInfo = new HashMap<UUID, T>();
 		if (this._deltaFolder == null) return;
 		File[] files = FileMisc.getFilesOrderByLastModified(this._deltaFolder, ".json", false);
-		eithonPlugin.getEithonLogger().debug(DebugPrintLevel.MAJOR, "Loading %d files", files.length);
 		if (files != null) {
+			eithonPlugin.getEithonLogger().debug(DebugPrintLevel.MAJOR, "Loading %d files", files.length);
 			for (File file : files) {
 				eithonPlugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Loading file \"%s\".", file.getName());
 				PlayerCollection<T> delta = loadDeltaFile(file);
@@ -100,13 +120,17 @@ implements Iterable<T>, IJson<PlayerCollection<T>>, Serializable
 
 	private void aggregateDelta(PlayerCollection<T> playerTimes) {
 		for (T playerTime : playerTimes) {
-			if (this._playerInfo.containsKey(playerTime.getUniqueId())) continue;
-			this._playerInfo.put(playerTime.getUniqueId(), playerTime);
+			if (this.playerInfo.containsKey(playerTime.getUniqueId())) continue;
+			this.playerInfo.put(playerTime.getUniqueId(), playerTime);
 		}
 	}
 
 	private PlayerCollection<T> loadDeltaFile(File file) {
 		FileContent fileContent = FileContent.loadFromFile(file);
 		return new PlayerCollection<T>(this._infoInstance).fromJson(fileContent.getPayload());
+	}
+
+	public Object size() {
+		return this.playerInfo.size();
 	}
 }
