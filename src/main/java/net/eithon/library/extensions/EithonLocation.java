@@ -74,15 +74,20 @@ public class EithonLocation implements IJson<EithonLocation>{
 	}
 
 	@Override
-	public void fromJson(Object json) {
+	public EithonLocation fromJson(Object json) {
 		JSONObject jsonObject = (JSONObject) json;
-		this._eithonWorld = EithonWorld.newFromJson(jsonObject.get("world"));
+		this._eithonWorld = EithonWorld.getFromJson(jsonObject.get("world"));
 		double x = (double) jsonObject.get("x");
 		double y = (double) jsonObject.get("y");
 		double z = (double) jsonObject.get("z");
 		float yaw = (float) (double) jsonObject.get("yaw");
 		float pitch = (float) (double) jsonObject.get("pitch");
 		this._location = new Location(this._eithonWorld.getWorld(), x, y, z, yaw, pitch);
+		return this;
+	}
+	
+	public static EithonLocation getFromJson(Object json) {
+		return new EithonLocation().fromJson(json);
 	}
 
 }

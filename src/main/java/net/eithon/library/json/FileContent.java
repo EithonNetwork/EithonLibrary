@@ -52,15 +52,19 @@ public class FileContent implements IJson<FileContent>{
 	}
 
 	@Override
-	public void fromJson(Object json) {
+	public FileContent fromJson(Object json) {
 		JSONObject jsonObject = (JSONObject) json;
 		this._name = (String) jsonObject.get("name");
 		this._version = (int) jsonObject.get("version");
 		this._payload = jsonObject.get("payload");
+		return this;
 	}
 
 	public void save(File file) {
 		FileMisc.makeSureParentDirectoryExists(file);
+		if (file.exists()) {
+			Logger.libraryError("Did not expect file \"%s\" to exist.", file.getAbsolutePath());
+		}
 		JSONObject data = (JSONObject) this.toJson();
 		try {
 			Writer writer = new FileWriter(file);

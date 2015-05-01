@@ -27,6 +27,11 @@ public class EithonPlayer implements IJson<EithonPlayer>, IUuidAndName{
 		}
 	}
 
+	public EithonPlayer(UUID id, String name) { 
+		this._id = id;
+		this._name = name;
+	}
+
 	EithonPlayer() {
 	}
 
@@ -67,7 +72,7 @@ public class EithonPlayer implements IJson<EithonPlayer>, IUuidAndName{
 	public boolean hasPermission(String permission) {
 		return this._player.hasPermission(permission);
 	}
-	
+
 	public boolean isInAcceptableWorldOrInformPlayer(List<String> acceptableWorlds) {
 		String worldName = getPlayer().getWorld().getName();
 		for (String acceptableWorldName : acceptableWorlds) {
@@ -93,9 +98,14 @@ public class EithonPlayer implements IJson<EithonPlayer>, IUuidAndName{
 	}
 
 	@Override
-	public void fromJson(Object json) {
+	public EithonPlayer fromJson(Object json) {
 		JSONObject jsonObject = (JSONObject) json;
 		this._id = UUID.fromString((String) jsonObject.get("id"));
 		this._name = (String) jsonObject.get("name");
+		return this;
+	}
+
+	public static EithonPlayer getFromJSon(Object json) {
+		return new EithonPlayer().fromJson(json);
 	}
 }
