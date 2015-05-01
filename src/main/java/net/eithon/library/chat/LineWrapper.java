@@ -8,7 +8,7 @@ import net.eithon.library.plugin.Logger.DebugPrintLevel;
 
 import org.bukkit.ChatColor;
 
-class LineWrapper {
+public class LineWrapper {
 	public static final char LINE_BREAK = '\n';
 	public static final char HORIZONTAL_TAB = '\t';
 	public static final char PAGE_BREAK = (char) 12;
@@ -34,6 +34,11 @@ class LineWrapper {
 			}
 			wrap(line);
 		}
+	}
+	
+	public static String[] wrapLine(String inputLine, int chatLineWidthInPixels)
+	{
+		return new LineWrapper(inputLine, chatLineWidthInPixels).getOutputLines();
 	}
 
 	public String[] getOutputLines() { return this._outputLines.toArray(new String[0]); }

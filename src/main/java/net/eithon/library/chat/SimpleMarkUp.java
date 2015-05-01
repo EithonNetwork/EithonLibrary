@@ -20,15 +20,28 @@ public class SimpleMarkUp {
 	private boolean _isItalic = false;
 	private boolean _isMagic = false;
 	private File _file;
+	private String _line = null;
 	private String[] _parsedLines;
 
 	public SimpleMarkUp(File file) {
 		this._file = file;
 		reloadRules();
 	}
+	
+	public SimpleMarkUp(String line) {
+		this._line = line;
+	}
 
 	public void reloadRules() {
 		parseFile();
+	}
+	
+	public static String[] parseAndWrapLine(String line, int chatLineWidthInPixels) {
+		return LineWrapper.wrapLine(parseLine(line), chatLineWidthInPixels);
+	}
+	
+	public static String parseLine(String line) {
+		return new SimpleMarkUp(line).parseLine(line, true);
 	}
 	
 	public String[] getParsedLines() { return this._parsedLines; }

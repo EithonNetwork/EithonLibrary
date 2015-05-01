@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.eithon.library.chat.SimpleMarkUp;
 import net.eithon.library.core.CoreMisc;
 import net.eithon.library.extensions.EithonPlugin;
 
@@ -18,6 +19,7 @@ abstract class ConfigurableFormat {
 	private String _formatValue;
 	protected EithonPlugin _eithonPlugin;
 	String[] _parameterNames;
+	private boolean _useMarkUpForMessages;
 
 	ConfigurableFormat(EithonPlugin eithonPlugin, String path, int parameters, String defaultValue, String... parameterNames) {
 		this._eithonPlugin = eithonPlugin;
@@ -27,6 +29,7 @@ abstract class ConfigurableFormat {
 		this._formatValue = value;
 		this._parameters = parameters;
 		this._parameterNames = parameterNames;
+		this._useMarkUpForMessages = config.getInt("eithon.UseMarkUpForMessages", 0) > 0;
 	}
 
 	public String getFormat() {
@@ -65,7 +68,13 @@ abstract class ConfigurableFormat {
 
 	public String getMessageWithColorCoding(Object... args) {
 		String beforeColors = getMessage(args);
-		return ChatColor.translateAlternateColorCodes('&', beforeColors);
+		String afterColors;
+		if (this._useMarkUpForMessages) {
+			afterColors = SimpleMarkUp.parseLine(beforeColors);
+		} else  {
+			afterColors = ChatColor.translateAlternateColorCodes('&', beforeColors);
+		}
+		return afterColors;
 	}
 
 	public void reportFailure(CommandSender sender, Exception e) {
