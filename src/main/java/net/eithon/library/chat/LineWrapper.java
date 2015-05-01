@@ -3,9 +3,6 @@ package net.eithon.library.chat;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.eithon.library.plugin.Logger;
-import net.eithon.library.plugin.Logger.DebugPrintLevel;
-
 import org.bukkit.ChatColor;
 
 public class LineWrapper {

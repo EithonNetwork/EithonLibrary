@@ -20,7 +20,6 @@ public class SimpleMarkUp {
 	private boolean _isItalic = false;
 	private boolean _isMagic = false;
 	private File _file;
-	private String _line = null;
 	private String[] _parsedLines;
 
 	public SimpleMarkUp(File file) {
@@ -28,8 +27,8 @@ public class SimpleMarkUp {
 		reloadRules();
 	}
 	
-	public SimpleMarkUp(String line) {
-		this._line = line;
+	public SimpleMarkUp() {
+		this._file = null;
 	}
 
 	public void reloadRules() {
@@ -41,7 +40,7 @@ public class SimpleMarkUp {
 	}
 	
 	public static String parseLine(String line) {
-		return new SimpleMarkUp(line).parseLine(line, true);
+		return new SimpleMarkUp().parseLine(line, true);
 	}
 	
 	public String[] getParsedLines() { return this._parsedLines; }

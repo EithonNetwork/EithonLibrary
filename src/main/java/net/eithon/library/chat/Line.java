@@ -4,8 +4,6 @@ import java.util.Stack;
 
 import org.bukkit.ChatColor;
 
-import com.sun.jna.platform.unix.X11.Font;
-
 class Line {
 	private StringBuilder _content;
 	private int _maxWidthInPixels;
