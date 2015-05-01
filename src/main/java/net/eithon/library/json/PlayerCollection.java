@@ -38,14 +38,14 @@ implements Iterable<T>, IJsonDelta<PlayerCollection<T>>, Serializable
 		this(instance, null);
 	}
 
-	@SuppressWarnings("unchecked")
+	@Override
 	public Object toJson() {
 		return toJsonDelta(true);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object toJsonDelta(boolean saveAll) {
-		Logger.libraryDebug(DebugPrintLevel.VERBOSE, "Entered PlayerCollection.toJson: %d info items.", this.playerInfo.size());
 		JSONArray json = new JSONArray();
 		for (T value : this.playerInfo.values()) {
 			if (!(value instanceof IJson<?>)) {
@@ -55,7 +55,6 @@ implements Iterable<T>, IJsonDelta<PlayerCollection<T>>, Serializable
 			Object infoAsJson = null;
 			if (saveAll) {
 				IJson<T> info = (IJson<T>) value;
-				Logger.libraryDebug(DebugPrintLevel.VERBOSE, "PlayerCollection.toJson: ", info.toString());
 				infoAsJson = info.toJson();
 			} else {
 				if (!(value instanceof IJsonDelta<?>)) {
@@ -63,11 +62,11 @@ implements Iterable<T>, IJsonDelta<PlayerCollection<T>>, Serializable
 					return null;
 				}
 				IJsonDelta<T> info = (IJsonDelta<T>) value;
-				Logger.libraryDebug(DebugPrintLevel.VERBOSE, "PlayerCollection.toJson: ", info.toString());
-				info.toJsonDelta(false);			
+				infoAsJson = info.toJsonDelta(false);			
 			}
 			if (infoAsJson != null) {
-				Logger.libraryDebug(DebugPrintLevel.VERBOSE, "PlayerCollection.toJson: info was not null");
+				json.add(infoAsJson);
+			} else {
 				json.add(infoAsJson);
 			}
 		}
@@ -77,13 +76,14 @@ implements Iterable<T>, IJsonDelta<PlayerCollection<T>>, Serializable
 	@Override
 	public PlayerCollection<T> fromJson(Object json) {
 		JSONArray jsonArray = (JSONArray) json;
-		HashMap<UUID, T> playerInfo = new HashMap<UUID, T>();
+		this.playerInfo = new HashMap<UUID, T>();
+		if ((jsonArray == null) || (jsonArray.size() == 0)) return this;
 		for (Object o : jsonArray) {
+			if (o == null) continue;
 			T info = this._infoInstance.factory();
 			info.fromJson(o);
-			playerInfo.put(info.getUniqueId(), info);
+			this.playerInfo.put(info.getUniqueId(), info);
 		}
-		this.playerInfo = playerInfo;
 		return this;
 	}
 
@@ -94,10 +94,16 @@ implements Iterable<T>, IJsonDelta<PlayerCollection<T>>, Serializable
 
 	public void saveDelta(EithonPlugin eithonPlugin)
 	{
+		saveDelta(eithonPlugin, false);
+	}
+
+	private void saveDelta(EithonPlugin eithonPlugin, boolean saveAll)
+	{
 		String fileName = String.format("delta_%06d.json", this._nextDelta++);
 		File file = new File(this._deltaFolder, fileName);
-		FileContent fileContent = new FileContent("PlayerTimes", 1, toJson());
-		fileContent.delayedSave(file, eithonPlugin);
+		FileContent fileContent = new FileContent("PlayerTimes", 1, toJsonDelta(saveAll));
+		if (eithonPlugin.isEnabled()) fileContent.delayedSave(file, eithonPlugin);
+		else fileContent.save(file);
 	}
 
 	public void consolidateDelta(EithonPlugin eithonPlugin)
@@ -115,7 +121,7 @@ implements Iterable<T>, IJsonDelta<PlayerCollection<T>>, Serializable
 			}
 		}
 		this._nextDelta = 0;
-		saveDelta(eithonPlugin);
+		saveDelta(eithonPlugin, true);
 	}
 
 	private void aggregateDelta(PlayerCollection<T> playerTimes) {
