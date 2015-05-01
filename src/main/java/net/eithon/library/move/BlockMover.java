@@ -7,7 +7,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-public class BlockMover {
+class BlockMover {
 	private Block _lastBlock;
 	private HashMap<String, IBlockMoverFollower> _followers;
 	
