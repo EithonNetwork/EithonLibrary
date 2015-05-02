@@ -236,6 +236,10 @@ public class CommandParser {
 	}
 
 	public void showCommandSyntax() {
+		if (this._currentCommand == null) {
+			this._sender.sendMessage("Unknown command.");
+			return;
+		}
 		this._commandHandler.showCommandSyntax(this._sender, this._currentCommand);
 	}
 
