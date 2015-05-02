@@ -123,7 +123,7 @@ public class CommandParser {
 		if (this._args.length <= index) return defaultValue;
 		String result = "";
 		String value;
-		while ((value = getArgumentString(index, null)) != null) {
+		while ((value = getArgumentString(index++, null)) != null) {
 			if (result.length() > 0) result += " ";
 			result += value;
 		}
