@@ -73,11 +73,19 @@ public class CommandParser {
 	}
 
 	public String getArgumentStringAsLowercase() {
-		return getArgumentStringAsLowercase(this._nextArgument++);
+		return getArgumentStringAsLowercase(this._nextArgument++, null);
+	}
+
+	public String getArgumentStringAsLowercase(String defaultValue) {
+		return getArgumentStringAsLowercase(this._nextArgument++, defaultValue);
 	}
 
 	public String getArgumentStringAsLowercase(int index) {
-		if (this._args.length <= index) return null;
+		return getArgumentStringAsLowercase(index, null);
+	}
+
+	public String getArgumentStringAsLowercase(int index, String defaultValue) {
+		if (this._args.length <= index) return defaultValue.toLowerCase();
 		return this._args[index].toLowerCase();
 	}
 
