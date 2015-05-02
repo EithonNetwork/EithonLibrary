@@ -1,15 +1,12 @@
 package net.eithon.library.move;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-
-import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerMoveEvent;
 
 import net.eithon.library.core.PlayerCollection;
 import net.eithon.library.plugin.Logger;
-import net.eithon.library.plugin.Logger.DebugPrintLevel;
+
+import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerMoveEvent;
 
 public class MoveEventHandler {
 	public static PlayerCollection<BlockMover> _playerSubscriptions = new PlayerCollection<BlockMover>();

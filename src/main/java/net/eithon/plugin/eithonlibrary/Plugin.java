@@ -1,15 +1,14 @@
 package net.eithon.plugin.eithonlibrary;
 
-import org.bukkit.block.Block;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerMoveEvent;
-
 import net.eithon.library.extensions.EithonPlugin;
 import net.eithon.library.move.MoveEventHandler;
 import net.eithon.library.plugin.GeneralMessage;
 import net.eithon.library.plugin.Logger;
-import net.eithon.library.plugin.Logger.DebugPrintLevel;
+
+import org.bukkit.block.Block;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerMoveEvent;
 
 public final class Plugin extends EithonPlugin implements Listener {
 	public static EithonPlugin eithonPlugin;
