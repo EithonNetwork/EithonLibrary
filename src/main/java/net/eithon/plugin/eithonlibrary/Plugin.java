@@ -4,6 +4,7 @@ import net.eithon.library.extensions.EithonPlugin;
 import net.eithon.library.move.MoveEventHandler;
 import net.eithon.library.plugin.GeneralMessage;
 import net.eithon.library.plugin.Logger;
+import net.eithon.library.time.AlarmTrigger;
 
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
@@ -20,6 +21,7 @@ public final class Plugin extends EithonPlugin implements Listener {
 		Logger logger = getEithonLogger();
 		Logger.setDefaultDebug(logger);
 		GeneralMessage.initialize(this);
+		AlarmTrigger.get().enable(this);
 		super.activate(null, this);
 	}
 

@@ -101,8 +101,8 @@ implements Iterable<T>, IJsonDelta<PlayerCollection<T>>, Serializable
 	{
 		String fileName = String.format("delta_%06d.json", this._nextDelta);
 		JSONArray jsonDelta = (JSONArray) toJsonDelta(saveAll);
-		if (jsonDelta.size() == 0) {
-			eithonPlugin.getEithonLogger().debug(DebugPrintLevel.MAJOR,
+		if ((jsonDelta.size() == 0) || (jsonDelta.get(0) == null)) {
+			eithonPlugin.getEithonLogger().debug(DebugPrintLevel.VERBOSE,
 					"File \"%s\" is not saved, due to no data to save for %s.", 
 					fileName, name);
 			return;

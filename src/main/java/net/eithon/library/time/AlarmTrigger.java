@@ -3,14 +3,17 @@ package net.eithon.library.time;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
+import net.eithon.library.extensions.EithonPlugin;
+import net.eithon.library.plugin.Logger;
+import net.eithon.library.plugin.Logger.DebugPrintLevel;
+
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
 public class AlarmTrigger {
 	private static final long TICK_LENGTH = 100L;
 	private static AlarmTrigger singleton = null;
-	private JavaPlugin _plugin = null;
+	private EithonPlugin _plugin = null;
 	private ArrayList<Alarm> _alarms = new ArrayList<Alarm>();
 	private int _enableCounter = 0;
 	private int _firstAlarmIndex= -1;
@@ -26,7 +29,7 @@ public class AlarmTrigger {
 		return singleton;
 	}
 
-	public void enable(JavaPlugin plugin){
+	public void enable(EithonPlugin plugin){
 		this._plugin = plugin;
 		this._enableCounter++;
 		this._firstAlarmIndex = getFirstAlarmIndex();
@@ -39,13 +42,35 @@ public class AlarmTrigger {
 
 	public void setAlarm(String name, LocalDateTime time, Runnable task)
 	{
+		this.isEnabledOrWarn();
+		
 		synchronized(this) {
 			Alarm alarm = new Alarm(name, time, task);
-			this._alarms.add(alarm);
-			Alarm firstAlarm = getFirstAlarm();
-			if ((firstAlarm == null) || firstAlarm.getTime().isAfter(time)) {
-				this._firstAlarmIndex = this._alarms.size()-1;	
-			}
+			addToAlarmQueue(alarm);
+		}
+	}
+
+	public void repeat(String name, long secondsBetweenRepeat, IRepeatable task)
+	{
+		this.isEnabledOrWarn();
+		synchronized(this) {
+			LocalDateTime time = LocalDateTime.now().plusSeconds(secondsBetweenRepeat);
+			Alarm alarm = new Alarm(name, time, new Runnable() {
+				@Override
+				public void run() {
+					boolean repeat = task.repeat();
+					if (repeat) repeat(name, secondsBetweenRepeat, task);
+				}
+			});
+			addToAlarmQueue(alarm);
+		}
+	}
+
+	private void addToAlarmQueue(Alarm alarm) {
+		this._alarms.add(alarm);
+		Alarm firstAlarm = getFirstAlarm();
+		if ((firstAlarm == null) || firstAlarm.getTime().isAfter(alarm.getTime())) {
+			this._firstAlarmIndex = this._alarms.size()-1;	
 		}
 	}
 
@@ -54,9 +79,16 @@ public class AlarmTrigger {
 		return (this._plugin != null);
 	}
 
+	private boolean isEnabledOrWarn()
+	{
+		if (this._plugin != null) return true;
+		Logger.libraryWarning("The AlarmTrigger has not been enabled");
+		return false;
+	}
+
 	void tick(int enableCounter) {
 		final int currentCounter = enableCounter;
-		if (!isEnabled()) return;
+		if (!isEnabledOrWarn()) return;
 		if (enableCounter < this._enableCounter) return;
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		scheduler.scheduleSyncDelayedTask(this._plugin, new Runnable() {
@@ -77,8 +109,7 @@ public class AlarmTrigger {
 		{
 			Alarm firstAlarm = getFirstAlarm();
 			while ((firstAlarm != null) && firstAlarm.maybeSetOff()) {
-				this._plugin.getLogger().info(String.format("The \"%s\" alarm set for %s was set off now (%s)", 
-						firstAlarm.getName(), firstAlarm.getTime().toString(), LocalDateTime.now().toString()));
+				Logger.libraryDebug(DebugPrintLevel.VERBOSE, "Alarm was set off: %s", firstAlarm.toString());
 				this._alarms.remove(this._firstAlarmIndex);
 				this._firstAlarmIndex = getFirstAlarmIndex();
 				firstAlarm = this._alarms.get(this._firstAlarmIndex);				
