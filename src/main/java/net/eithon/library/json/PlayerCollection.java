@@ -99,11 +99,19 @@ implements Iterable<T>, IJsonDelta<PlayerCollection<T>>, Serializable
 
 	private void saveDelta(EithonPlugin eithonPlugin, String name, int version, boolean saveAll)
 	{
-		String fileName = String.format("delta_%06d.json", this._nextDelta++);
+		String fileName = String.format("delta_%06d.json", this._nextDelta);
+		JSONArray jsonDelta = (JSONArray) toJsonDelta(saveAll);
+		if (jsonDelta.size() == 0) {
+			eithonPlugin.getEithonLogger().debug(DebugPrintLevel.MAJOR,
+					"File \"%s\" is not saved, due to no data to save for %s.", 
+					fileName, name);
+			return;
+		}
 		File file = new File(this._deltaFolder, fileName);
-		FileContent fileContent = new FileContent(name, version, toJsonDelta(saveAll));
+		FileContent fileContent = new FileContent(name, version, jsonDelta);
 		if (eithonPlugin.isEnabled()) fileContent.delayedSave(file, eithonPlugin);
 		else fileContent.save(file);
+		this._nextDelta++;
 	}
 
 	public void consolidateDelta(EithonPlugin eithonPlugin, String name, int version)
