@@ -73,12 +73,61 @@ public class CommandParser {
 	}
 
 	public String getArgumentStringAsLowercase() {
-		return getArgumentStringAsLowercase(this._nextArgument++);
+		return getArgumentStringAsLowercase(this._nextArgument++, null);
+	}
+
+	public String getArgumentStringAsLowercase(String defaultValue) {
+		return getArgumentStringAsLowercase(this._nextArgument++, defaultValue);
 	}
 
 	public String getArgumentStringAsLowercase(int index) {
-		if (this._args.length <= index) return null;
-		return this._args[index].toLowerCase();
+		return getArgumentStringAsLowercase(index, null);
+	}
+
+	public String getArgumentStringAsLowercase(int index, String defaultValue) {
+		String result = getArgumentString(index, defaultValue);
+		if (result == null) return null;
+		return result.toLowerCase();
+	}
+
+	public String getArgumentString() {
+		return getArgumentString(this._nextArgument++, null);
+	}
+
+	public String getArgumentString(String defaultValue) {
+		return getArgumentString(this._nextArgument++, defaultValue);
+	}
+
+	public String getArgumentString(int index) {
+		return getArgumentString(index, null);
+	}
+
+	public String getArgumentString(int index, String defaultValue) {
+		if (this._args.length <= index) return defaultValue;
+		return this._args[index];
+	}
+
+	public String getArgumentRest() {
+		return getArgumentRest(this._nextArgument++, null);
+	}
+
+	public String getArgumentRest(String defaultValue) {
+		return getArgumentRest(this._nextArgument++, defaultValue);
+	}
+
+	public String getArgumentRest(int index) {
+		return getArgumentRest(index, null);
+	}
+
+	private String getArgumentRest(int index, String defaultValue) {
+		if (this._args.length <= index) return defaultValue;
+		String result = "";
+		String value;
+		while ((value = getArgumentString(index++, null)) != null) {
+			if (result.length() > 0) result += " ";
+			result += value;
+		}
+		return result;
 	}
 
 	public int getArgumentInteger(int defaultValue) {
@@ -187,6 +236,10 @@ public class CommandParser {
 	}
 
 	public void showCommandSyntax() {
+		if (this._currentCommand == null) {
+			this._sender.sendMessage("Unknown command.");
+			return;
+		}
 		this._commandHandler.showCommandSyntax(this._sender, this._currentCommand);
 	}
 

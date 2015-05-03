@@ -45,12 +45,17 @@ public class EithonBlock implements IJson<EithonBlock>{
 	}
 
 	@Override
-	public void fromJson(Object json) {
+	public EithonBlock fromJson(Object json) {
 		JSONObject jsonObject = (JSONObject) json;
-		World world = EithonWorld.newFromJson(jsonObject.get("world")).getWorld();
+		World world = EithonWorld.getFromJson(jsonObject.get("world")).getWorld();
 		int x = (int) jsonObject.get("x");
 		int y = (int) jsonObject.get("y");
 		int z = (int) jsonObject.get("z");
 		this._block = world.getBlockAt(x, y, z);
+		return this;
+	}
+	
+	public static EithonBlock getFromJson(Object json) {
+		return new EithonBlock().fromJson(json);
 	}
 }

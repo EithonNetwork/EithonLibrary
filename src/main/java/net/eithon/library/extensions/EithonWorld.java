@@ -66,15 +66,14 @@ public class EithonWorld implements IJson<EithonWorld>, IUuidAndName{
 	}
 
 	@Override
-	public void fromJson(Object json) {
+	public EithonWorld fromJson(Object json) {
 		JSONObject jsonObject = (JSONObject) json;
 		this._id = UUID.fromString((String) jsonObject.get("id"));
 		this._name = (String) jsonObject.get("name");
+		return this;
 	}
 	
-	public static EithonWorld newFromJson(Object json) {
-		EithonWorld eithonWorld = new EithonWorld();
-		eithonWorld.fromJson(json);
-		return eithonWorld;
+	public static EithonWorld getFromJson(Object json) {
+		return new EithonWorld().fromJson(json);
 	}
 }

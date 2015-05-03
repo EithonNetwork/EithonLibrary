@@ -26,9 +26,21 @@ public class SimpleMarkUp {
 		this._file = file;
 		reloadRules();
 	}
+	
+	public SimpleMarkUp() {
+		this._file = null;
+	}
 
 	public void reloadRules() {
 		parseFile();
+	}
+	
+	public static String[] parseAndWrapLine(String line, int chatLineWidthInPixels) {
+		return LineWrapper.wrapLine(parseLine(line), chatLineWidthInPixels);
+	}
+	
+	public static String parseLine(String line) {
+		return new SimpleMarkUp().parseLine(line, true);
 	}
 	
 	public String[] getParsedLines() { return this._parsedLines; }

@@ -2,6 +2,9 @@ package net.eithon.library.time;
 
 import java.time.LocalDateTime;
 
+import net.eithon.library.plugin.Logger;
+import net.eithon.library.plugin.Logger.DebugPrintLevel;
+
 class Alarm {
 
 	private LocalDateTime _when;
@@ -38,5 +41,10 @@ class Alarm {
 			}
 			return false;
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return String.format("\"%s\" %s (%s) ", getName(), this._hasBeenSetOff?"off":"on", this._when.toString());
 	}
 }

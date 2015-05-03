@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 
 public class PlayerCollection<T> implements Iterable<T>, Serializable {
 	private static final long serialVersionUID = 1L;
-	private HashMap<UUID, T> playerInfo = null;
+	protected HashMap<UUID, T> playerInfo = null;
 
 	public PlayerCollection() {
 		this.playerInfo = new HashMap<UUID, T>();
