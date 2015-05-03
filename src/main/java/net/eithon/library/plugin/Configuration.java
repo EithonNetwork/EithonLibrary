@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,6 +82,23 @@ public class Configuration {
 			value = defaultValue;
 		}
 		this._plugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = %d" , path, value);
+		return value;
+	}
+
+	public LocalTime getLocalTime(String path, LocalTime defaultValue) {
+		String string;
+		LocalTime value;
+		try {
+			string = this._config.getString(path);
+			if (string == null) return defaultValue;
+			value = LocalTime.parse(string);
+		} catch (Exception ex) {
+			this._plugin.getEithonLogger().warning("Failed to read configuration \"%s\", will use default value (%s).",
+					path, defaultValue.toString());
+			this._plugin.getEithonLogger().debug(DebugPrintLevel.MAJOR, "Exception: %s", ex.getMessage());
+			value = defaultValue;
+		}
+		this._plugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = %s" , path, value.toString());
 		return value;
 	}
 

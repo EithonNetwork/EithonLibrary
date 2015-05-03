@@ -7,11 +7,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.file.Files;
 
 import net.eithon.library.file.FileMisc;
 import net.eithon.library.plugin.Logger;
 import net.eithon.library.plugin.Logger.DebugPrintLevel;
 
+import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -22,16 +24,16 @@ public class FileContent implements IJson<FileContent>{
 	private String _name;
 	private long _version;
 	private Object _payload;
-	
+
 	FileContent() {
 	}
-	
+
 	public FileContent(String name, int version, Object payload) {
 		this._name = name;
 		this._version = version;
 		this._payload = payload;
 	}
-	
+
 	public String getName() { return this._name; }
 	public long getVersion() { return this._version; }
 	public Object getPayload() { return this._payload; }
@@ -61,6 +63,10 @@ public class FileContent implements IJson<FileContent>{
 	}
 
 	public void save(File file) {
+		save(file, null);
+	}
+
+	void save(File file, File archiveFile) {
 		FileMisc.makeSureParentDirectoryExists(file);
 		if (file.exists()) {
 			Logger.libraryError("Did not expect file \"%s\" to exist.", file.getAbsolutePath());
@@ -71,6 +77,7 @@ public class FileContent implements IJson<FileContent>{
 			data.writeJSONString(writer);
 			writer.close();
 			Logger.libraryDebug(DebugPrintLevel.MAJOR, "Saved \"%s\".", file.getName());
+			if (archiveFile != null) archiveFile(file, archiveFile);
 		} catch (IOException e) {
 			Logger.libraryWarning("Can't create file \"%s\" for save: %s", file.getName(), e.getMessage());
 		} catch (Exception e) {
@@ -115,12 +122,27 @@ public class FileContent implements IJson<FileContent>{
 	}
 
 	public void delayedSave(File file, JavaPlugin plugin) {
+		delayedSave(file, plugin, null);
+	}
+
+	void delayedSave(File file, JavaPlugin plugin, File archiveFile) {
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		scheduler.scheduleSyncDelayedTask(plugin, new Runnable() {
 			public void run() {
-				save(file);
+				save(file, archiveFile);
 			}
-		});		
+		});	
 	}
-
+	
+	void archiveFile(File file, File archiveFile) {
+		try {
+			FileMisc.makeSureParentDirectoryExists(archiveFile);
+			FileUtils.copyFile(file, archiveFile);
+			Logger.libraryInfo("Archived player statistics to file \"%s\".", archiveFile.getName());
+		} catch (IOException e) {
+			Logger.libraryError("Failed to archive player statistics to file \"%s\".", archiveFile.getName());
+			e.printStackTrace();
+			return;
+		}
+	}
 }
