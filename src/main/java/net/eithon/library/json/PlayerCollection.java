@@ -92,21 +92,21 @@ implements Iterable<T>, IJsonDelta<PlayerCollection<T>>, Serializable
 		return new PlayerCollection<T>(this._infoInstance);
 	}
 
-	public void saveDelta(EithonPlugin eithonPlugin)
+	public void saveDelta(EithonPlugin eithonPlugin, String name, int version)
 	{
-		saveDelta(eithonPlugin, false);
+		saveDelta(eithonPlugin, name, version, false);
 	}
 
-	private void saveDelta(EithonPlugin eithonPlugin, boolean saveAll)
+	private void saveDelta(EithonPlugin eithonPlugin, String name, int version, boolean saveAll)
 	{
 		String fileName = String.format("delta_%06d.json", this._nextDelta++);
 		File file = new File(this._deltaFolder, fileName);
-		FileContent fileContent = new FileContent("PlayerTimes", 1, toJsonDelta(saveAll));
+		FileContent fileContent = new FileContent(name, version, toJsonDelta(saveAll));
 		if (eithonPlugin.isEnabled()) fileContent.delayedSave(file, eithonPlugin);
 		else fileContent.save(file);
 	}
 
-	public void consolidateDelta(EithonPlugin eithonPlugin)
+	public void consolidateDelta(EithonPlugin eithonPlugin, String name, int version)
 	{
 		this.playerInfo = new HashMap<UUID, T>();
 		if (this._deltaFolder == null) return;
@@ -121,7 +121,7 @@ implements Iterable<T>, IJsonDelta<PlayerCollection<T>>, Serializable
 			}
 		}
 		this._nextDelta = 0;
-		saveDelta(eithonPlugin, true);
+		saveDelta(eithonPlugin, name, version, true);
 	}
 
 	private void aggregateDelta(PlayerCollection<T> playerTimes) {
