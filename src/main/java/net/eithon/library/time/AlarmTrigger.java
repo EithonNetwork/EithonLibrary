@@ -1,6 +1,8 @@
 package net.eithon.library.time;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 
 import net.eithon.library.extensions.EithonPlugin;
@@ -56,7 +58,6 @@ public class AlarmTrigger {
 		synchronized(this) {
 			LocalDateTime time = LocalDateTime.now().plusSeconds(secondsBetweenRepeat);
 			Alarm alarm = new Alarm(name, time, new Runnable() {
-				@Override
 				public void run() {
 					boolean repeat = task.repeat();
 					if (repeat) repeat(name, secondsBetweenRepeat, task);
@@ -64,6 +65,20 @@ public class AlarmTrigger {
 			});
 			addToAlarmQueue(alarm);
 		}
+	}
+	
+	public void repeatEveryDay(String name, LocalTime timeOfDay, IRepeatable task) {
+		LocalDateTime time = null;
+		LocalDateTime alarmToday = LocalDateTime.of(LocalDate.now(), timeOfDay);
+		LocalDateTime alarmTomorrow = LocalDateTime.of(LocalDate.now().plusDays(1),timeOfDay);
+		time = (LocalDateTime.now().isBefore(alarmToday)) ? alarmToday : alarmTomorrow;
+		Alarm alarm = new Alarm(name, time, new Runnable() {
+			public void run() {
+				boolean repeat = task.repeat();
+				if (repeat) repeatEveryDay(name, timeOfDay, task);
+			}
+		});
+		addToAlarmQueue(alarm);
 	}
 
 	private void addToAlarmQueue(Alarm alarm) {
