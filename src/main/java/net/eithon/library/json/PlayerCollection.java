@@ -2,7 +2,9 @@ package net.eithon.library.json;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 import net.eithon.library.core.IFactory;
@@ -11,6 +13,7 @@ import net.eithon.library.extensions.EithonPlugin;
 import net.eithon.library.file.FileMisc;
 import net.eithon.library.plugin.Logger;
 import net.eithon.library.plugin.Logger.DebugPrintLevel;
+import net.eithon.plugin.stats.logic.PlayerStatistics;
 
 import org.json.simple.JSONArray;
 
@@ -151,15 +154,12 @@ implements Iterable<T>, IJsonDelta<PlayerCollection<T>>, Serializable
 		return new PlayerCollection<T>(this._infoInstance).fromJson(fileContent.getPayload());
 	}
 
-	public int size() {
-		return this.playerInfo.size();
-	}
+	public int size() {	return this.playerInfo.size(); }
 
-	public Object[] toArray() {
-		return this.playerInfo.values().toArray();
-	}
+	public Object[] toArray() { return this.playerInfo.values().toArray(); }
 
-	public T[] toArray(T[] playerTimes) {
-		return this.playerInfo.values().toArray(playerTimes);
-	}
+	public Collection<T> values() { return this.playerInfo.values(); }
+
+	@Deprecated
+	public T[] toArray(T[] playerTimes) { return this.playerInfo.values().toArray(playerTimes); }
 }
