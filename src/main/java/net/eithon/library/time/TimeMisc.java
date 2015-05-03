@@ -1,6 +1,18 @@
 package net.eithon.library.time;
 
+import java.time.LocalDateTime;
+
 public class TimeMisc {
+	public static LocalDateTime toLocalDateTime(Object o) {
+		if (o == null) return null;
+		return LocalDateTime.parse((String) o);
+	}
+	
+	public static String fromLocalDateTime(LocalDateTime time) {
+		if (time == null) return null;
+		return time.toString();
+	}
+	
 	public static long secondsToTicks(double seconds)
 	{
 		return Math.round(20*seconds);
