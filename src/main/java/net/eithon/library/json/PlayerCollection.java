@@ -2,10 +2,13 @@ package net.eithon.library.json;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 import net.eithon.library.core.IFactory;
 import net.eithon.library.core.IUuidAndName;
@@ -13,7 +16,6 @@ import net.eithon.library.extensions.EithonPlugin;
 import net.eithon.library.file.FileMisc;
 import net.eithon.library.plugin.Logger;
 import net.eithon.library.plugin.Logger.DebugPrintLevel;
-import net.eithon.plugin.stats.logic.PlayerStatistics;
 
 import org.json.simple.JSONArray;
 
@@ -97,10 +99,15 @@ implements Iterable<T>, IJsonDelta<PlayerCollection<T>>, Serializable
 
 	public void saveDelta(EithonPlugin eithonPlugin, String name, int version)
 	{
-		saveDelta(eithonPlugin, name, version, false);
+		saveDelta(eithonPlugin, name, version, false, null);
 	}
 
-	private void saveDelta(EithonPlugin eithonPlugin, String name, int version, boolean saveAll)
+	public void saveDelta(EithonPlugin eithonPlugin, String name, int version, boolean saveAll)
+	{
+		saveDelta(eithonPlugin, name, version, saveAll, null);
+	}
+
+	public void saveDelta(EithonPlugin eithonPlugin, String name, int version, boolean saveAll, File archiveFile)
 	{
 		File file = getFile(this._nextDelta);
 		JSONArray jsonDelta = (JSONArray) toJsonDelta(saveAll);
@@ -111,7 +118,7 @@ implements Iterable<T>, IJsonDelta<PlayerCollection<T>>, Serializable
 			return;
 		}
 		FileContent fileContent = new FileContent(name, version, jsonDelta);
-		if (eithonPlugin.isEnabled()) fileContent.delayedSave(file, eithonPlugin);
+		if (eithonPlugin.isEnabled()) fileContent.delayedSave(file, eithonPlugin, archiveFile);
 		else fileContent.save(file);
 		this._nextDelta++;
 	}
@@ -124,7 +131,7 @@ implements Iterable<T>, IJsonDelta<PlayerCollection<T>>, Serializable
 		return String.format("delta_%06d.json", index);
 	}
 
-	public void consolidateDelta(EithonPlugin eithonPlugin, String name, int version)
+	public void consolidateDelta(EithonPlugin eithonPlugin, String name, int version, File archiveFile)
 	{
 		this.playerInfo = new HashMap<UUID, T>();
 		if (this._deltaFolder == null) return;
@@ -139,7 +146,7 @@ implements Iterable<T>, IJsonDelta<PlayerCollection<T>>, Serializable
 			}
 		}
 		this._nextDelta = 0;
-		saveDelta(eithonPlugin, name, version, true);
+		saveDelta(eithonPlugin, name, version, true, archiveFile);
 	}
 
 	private void aggregateDelta(PlayerCollection<T> playerTimes) {
@@ -162,4 +169,16 @@ implements Iterable<T>, IJsonDelta<PlayerCollection<T>>, Serializable
 
 	@Deprecated
 	public T[] toArray(T[] playerTimes) { return this.playerInfo.values().toArray(playerTimes); }
+
+	public List<T> sort(int maxItems, Predicate<T> removeIfPredicate, Comparator<T> comparator) {
+		List<T> items = new ArrayList<T>(this.playerInfo.values());
+		if (removeIfPredicate != null) items.removeIf(removeIfPredicate);
+		items.sort(comparator);
+		if (maxItems > 0) items = items.subList(0,  maxItems-1);
+		return items;
+	}
+
+	public List<T> sort(int maxItems, Comparator<T> comparator) {
+		return sort(maxItems, null, comparator);
+	}
 }
