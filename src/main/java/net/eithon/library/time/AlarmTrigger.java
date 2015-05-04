@@ -89,11 +89,6 @@ public class AlarmTrigger {
 		}
 	}
 
-	private boolean isEnabled()
-	{
-		return (this._plugin != null);
-	}
-
 	private boolean isEnabledOrWarn()
 	{
 		if (this._plugin != null) return true;
