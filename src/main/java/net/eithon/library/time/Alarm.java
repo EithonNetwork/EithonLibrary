@@ -2,9 +2,6 @@ package net.eithon.library.time;
 
 import java.time.LocalDateTime;
 
-import net.eithon.library.plugin.Logger;
-import net.eithon.library.plugin.Logger.DebugPrintLevel;
-
 class Alarm {
 
 	private LocalDateTime _when;
