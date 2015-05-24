@@ -28,6 +28,12 @@ import org.json.simple.JSONValue;
 public class Converter {
 	@SuppressWarnings("unchecked")	
 	
+	public static long toLong(Object o, long defaultValue)
+	{
+		if (o == null) return defaultValue;
+		return (long) o;
+	}
+	
 	@Deprecated // Use EithonLocation instead
 	public static JSONObject fromLocation(Location location, boolean withWorld)
 	{
