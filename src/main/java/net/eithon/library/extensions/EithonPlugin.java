@@ -36,6 +36,10 @@ public class EithonPlugin extends JavaPlugin implements Listener {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		if (this._commandHandler == null) {
+			this._logger.error("EithonPlugin has not been activated, can't execute command \"%s\".", label);
+			return false;
+		}
 		CommandParser commandParser = new CommandParser(this._commandHandler, sender, cmd, label, args);
 		return commandParser.execute();
 	}
