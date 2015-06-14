@@ -27,6 +27,10 @@ public class CoolDown {
 		addPlayer(player, this._defaultCoolDownPeriodInSeconds);
 	}
 	
+	public void removePlayer(Player player) {
+		_coolDowns.remove(player);
+	}
+	
 	public void addPlayer(Player player, int coolDownPeriodInSeconds) {
 		this._playerCoolDownEnds.put(player, LocalDateTime.now().plusSeconds(coolDownPeriodInSeconds));
 	}
