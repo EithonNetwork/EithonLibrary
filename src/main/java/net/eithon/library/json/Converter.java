@@ -96,9 +96,9 @@ public class Converter {
 		if (world == null) {
 			world = toWorld((JSONObject) json.get("world"));
 		}
-		int x = (int) json.get("x");
-		int y = (int) json.get("y");
-		int z = (int) json.get("z");
+		int x = ((Long) json.get("x")).intValue();
+		int y = ((Long) json.get("y")).intValue();
+		int z = ((Long) json.get("z")).intValue();
 		return world.getBlockAt(x, y, z);
 	}
 
@@ -206,7 +206,7 @@ public class Converter {
 	@Deprecated // Use json.FileContent instead
 	public static int toBodyVersion(JSONObject json)
 	{
-		return (int) json.get("version");
+		return ((Long) json.get("version")).intValue();
 	}
 
 	@Deprecated // Use json.FileContent instead
