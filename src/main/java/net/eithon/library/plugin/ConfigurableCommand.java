@@ -4,6 +4,7 @@ import net.eithon.library.extensions.EithonPlugin;
 import net.eithon.library.plugin.Logger.DebugPrintLevel;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 
 public class ConfigurableCommand extends ConfigurableFormat{
 
@@ -12,9 +13,18 @@ public class ConfigurableCommand extends ConfigurableFormat{
 		super(eithonPlugin, path, parameters, defaultValue);
 	}
 	
+	private void executeCommandAs(String command, CommandSender sender) {
+		this._eithonPlugin.getEithonLogger().debug(DebugPrintLevel.MAJOR, "/%s", command);
+		this._eithonPlugin.getServer().dispatchCommand(sender, command);
+	}
+	
+	public void executeAs(CommandSender sender, Object... args) {
+		String command = getMessage(args);
+		executeCommandAs(command, sender);
+	}
+	
 	public void execute(Object... args) {
 		String command = getMessage(args);
-		this._eithonPlugin.getEithonLogger().debug(DebugPrintLevel.MAJOR, "/%s", command);
-		this._eithonPlugin.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
+		executeCommandAs(command, Bukkit.getServer().getConsoleSender());
 	}
 }
