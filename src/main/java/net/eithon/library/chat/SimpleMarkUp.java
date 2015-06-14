@@ -40,7 +40,11 @@ public class SimpleMarkUp {
 	}
 	
 	public static String parseLine(String line) {
-		return new SimpleMarkUp().parseLine(line, true);
+		SimpleMarkUp simple = new  SimpleMarkUp();
+		simple._colorStack = new Stack<String>();
+		String code = convertToColorCode("grey");
+		simple._colorStack.push(code);
+		return simple.parseLine(line, true);
 	}
 	
 	public String[] getParsedLines() { return this._parsedLines; }
