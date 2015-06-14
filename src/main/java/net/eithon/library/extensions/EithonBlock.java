@@ -48,9 +48,9 @@ public class EithonBlock implements IJson<EithonBlock>{
 	public EithonBlock fromJson(Object json) {
 		JSONObject jsonObject = (JSONObject) json;
 		World world = EithonWorld.getFromJson(jsonObject.get("world")).getWorld();
-		int x = (int) jsonObject.get("x");
-		int y = (int) jsonObject.get("y");
-		int z = (int) jsonObject.get("z");
+		int x = ((Long) jsonObject.get("x")).intValue();
+		int y = ((Long) jsonObject.get("y")).intValue();
+		int z = ((Long) jsonObject.get("z")).intValue();
 		this._block = world.getBlockAt(x, y, z);
 		return this;
 	}
