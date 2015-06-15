@@ -1,6 +1,7 @@
 package net.eithon.library.plugin;
 
 import net.eithon.library.extensions.EithonPlayer;
+import net.eithon.library.time.TimeMisc;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -140,6 +141,21 @@ public class CommandParser {
 			return Integer.parseInt(this._args[index]);
 		} catch (Exception ex) { 
 			this._sender.sendMessage(String.format("Could not parse this as an integer: %s", this._args[index]));
+			showCommandSyntax();
+			return defaultValue; 
+		}
+	}
+
+	public long getArgumentTimeAsSeconds(long defaultValue) {
+		return getArgumentTimeAsSeconds(this._nextArgument++, defaultValue);
+	}
+
+	public long getArgumentTimeAsSeconds(int index, long defaultValue) {
+		if (this._args.length <= index) return defaultValue;
+		try {
+			return TimeMisc.stringToSeconds(this._args[index]);
+		} catch (Exception ex) { 
+			this._sender.sendMessage(String.format("Could not parse this as a time (format H:MM:SS): %s", this._args[index]));
 			showCommandSyntax();
 			return defaultValue; 
 		}
