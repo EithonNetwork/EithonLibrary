@@ -53,6 +53,7 @@ implements Iterable<T>, IJsonDelta<PlayerCollection<T>>, Serializable
 	public Object toJsonDelta(boolean saveAll) {
 		JSONArray json = new JSONArray();
 		for (T value : this.playerInfo.values()) {
+			Logger.libraryDebug(DebugPrintLevel.MINOR, "Collecting delta for player %s", value.getName());
 			if (!(value instanceof IJson<?>)) {
 				Logger.libraryError("%s must implement interface IJson", value.toString());
 				return null;
@@ -69,11 +70,8 @@ implements Iterable<T>, IJsonDelta<PlayerCollection<T>>, Serializable
 				IJsonDelta<T> info = (IJsonDelta<T>) value;
 				infoAsJson = info.toJsonDelta(false);			
 			}
-			if (infoAsJson != null) {
-				json.add(infoAsJson);
-			} else {
-				json.add(infoAsJson);
-			}
+			if (infoAsJson != null) json.add(infoAsJson);
+			else Logger.libraryDebug(DebugPrintLevel.MINOR, "No delta found for player %s", value.getName());
 		}
 		return json;
 	}

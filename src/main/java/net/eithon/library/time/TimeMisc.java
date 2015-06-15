@@ -23,30 +23,53 @@ public class TimeMisc {
 		return ticks/20.0;
 	}
 	
+	public static long stringToSeconds(String time) {
+		String[] parts = time.split(":");
+		switch (parts.length) {
+		case 1:
+			return Long.parseLong(parts[0]);
+		case 2:
+			return Long.parseLong(parts[0]) * 60 + Long.parseLong(parts[1]);
+		case 3:
+			return Long.parseLong(parts[0]) * 3600 + Long.parseLong(parts[1]) * 60 + Long.parseLong(parts[2]);
+		default:
+			break;
+		}
+		return 0;
+	}
+	
 	public static String secondsToString(long seconds) {
+		return secondsToString(seconds, false);
+	}
+	
+	public static String secondsToString(long seconds, boolean showDays) {
 		if (seconds < 60) return String.format("%d s", seconds);
 		long minutes = seconds/60;
-		return minutesToString(minutes, seconds-minutes*60);
+		return minutesToString(minutes, seconds-minutes*60, showDays);
 	}
 	
 	public static String minutesToString(long minutes) {
+		return minutesToString(minutes, false);
+	}
+	
+	public static String minutesToString(long minutes, boolean showDays) {
 		long hours = minutes/60;
-		return hoursToString(hours, minutes-hours*60);
+		return hoursToString(hours, minutes-hours*60, showDays);
 	}
 
-	private static String minutesToString(long minutes, long seconds) {
+	private static String minutesToString(long minutes, long seconds, boolean showDays) {
 		long hours = minutes/60;
-		return hoursToString(hours, minutes-hours*60, seconds);
+		return hoursToString(hours, minutes-hours*60, seconds, showDays);
 	}
 
-	private static String hoursToString(long hours, long minutes) {
-		if (hours < 24) return String.format("%d:%02d", hours, minutes);
+	private static String hoursToString(long hours, long minutes, boolean showDays) {
+		if (showDays || (hours < 24)) return String.format("%d:%02d", hours, minutes);
 		long days = hours/24;
 		return daysToString(days, hours-days*24, minutes);
 	}
 
-	private static String hoursToString(long hours, long minutes, long seconds) {
-		if (hours < 24) return String.format("%d:%02d:%02d", hours, minutes, seconds);
+	private static String hoursToString(long hours, long minutes, long seconds, boolean showDays) {
+		if (showDays || (hours < 24)) return String.format("%d:%02d:%02d", hours, minutes, seconds);
 		long days = hours/24;
 		return daysToString(days, hours-days*24, minutes, seconds);
 	}

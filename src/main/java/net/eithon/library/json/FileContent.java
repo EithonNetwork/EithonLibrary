@@ -68,7 +68,7 @@ public class FileContent implements IJson<FileContent>{
 	void save(File file, File archiveFile) {
 		FileMisc.makeSureParentDirectoryExists(file);
 		if (file.exists()) {
-			Logger.libraryError("Did not expect file \"%s\" to exist.", file.getAbsolutePath());
+			Logger.libraryWarning("Did not expect file \"%s\" to exist.", file.getAbsolutePath());
 		}
 		JSONObject data = (JSONObject) this.toJson();
 		try {
