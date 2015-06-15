@@ -19,6 +19,7 @@ public class ConfigurableMessage extends ConfigurableFormat{
 	public boolean sendMessage(CommandSender sender, Object... args) {
 		String message = getMessageWithColorCoding(args);
 		if (message == null) return false;
+		if (sender == null) return false;
 		if (this._useWrapping) sender.sendMessage(LineWrapper.wrapLine(message, 320));
 		else sender.sendMessage(message);
 		return true;
