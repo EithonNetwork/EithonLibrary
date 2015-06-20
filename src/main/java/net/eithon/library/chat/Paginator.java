@@ -52,13 +52,17 @@ public class Paginator {
 			for (String outputLine : outputLines) {
 				if ((pageLines.size() == 0) && (outputLine.length() == 0)) continue;
 				boolean newPage = false;
-				if (outputLine.equalsIgnoreCase(pageBreak)) newPage = true;
+				boolean hardBreak = false;
+				if (outputLine.equalsIgnoreCase(pageBreak)) {
+					newPage = true;
+					hardBreak = true;
+				}
 				else {
 					pageLines.add(outputLine);
 					if (pageLines.size() >= pageHeightInLines) newPage = true;
 				}
 				if (newPage) {
-					trimEmptyLines(pageLines);
+					if (!hardBreak) trimEmptyLines(pageLines);
 					Page page = new Page(pageLines.toArray(new String[0]), pageNumber);
 					pages.add(page);
 					pageNumber++;
