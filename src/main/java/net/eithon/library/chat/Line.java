@@ -13,6 +13,9 @@ class Line {
 	private boolean _shouldBeCentered;
 	private String _activeChatColorCharacters;
 	private boolean _isFirstLine;
+	private String _fillPrefix;
+	private Character _fillCharacter;
+	private String _fillPostfix;
 
 	Line(int maxWidthInPixels)  {
 		this._maxWidthInPixels = maxWidthInPixels;
@@ -23,7 +26,12 @@ class Line {
 
 	boolean shouldBeCentered() { return this._shouldBeCentered; }
 
-	void setShouldBeCentered(boolean value) { this._shouldBeCentered = value; }
+	void setShouldBeCentered(String fillPrefix, Character fillCharacter, String fillPostfix) { 
+		this._shouldBeCentered = true;
+		this._fillPrefix = fillPrefix;
+		this._fillCharacter = fillCharacter;
+		this._fillPostfix = fillPostfix;
+	}
 
 	boolean hasPendingSoftHyphen() { return this._hasPendingSoftHyphen; }
 
@@ -38,18 +46,20 @@ class Line {
 	@Override
 	public String toString() {
 		if (!this.hasContent()) return "";
-		return centeredPrefix() + this._content.toString();
+		String centeredPrefix = centeredPrefix();
+		return centeredPrefix + this._content.toString() + centeredPrefix;
 	}
 	
 	private String centeredPrefix() {
 		if (!shouldBeCentered()) return "";
-		String prefix = "";
+		String prefix = this._fillPrefix;
 		long prefixPixelsNeeded = (this._maxWidthInPixels-this._widthInPixels)/2;
-		int spaceWidth = FontPixels.get().pixelWidth(' ');
+		int spaceWidth = FontPixels.get().pixelWidth(this._fillCharacter);
 		while (prefixPixelsNeeded-spaceWidth > 0) {
-			prefix += " ";
+			prefix += this._fillCharacter;
 			prefixPixelsNeeded -= spaceWidth;
 		}
+		prefix += this._fillPostfix;
 		return prefix;
 	}
 
@@ -66,9 +76,10 @@ class Line {
 		this._isFirstLine = false;
 	}
 
-	void add(Word word) {		
-		updateChatColors(word.toString());
-		this._content.append(word.toString());
+	void add(Word word) {
+		String wordAsString = word.toString();
+		updateChatColors(wordAsString);
+		this._content.append(wordAsString);
 		this._widthInPixels += word.getWidthInPixels();
 		this._numberOfVisibleCharacters += word.getVisibleCharacters();
 		this._hasPendingSoftHyphen = false;
