@@ -3,7 +3,8 @@ package net.eithon.library.time;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.UUID;
 
 import net.eithon.library.extensions.EithonPlugin;
 import net.eithon.library.plugin.Logger;
@@ -16,9 +17,9 @@ public class AlarmTrigger {
 	private static final long TICK_LENGTH = 100L;
 	private static AlarmTrigger singleton = null;
 	private EithonPlugin _plugin = null;
-	private ArrayList<Alarm> _alarms = new ArrayList<Alarm>();
+	private HashMap<UUID, Alarm> _alarms = new HashMap<UUID, Alarm>();
 	private int _enableCounter = 0;
-	private int _firstAlarmIndex= -1;
+	private UUID _firstAlarmId= null;
 
 	private AlarmTrigger() {
 	}
@@ -34,7 +35,7 @@ public class AlarmTrigger {
 	public void enable(EithonPlugin plugin){
 		this._plugin = plugin;
 		this._enableCounter++;
-		this._firstAlarmIndex = getFirstAlarmIndex();
+		this._firstAlarmId = getFirstAlarmId();
 		tick(this._enableCounter);
 	}
 
@@ -42,14 +43,43 @@ public class AlarmTrigger {
 		this._plugin = null;
 	}
 
-	public void setAlarm(String name, LocalDateTime time, Runnable task)
+	public UUID setAlarm(String name, long secondsToAlarm, Runnable task)
+	{
+		LocalDateTime time = LocalDateTime.now().plusSeconds(secondsToAlarm);
+		return setAlarm(name, time, task);
+	}
+
+	public UUID setAlarm(String name, LocalDateTime when, Runnable task)
 	{
 		this.isEnabledOrWarn();
 		
+		Alarm alarm; 
 		synchronized(this) {
-			Alarm alarm = new Alarm(name, time, task);
+			alarm = new Alarm(name, when, task);
 			addToAlarmQueue(alarm);
 		}
+		return alarm.getId();
+	}
+
+	public boolean resetAlarm(UUID id, long secondsToAlarm)
+	{
+		LocalDateTime time = LocalDateTime.now().plusSeconds(secondsToAlarm);
+		return resetAlarm(id, time);
+	}
+
+	public boolean resetAlarm(UUID id, LocalDateTime when)
+	{
+		this.isEnabledOrWarn();
+		if (id == null) return false;
+		
+		Alarm alarm; 
+		synchronized(this) {
+			alarm = this._alarms.get(id);
+			if (alarm == null) return false;
+			alarm.reset(when);
+			this._firstAlarmId = getFirstAlarmId();
+		}
+		return true;
 	}
 
 	public void repeat(String name, long secondsBetweenRepeat, IRepeatable task)
@@ -82,11 +112,8 @@ public class AlarmTrigger {
 	}
 
 	private void addToAlarmQueue(Alarm alarm) {
-		this._alarms.add(alarm);
-		Alarm firstAlarm = getFirstAlarm();
-		if ((firstAlarm == null) || firstAlarm.getTime().isAfter(alarm.getTime())) {
-			this._firstAlarmIndex = this._alarms.size()-1;	
-		}
+		this._alarms.put(alarm.getId(), alarm);
+		this._firstAlarmId = getFirstAlarmId();
 	}
 
 	private boolean isEnabledOrWarn()
@@ -120,37 +147,34 @@ public class AlarmTrigger {
 			Alarm firstAlarm = getFirstAlarm();
 			while ((firstAlarm != null) && firstAlarm.maybeSetOff()) {
 				Logger.libraryDebug(DebugPrintLevel.VERBOSE, "Alarm was set off: %s", firstAlarm.toString());
-				this._alarms.remove(this._firstAlarmIndex);
-				this._firstAlarmIndex = getFirstAlarmIndex();
-				firstAlarm = this._alarms.get(this._firstAlarmIndex);				
+				if (firstAlarm.hasBeenSetOff()) this._alarms.remove(this._firstAlarmId);
+				this._firstAlarmId = getFirstAlarmId();
+				firstAlarm = getFirstAlarm();			
 			}
 		}
 	}
 
-	private int getFirstAlarmIndex()
+	private UUID getFirstAlarmId()
 	{
-		if (this._alarms.size() < 1) return -1;
-		Alarm alarm = this._alarms.get(0);
-		LocalDateTime firstAlarmTime = alarm.getTime();
-		int firstAlarmIndex = 0;
-		for (int i = 1; i < this._alarms.size(); i++) {
-			alarm = this._alarms.get(i);
+		UUID firstId = null;
+		LocalDateTime firstAlarmTime = LocalDateTime.MAX;
+		for (Alarm alarm : this._alarms.values()) {
 			if (alarm.getTime().isBefore(firstAlarmTime)) {
-				firstAlarmIndex = i;
+				firstId = alarm.getId();
 				firstAlarmTime = alarm.getTime();
-			}		
+			}			
 		}
 
-		return firstAlarmIndex;
+		return firstId;
 	}
 
 	private Alarm getFirstAlarm()
 	{
 		if (hasNoAlarms()) return null;
-		return this._alarms.get(this._firstAlarmIndex);
+		return this._alarms.get(this._firstAlarmId);
 	}
 
 	private boolean hasNoAlarms() {
-		return this._firstAlarmIndex == -1;
+		return this._firstAlarmId == null;
 	}
 }
