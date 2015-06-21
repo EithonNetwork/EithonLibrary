@@ -44,7 +44,8 @@ public class LineWrapper {
 	{
 		this._line = new Line(this._chatLineWidthInPixels);
 		this._nextWord = new Word();	
-		final char[] rawChars = (inputLine + ' ').toCharArray(); // add a trailing space to trigger wrapping
+		final char[] rawChars = inputLine.toCharArray();
+		//final char[] rawChars = (inputLine + ' ').toCharArray(); // add a trailing space to trigger wrapping
 		for (int i = 0; i < rawChars.length; i++) {
 			if (rawChars[i] == ChatColor.COLOR_CHAR) {
 				this._nextWord.add(rawChars[i++]);
@@ -53,7 +54,16 @@ public class LineWrapper {
 			}
 			final char c = rawChars[i];
 			if (c == HORIZONTAL_TAB) {
-				this._line.setShouldBeCentered(true);
+				String fillPrefix = "";
+				i++;
+				while (rawChars[i] == ChatColor.COLOR_CHAR) {
+					fillPrefix += Character.toString(rawChars[i++]) + Character.toString(rawChars[i++]);
+				}
+				String fillPostfix = "";
+				while (rawChars[i] == ChatColor.COLOR_CHAR) {
+					fillPostfix += Character.toString(rawChars[i++]) + Character.toString(rawChars[i]);
+				}
+				this._line.setShouldBeCentered(fillPrefix, rawChars[i], fillPostfix);
 				continue;
 			}
 

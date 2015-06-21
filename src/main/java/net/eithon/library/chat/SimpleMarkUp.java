@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 import java.util.StringTokenizer;
@@ -26,7 +27,7 @@ public class SimpleMarkUp {
 		this._file = file;
 		reloadRules();
 	}
-	
+
 	public SimpleMarkUp() {
 		this._file = null;
 	}
@@ -34,11 +35,11 @@ public class SimpleMarkUp {
 	public void reloadRules() {
 		parseFile();
 	}
-	
+
 	public static String[] parseAndWrapLine(String line, int chatLineWidthInPixels) {
 		return LineWrapper.wrapLine(parseLine(line), chatLineWidthInPixels);
 	}
-	
+
 	public static String parseLine(String line) {
 		SimpleMarkUp simple = new  SimpleMarkUp();
 		simple._colorStack = new Stack<String>();
@@ -46,7 +47,7 @@ public class SimpleMarkUp {
 		simple._colorStack.push(code);
 		return simple.parseLine(line, true);
 	}
-	
+
 	public String[] getParsedLines() { return this._parsedLines; }
 
 	private void parseFile() {
@@ -112,6 +113,22 @@ public class SimpleMarkUp {
 				} else if (token.equalsIgnoreCase("-")) {
 					token = Character.toString((char) 31) ; // US (Unit separator), Optional hyphen
 					specialCharacter = true;
+				} else if (token.startsWith("hl=")) {
+					int repetitions = 0;
+					try {
+						repetitions = Integer.parseInt(token.substring(3));
+					} catch (Exception e) {}
+					token = "";
+					if (repetitions > 0) {
+						boolean wasStrikeThrough = this._isStrikeThrough;
+						final char[] array = new char[repetitions];
+						Arrays.fill(array, '-');
+						this._isStrikeThrough = true;
+						if (!wasStrikeThrough) token = activeCodes();
+						token += new String(array);
+						this._isStrikeThrough = wasStrikeThrough;
+						specialCharacter = true;
+					}
 				} else if (token.equalsIgnoreCase("b")) {
 					this._isBold = true;
 				} else if (token.equalsIgnoreCase("s")) {

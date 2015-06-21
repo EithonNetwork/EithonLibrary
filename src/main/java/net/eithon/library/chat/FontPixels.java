@@ -323,7 +323,7 @@ public class FontPixels
 		pixelWidths.put ("ⁿ", new Integer(6));
 		pixelWidths.put ("²", new Integer(5));
 		pixelWidths.put ("■", new Integer(5));
-		pixelWidths.put (" ", new Integer(5));
+		pixelWidths.put (" ", new Integer(4));
 
 	}
 }
