@@ -169,7 +169,7 @@ public class SimpleMarkUp {
 	}
 
 	private String handleBackslash(StringTokenizer st, String token) {
-		if (token.equals('\\') && (st.hasMoreElements())) {
+		if (token.equals("\\") && (st.hasMoreElements())) {
 			token = st.nextToken();
 			char firstChar = token.charAt(0);
 			token = token.substring(1);
