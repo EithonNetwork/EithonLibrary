@@ -17,7 +17,7 @@ public class Config {
 		public static int eithonDebugLevel;
 
 		static void load(Configuration config) {
-			eithonDebugLevel = config.getInt("EithonDebugLevel", 4);
+			eithonDebugLevel = config.getInt("eithon.DebugLevel", 4);
 		}
 	}
 	public static class C {
