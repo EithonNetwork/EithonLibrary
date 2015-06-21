@@ -63,7 +63,7 @@ public class LineWrapper {
 				while (rawChars[i] == ChatColor.COLOR_CHAR) {
 					fillPostfix += Character.toString(rawChars[i++]) + Character.toString(rawChars[i]);
 				}
-				this._line.setShouldBeCentered(fillPrefix, rawChars[i++], fillPostfix);
+				this._line.setShouldBeCentered(fillPrefix, rawChars[i], fillPostfix);
 				continue;
 			}
 
