@@ -35,7 +35,7 @@ public class Logger {
 	}
 	
 	public void enable() {
-		int level = this._plugin.getConfiguration().getInt("EithonDebugLevel", 3);
+		int level = this._plugin.getConfiguration().getInt("eithon.DebugLevel", 3);
 		switch (level) {
 		case 0:
 			this._debugLevel = DebugPrintLevel.NONE;
