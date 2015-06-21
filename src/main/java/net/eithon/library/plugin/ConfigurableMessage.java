@@ -2,6 +2,7 @@ package net.eithon.library.plugin;
 
 import net.eithon.library.chat.LineWrapper;
 import net.eithon.library.extensions.EithonPlugin;
+import net.eithon.library.plugin.Logger.DebugPrintLevel;
 
 import org.bukkit.command.CommandSender;
 
@@ -17,11 +18,17 @@ public class ConfigurableMessage extends ConfigurableFormat{
 	}
 
 	public boolean sendMessage(CommandSender sender, Object... args) {
+		if (sender == null) return false;
 		String message = getMessageWithColorCoding(args);
 		if (message == null) return false;
-		if (sender == null) return false;
-		if (this._useWrapping) sender.sendMessage(LineWrapper.wrapLine(message, 320));
-		else sender.sendMessage(message);
+		if (this._useWrapping) {
+			this._eithonPlugin.getEithonLogger().debug(DebugPrintLevel.VERBOSE, "Wrapping \"%s\".", message);
+			String[] messageArray = LineWrapper.wrapLine(message, 320);
+			sender.sendMessage(messageArray);
+		} else {
+			this._eithonPlugin.getEithonLogger().debug(DebugPrintLevel.VERBOSE, "sendMessage \"%s\".", message);
+			sender.sendMessage(message);
+		}
 		return true;
 	}
 	
