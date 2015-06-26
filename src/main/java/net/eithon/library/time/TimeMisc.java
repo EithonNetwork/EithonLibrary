@@ -63,13 +63,13 @@ public class TimeMisc {
 	}
 
 	private static String hoursToString(long hours, long minutes, boolean showDays) {
-		if (showDays || (hours < 24)) return String.format("%d:%02d", hours, minutes);
+		if (!showDays || (hours < 24)) return String.format("%d:%02d", hours, minutes);
 		long days = hours/24;
 		return daysToString(days, hours-days*24, minutes);
 	}
 
 	private static String hoursToString(long hours, long minutes, long seconds, boolean showDays) {
-		if (showDays || (hours < 24)) return String.format("%d:%02d:%02d", hours, minutes, seconds);
+		if (!showDays || (hours < 24)) return String.format("%d:%02d:%02d", hours, minutes, seconds);
 		long days = hours/24;
 		return daysToString(days, hours-days*24, minutes, seconds);
 	}
