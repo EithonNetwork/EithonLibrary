@@ -79,13 +79,14 @@ public class SimpleMarkUp {
 
 	private String parseLine(String line, boolean firstLine) {
 		String parsedLine = "";
-		StringTokenizer st = new StringTokenizer(line, "[]", true);
+		StringTokenizer st = new StringTokenizer(line, "[]\\", true);
 		boolean isInsideBrackets = false;
 		boolean firstToken = true;
 		boolean hasContent = false;
 		while (st.hasMoreElements()) {
 			boolean specialCharacter = false;
 			String token = st.nextToken();
+			token = handleBackslash(st, token);
 			if (token.equalsIgnoreCase("[")) {
 				isInsideBrackets = true;
 				continue;
@@ -165,6 +166,29 @@ public class SimpleMarkUp {
 
 		if (!hasContent) return "";
 		return parsedLine;
+	}
+
+	private String handleBackslash(StringTokenizer st, String token) {
+		if (token.equals("\\") && (st.hasMoreElements())) {
+			token = st.nextToken();
+			char firstChar = token.charAt(0);
+			token = token.substring(1);
+			switch (firstChar) {
+			case 'n':
+				firstChar = '\n';
+				break;
+			case 't':
+				firstChar = '\t';
+				break;
+			case '\\':
+				firstChar = '\\';
+				break;
+			default:
+				break;
+			}
+			token = Character.toString(firstChar) + token;
+		}
+		return token;
 	}
 
 	private String activeCodes() {

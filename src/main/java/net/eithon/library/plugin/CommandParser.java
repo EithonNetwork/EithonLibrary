@@ -191,6 +191,10 @@ public class CommandParser {
 		return getArgumentEithonPlayer(this._nextArgument++, defaultValue);
 	}
 
+	public EithonPlayer getArgumentEithonPlayer(Player defaultValue) {
+		return getArgumentEithonPlayer(this._nextArgument++, defaultValue == null ? null : new EithonPlayer(defaultValue));
+	}
+
 	public EithonPlayer getArgumentEithonPlayer(int index, EithonPlayer defaultValue) {
 		String playerIdOrName =  getArgumentStringAsLowercase(index);
 		if (playerIdOrName == null) return defaultValue;

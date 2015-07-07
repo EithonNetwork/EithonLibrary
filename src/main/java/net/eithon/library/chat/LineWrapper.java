@@ -137,7 +137,7 @@ public class LineWrapper {
 			if (pageBreakPosition < 0) pageBreakPosition = Integer.MAX_VALUE;
 			if (lineBreakPosition < 0) lineBreakPosition = Integer.MAX_VALUE;
 			int breakPosition = Math.min(pageBreakPosition, lineBreakPosition);
-			final String firstPart = inputLine.substring(0, breakPosition-1);
+			final String firstPart = inputLine.substring(0, breakPosition);
 			lines.add(firstPart);
 			if (pageBreakPosition < lineBreakPosition) {
 				lines.add(pageBreak);

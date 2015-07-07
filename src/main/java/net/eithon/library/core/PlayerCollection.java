@@ -1,10 +1,12 @@
-package net.eithon.library.core;
+	package net.eithon.library.core;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
+
+import net.eithon.library.extensions.EithonPlayer;
 
 import org.bukkit.entity.Player;
 
@@ -15,6 +17,11 @@ public class PlayerCollection<T> implements Iterable<T>, Serializable {
 	public PlayerCollection() {
 		this.playerInfo = new HashMap<UUID, T>();
 	}
+
+	public void put(EithonPlayer eithonPlayer, T info) {
+		UUID id = eithonPlayer.getUniqueId();
+		put(id, info);
+	}
 	public void put(Player player, T info) {
 		UUID id = player.getUniqueId();
 		put(id, info);
@@ -22,6 +29,11 @@ public class PlayerCollection<T> implements Iterable<T>, Serializable {
 	
 	public void put(UUID playerId, T info) {
 		this.playerInfo.put(playerId, info);
+	}
+	
+	public T get(EithonPlayer eithonPlayer) {
+		UUID id = eithonPlayer.getUniqueId();
+		return get(id);
 	}
 	
 	public T get(Player player) {
