@@ -24,6 +24,8 @@ public class PermissionGroupLadder {
 		this._isAccumulative = isAccumulative;
 		this._permissionGroups = permissionGroups;
 	}
+	
+	public boolean canUpdatePermissionGroups() { return this._permissionService != null; }
 
 	public int getLevel(String permissionName) {
 		for (int i = 0; i < this._permissionGroups.length; i++) {
