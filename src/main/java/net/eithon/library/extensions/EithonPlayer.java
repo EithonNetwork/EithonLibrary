@@ -1,20 +1,27 @@
 package net.eithon.library.extensions;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import net.eithon.library.core.CoreMisc;
 import net.eithon.library.core.IUuidAndName;
-import net.eithon.library.core.Config;
 import net.eithon.library.json.IJson;
 import net.eithon.library.plugin.GeneralMessage;
+import net.eithon.plugin.eithonlibrary.Config;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Server;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionAttachment;
+import org.bukkit.permissions.PermissionAttachmentInfo;
+import org.bukkit.plugin.Plugin;
 import org.json.simple.JSONObject;
 
-public class EithonPlayer implements IJson<EithonPlayer>, IUuidAndName{
+public class EithonPlayer implements CommandSender, IJson<EithonPlayer>, IUuidAndName{
 
 	private Player _player = null;
 	private OfflinePlayer _offlinePlayer = null;
@@ -147,5 +154,83 @@ public class EithonPlayer implements IJson<EithonPlayer>, IUuidAndName{
 
 	public static EithonPlayer getFromJSon(Object json) {
 		return new EithonPlayer().fromJson(json);
+	}
+
+	@Override
+	public PermissionAttachment addAttachment(Plugin arg0) {
+		return getPlayer().addAttachment(arg0);
+	}
+
+	@Override
+	public PermissionAttachment addAttachment(Plugin arg0, int arg1) {
+		return getPlayer().addAttachment(arg0, arg1);
+	}
+
+	@Override
+	public PermissionAttachment addAttachment(Plugin arg0, String arg1,
+			boolean arg2) {
+		return getPlayer().addAttachment(arg0, arg1, arg2);
+	}
+
+	@Override
+	public PermissionAttachment addAttachment(Plugin arg0, String arg1,
+			boolean arg2, int arg3) {
+		return getPlayer().addAttachment(arg0, arg1, arg2, arg3);
+	}
+
+	@Override
+	public Set<PermissionAttachmentInfo> getEffectivePermissions() {
+		return getPlayer().getEffectivePermissions();
+	}
+
+	@Override
+	public boolean hasPermission(Permission arg0) {
+		return getPlayer().hasPermission(arg0);
+	}
+
+	@Override
+	public boolean isPermissionSet(String arg0) {
+		return getPlayer().isPermissionSet(arg0);
+	}
+
+	@Override
+	public boolean isPermissionSet(Permission arg0) {
+		return getPlayer().isPermissionSet(arg0);
+	}
+
+	@Override
+	public void recalculatePermissions() {
+		getPlayer().recalculatePermissions();
+	}
+
+	@Override
+	public void removeAttachment(PermissionAttachment arg0) {
+		getPlayer().removeAttachment(arg0);
+		
+	}
+
+	@Override
+	public boolean isOp() {
+		return getPlayer().isOp();
+	}
+
+	@Override
+	public void setOp(boolean arg0) {
+		getPlayer().setOp(arg0);		
+	}
+
+	@Override
+	public Server getServer() {
+		return getPlayer().getServer();
+	}
+
+	@Override
+	public void sendMessage(String arg0) {
+		sendMessage(arg0);
+	}
+
+	@Override
+	public void sendMessage(String[] arg0) {
+		sendMessage(arg0);
 	}
 }

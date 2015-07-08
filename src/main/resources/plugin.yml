@@ -3,6 +3,7 @@ main: net.eithon.plugin.eithonlibrary.Plugin
 version: 1.0
 author: vanbrayne
 depend: [Essentials]
+softdepend: [zPermissions]
 description: A Minecraft plugin for the Eithon Java library which supports plugin development
 commands:
   eithonlibrary:
