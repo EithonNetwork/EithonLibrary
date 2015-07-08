@@ -5,9 +5,9 @@ import java.util.UUID;
 
 import net.eithon.library.core.CoreMisc;
 import net.eithon.library.core.IUuidAndName;
-import net.eithon.library.core.Config;
 import net.eithon.library.json.IJson;
 import net.eithon.library.plugin.GeneralMessage;
+import net.eithon.plugin.eithonlibrary.Config;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;

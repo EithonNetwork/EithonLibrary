@@ -1,6 +1,7 @@
-package net.eithon.library.core;
+package net.eithon.plugin.eithonlibrary;
 
 import net.eithon.library.extensions.EithonPlugin;
+import net.eithon.library.plugin.ConfigurableCommand;
 import net.eithon.library.plugin.ConfigurableMessage;
 import net.eithon.library.plugin.Configuration;
 
@@ -21,10 +22,18 @@ public class Config {
 		}
 	}
 	public static class C {
-		static void load(Configuration config) {
-		}
 
+		public static ConfigurableCommand addGroupCommand;
+		public static ConfigurableCommand removeGroupCommand;
+
+		static void load(Configuration config) {
+			addGroupCommand = config.getConfigurableCommand("commands.AddGroup_2", 2,
+					"perm player %s addgroup %s");
+			removeGroupCommand = config.getConfigurableCommand("commands.RemoveGroup_2", 2,
+					"perm player %s removegroup %s");
+		}
 	}
+	
 	public static class M {
 		public static ConfigurableMessage expectedToBePlayer;
 		public static ConfigurableMessage requiredPermission;

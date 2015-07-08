@@ -20,6 +20,7 @@ public final class Plugin extends EithonPlugin implements Listener {
 		super.onEnable();
 		Logger logger = getEithonLogger();
 		Logger.setDefaultDebug(logger);
+		Config.load(this);
 		GeneralMessage.initialize(this);
 		AlarmTrigger.get().enable(this);
 		super.activate(null, this);
