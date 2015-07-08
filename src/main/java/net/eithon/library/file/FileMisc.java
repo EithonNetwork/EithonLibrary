@@ -16,6 +16,15 @@ public class FileMisc {
 			directory.mkdirs();
 		}
 	}
+	
+	public static void makeSureDirectoriesExists(File file){
+		if (file.isDirectory()) {
+			if (file.exists()) return;
+			file.mkdirs();
+			return;
+		}
+		makeSureParentDirectoryExists(file);
+	}
 
 	public static File getPluginDataFile(JavaPlugin plugin, String fileName) {
 		return new File(plugin.getDataFolder(), fileName);
