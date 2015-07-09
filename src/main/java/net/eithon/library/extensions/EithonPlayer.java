@@ -158,79 +158,109 @@ public class EithonPlayer implements CommandSender, IJson<EithonPlayer>, IUuidAn
 
 	@Override
 	public PermissionAttachment addAttachment(Plugin arg0) {
-		return getPlayer().addAttachment(arg0);
+		Player player = getPlayer();
+		if (player == null) return null;
+		return player.addAttachment(arg0);
 	}
 
 	@Override
 	public PermissionAttachment addAttachment(Plugin arg0, int arg1) {
-		return getPlayer().addAttachment(arg0, arg1);
+		Player player = getPlayer();
+		if (player == null) return null;
+		return player.addAttachment(arg0, arg1);
 	}
 
 	@Override
 	public PermissionAttachment addAttachment(Plugin arg0, String arg1,
 			boolean arg2) {
-		return getPlayer().addAttachment(arg0, arg1, arg2);
+		Player player = getPlayer();
+		if (player == null) return null;
+		return player.addAttachment(arg0, arg1, arg2);
 	}
 
 	@Override
 	public PermissionAttachment addAttachment(Plugin arg0, String arg1,
 			boolean arg2, int arg3) {
-		return getPlayer().addAttachment(arg0, arg1, arg2, arg3);
+		Player player = getPlayer();
+		if (player == null) return null;
+		return player.addAttachment(arg0, arg1, arg2, arg3);
 	}
 
 	@Override
 	public Set<PermissionAttachmentInfo> getEffectivePermissions() {
-		return getPlayer().getEffectivePermissions();
+		Player player = getPlayer();
+		if (player == null) return null;
+		return player.getEffectivePermissions();
 	}
 
 	@Override
 	public boolean hasPermission(Permission arg0) {
-		return getPlayer().hasPermission(arg0);
+		Player player = getPlayer();
+		if (player == null) return false;
+		return player.hasPermission(arg0);
 	}
 
 	@Override
 	public boolean isPermissionSet(String arg0) {
-		return getPlayer().isPermissionSet(arg0);
+		Player player = getPlayer();
+		if (player == null) return false;
+		return player.isPermissionSet(arg0);
 	}
 
 	@Override
 	public boolean isPermissionSet(Permission arg0) {
-		return getPlayer().isPermissionSet(arg0);
+		Player player = getPlayer();
+		if (player == null) return false;
+		return player.isPermissionSet(arg0);
 	}
 
 	@Override
 	public void recalculatePermissions() {
-		getPlayer().recalculatePermissions();
+		Player player = getPlayer();
+		if (player == null) return;
+		player.recalculatePermissions();
 	}
 
 	@Override
 	public void removeAttachment(PermissionAttachment arg0) {
-		getPlayer().removeAttachment(arg0);
+		Player player = getPlayer();
+		if (player == null) return;
+		player.removeAttachment(arg0);
 		
 	}
 
 	@Override
 	public boolean isOp() {
-		return getPlayer().isOp();
+		Player player = getPlayer();
+		if (player == null) return false;
+		return player.isOp();
 	}
 
 	@Override
 	public void setOp(boolean arg0) {
-		getPlayer().setOp(arg0);		
+		Player player = getPlayer();
+		if (player == null) return;
+		player.setOp(arg0);		
 	}
 
 	@Override
 	public Server getServer() {
-		return getPlayer().getServer();
+		Player player = getPlayer();
+		if (player == null) return null;
+		return player.getServer();
 	}
 
 	@Override
 	public void sendMessage(String arg0) {
-		sendMessage(arg0);
+		Player player = getPlayer();
+		if (player == null) return;
+		player.sendMessage(arg0);
 	}
 
 	@Override
 	public void sendMessage(String[] arg0) {
-		sendMessage(arg0);
+		Player player = getPlayer();
+		if (player == null) return;
+		player.sendMessage(arg0);
 	}
 }
