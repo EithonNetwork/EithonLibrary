@@ -26,28 +26,33 @@ public class EithonPlayer implements CommandSender, IJson<EithonPlayer>, IUuidAn
 	private Player _player = null;
 	private OfflinePlayer _offlinePlayer = null;
 	private UUID _id = null;
-	private String _name = null;
 	public EithonPlayer(Player player) { 
 		this._player = player;
+		this._offlinePlayer = player;
 		if (player != null) {
 			this._id = player.getUniqueId();
-			this._name = player.getName();
 			verifyPlayerIsOnline();
 		}
 	}
 
 	public EithonPlayer(OfflinePlayer player) { 
+		this._player = null;
 		this._offlinePlayer = player;
 		if (player != null) {
 			this._id = player.getUniqueId();
-			this._name = player.getName();
 			verifyPlayerIsOnline();
 		}
 	}
 
+	@Deprecated
 	public EithonPlayer(UUID id, String name) { 
 		this._id = id;
-		this._name = name;
+		verifyPlayerIsOnline();
+	}
+
+	public EithonPlayer(UUID id) { 
+		this._id = id;
+		verifyPlayerIsOnline();
 	}
 
 	EithonPlayer() {
@@ -57,7 +62,7 @@ public class EithonPlayer implements CommandSender, IJson<EithonPlayer>, IUuidAn
 	public UUID getUniqueId() { return this._id; }
 
 	@Override
-	public String getName() { return this._name; }
+	public String getName() { return this._offlinePlayer.getName(); }
 	
 	public boolean isOnline() { return verifyPlayerIsOnline(); }
 
@@ -67,7 +72,6 @@ public class EithonPlayer implements CommandSender, IJson<EithonPlayer>, IUuidAn
 	}
 	
 	public OfflinePlayer getOfflinePlayer() {
-		verifyPlayerIsOnline();
 		return this._offlinePlayer;
 	}
 
@@ -76,7 +80,7 @@ public class EithonPlayer implements CommandSender, IJson<EithonPlayer>, IUuidAn
 			// Check if the player is online now
 			this._player = Bukkit.getPlayer(this._id);
 			if (this._player != null) {
-				this._offlinePlayer = null;
+				this._offlinePlayer = this._player;
 				return true;
 			}
 		} else {
@@ -94,17 +98,13 @@ public class EithonPlayer implements CommandSender, IJson<EithonPlayer>, IUuidAn
 		Player player = null;
 		try {
 			UUID id = UUID.fromString(playerIdOrName);
-			player = Bukkit.getPlayer(id);
+			return new EithonPlayer(id);
 		} catch (Exception e) { }
-		if (player == null) try { player = Bukkit.getPlayer(playerIdOrName); } catch (Exception e) { }
+		try { player = Bukkit.getPlayer(playerIdOrName); } catch (Exception e) { }
 		if (player != null) return new EithonPlayer(player);
 		
 		OfflinePlayer offlinePlayer = null;
-		try {
-			UUID id = UUID.fromString(playerIdOrName);
-			offlinePlayer = Bukkit.getOfflinePlayer(id);
-		} catch (Exception e) { }
-		if (offlinePlayer == null) try { offlinePlayer = Bukkit.getOfflinePlayer(playerIdOrName); } catch (Exception e) { }
+		try { offlinePlayer = Bukkit.getOfflinePlayer(playerIdOrName); } catch (Exception e) { }
 		if (offlinePlayer != null) return new EithonPlayer(offlinePlayer);
 		return null;
 	}
@@ -148,7 +148,7 @@ public class EithonPlayer implements CommandSender, IJson<EithonPlayer>, IUuidAn
 	public EithonPlayer fromJson(Object json) {
 		JSONObject jsonObject = (JSONObject) json;
 		this._id = UUID.fromString((String) jsonObject.get("id"));
-		this._name = (String) jsonObject.get("name");
+		this.verifyPlayerIsOnline();
 		return this;
 	}
 
