@@ -28,4 +28,14 @@ public class PluginMisc {
 		Plugin plugin = pluginManager.getPlugin(pluginName);
 		return (plugin != null && plugin.isEnabled());
 	}
+	
+	public static Plugin getPlugin(String pluginName) {
+		Server server = Bukkit.getServer();
+		if (server == null) return null;
+
+		PluginManager pluginManager = server.getPluginManager();
+		if (pluginManager == null) return null;
+		
+		return pluginManager.getPlugin(pluginName);
+	}
 }
