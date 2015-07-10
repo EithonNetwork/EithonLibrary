@@ -1,76 +1,53 @@
 package net.eithon.library.title;
 
+import io.puharesource.mc.titlemanager.api.TitleObject;
+import io.puharesource.mc.titlemanager.api.TitleObject.TitleType;
+import net.eithon.library.plugin.PluginMisc;
 
-
-import java.lang.reflect.Field;
-
-import net.minecraft.server.v1_8_R2.IChatBaseComponent;
-import net.minecraft.server.v1_8_R2.PacketPlayOutPlayerListHeaderFooter;
-import net.minecraft.server.v1_8_R2.PacketPlayOutTitle;
-import net.minecraft.server.v1_8_R2.PlayerConnection;
-
-import org.bukkit.ChatColor;
-import org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
+// Uses TitleManager, https://github.com/Puharesource/TitleManager
+public class Title {
+	private static Title singleton;
+	private boolean _hasTitleManager;
 
-public class Title  {
-    public static void sendTitle(Player player, Integer fadeIn, Integer stay, Integer fadeOut, String title, String subtitle) {
-        PlayerConnection connection = ((CraftPlayer) player).getHandle().playerConnection;
+	private Title() {
+		this._hasTitleManager = PluginMisc.isPluginEnabled("TitleManager");
+	}
 
-        PacketPlayOutTitle packetPlayOutTimes = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TIMES, null, fadeIn, stay, fadeOut);
-        connection.sendPacket(packetPlayOutTimes);
+	public static Title get() {
+		if (singleton == null) singleton = new Title();
+		return singleton;
+	}
 
-        if (subtitle != null) {
-            subtitle = subtitle.replaceAll("%player%", player.getDisplayName());
-            subtitle = ChatColor.translateAlternateColorCodes('&', subtitle);
-            IChatBaseComponent titleSub = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + subtitle + "\"}");
-            PacketPlayOutTitle packetPlayOutSubTitle = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.SUBTITLE, titleSub);
-            connection.sendPacket(packetPlayOutSubTitle);
-        }
+	private boolean canUseFloatingText() {
+		if (!this._hasTitleManager) {
+			this._hasTitleManager = PluginMisc.isPluginEnabled("TitleManager");			
+		}
+		return this._hasTitleManager;
+	}
 
-        if (title != null) {
-            title = title.replaceAll("%player%", player.getDisplayName());
-            title = ChatColor.translateAlternateColorCodes('&', title);
-            IChatBaseComponent titleMain = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + title + "\"}");
-            PacketPlayOutTitle packetPlayOutTitle = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TITLE, titleMain);
-            connection.sendPacket(packetPlayOutTitle);
-        }
-    }
+	public void sendFloatingText(Player player, String title, int fadeIn, int stay, int fadeOut) {
+		if (canUseFloatingText()) {
+			new TitleObject(title, TitleType.TITLE)
+			.setFadeIn(fadeIn)
+			.setStay(stay)
+			.setFadeOut(fadeOut)
+			.send(player);
+		} else {
+			player.sendMessage(title);
+		}
+	}
 
-    public static void sendTabTitle(Player player, String header, String footer) {
-        if (header == null) header = "";
-        header = ChatColor.translateAlternateColorCodes('&', header);
-
-        if (footer == null) footer = "";
-        footer = ChatColor.translateAlternateColorCodes('&', footer);
-
-        header = header.replaceAll("%player%", player.getDisplayName());
-        footer = footer.replaceAll("%player%", player.getDisplayName());
-
-        PlayerConnection connection = ((CraftPlayer) player).getHandle().playerConnection;
-        IChatBaseComponent tabTitle = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + header + "\"}");
-        IChatBaseComponent tabFoot = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + footer + "\"}");
-        PacketPlayOutPlayerListHeaderFooter headerPacket = new PacketPlayOutPlayerListHeaderFooter(tabTitle);
-
-        try {
-            Field field = headerPacket.getClass().getDeclaredField("b");
-            field.setAccessible(true);
-            field.set(headerPacket, tabFoot);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            connection.sendPacket(headerPacket);
-        }
-    }
-
-    boolean isInteger(String s) {
-        try {
-            Integer.parseInt(s);
-        } catch (NumberFormatException e) {
-            return false;
-        }
-        return true;
-    }
- }
-
+	public void sendFloatingText(Player player, String title, String subTitle, int fadeIn, int stay, int fadeOut) {
+		if (canUseFloatingText()) {
+			new TitleObject(title, subTitle)
+			.setFadeIn(fadeIn)
+			.setStay(stay)
+			.setFadeOut(fadeOut)
+			.send(player);
+		} else {
+			player.sendMessage(String.format("%s\n%s", title, subTitle));
+		}
+	}
+}

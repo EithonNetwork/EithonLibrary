@@ -72,10 +72,12 @@ public class EithonPlugin extends JavaPlugin implements Listener {
 
 	public Logger getEithonLogger() { return this._logger; }
 
+	@Deprecated
 	public ConfigurableMessage getConfigurableMessage(String path, int parameters, String defaultValue) {
 		return this._config.getConfigurableMessage(path, parameters, defaultValue);
 	}
-	
+
+	@Deprecated
 	public ConfigurableCommand getConfigurableCommand(String path, int parameters, String defaultValue) {
 		return this._config.getConfigurableCommand(path, parameters, defaultValue);
 	}

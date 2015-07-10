@@ -1,7 +1,11 @@
 package net.eithon.library.plugin;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 
 public class PluginMisc {
 
@@ -12,5 +16,16 @@ public class PluginMisc {
 		
 		GeneralMessage.expectedToBePlayer.sendMessage(sender, sender.getName());
 		return false;	
+	}
+	
+	public static boolean isPluginEnabled(String pluginName) {
+		Server server = Bukkit.getServer();
+		if (server == null) return false;
+
+		PluginManager pluginManager = server.getPluginManager();
+		if (pluginManager == null) return false;
+		
+		Plugin plugin = pluginManager.getPlugin(pluginName);
+		return (plugin != null && plugin.isEnabled());
 	}
 }
