@@ -112,6 +112,7 @@ public class FileContent implements IJson<FileContent>{
 			Logger.libraryWarning("Can't open file \"%s\" for load: %s", file.getName(), e.getMessage());
 		} catch (Exception e) {
 			Logger.libraryError("Failed to load file \"%s\": %s", file.getName(), e.getMessage());
+			e.printStackTrace();
 		} finally {
 			if (reader != null) try { reader.close(); } catch (IOException e) {}
 		}
