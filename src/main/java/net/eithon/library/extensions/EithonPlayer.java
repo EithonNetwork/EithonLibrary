@@ -152,7 +152,12 @@ public class EithonPlayer implements CommandSender, IJson<EithonPlayer>, IUuidAn
 		return this;
 	}
 
+	@Deprecated // Misspelled; Use getFromJson
 	public static EithonPlayer getFromJSon(Object json) {
+		return new EithonPlayer().fromJson(json);
+	}
+
+	public static EithonPlayer getFromJson(Object json) {
 		return new EithonPlayer().fromJson(json);
 	}
 
