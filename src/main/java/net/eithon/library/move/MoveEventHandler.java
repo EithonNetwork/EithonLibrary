@@ -9,8 +9,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 public class MoveEventHandler {
-	public static PlayerCollection<BlockMover> _playerSubscriptions = new PlayerCollection<BlockMover>();
-	public static HashMap<String, IBlockMoverFollower> _generalSubscriptions = new HashMap<String, IBlockMoverFollower>();
+	private static PlayerCollection<BlockMover> _playerSubscriptions = new PlayerCollection<BlockMover>();
+	private static HashMap<String, IBlockMoverFollower> _generalSubscriptions = new HashMap<String, IBlockMoverFollower>();
+	
 	public static void handle(PlayerMoveEvent event) {
 		for (IBlockMoverFollower follower : _generalSubscriptions.values()) {
 			follower.moveEventHandler(event);
