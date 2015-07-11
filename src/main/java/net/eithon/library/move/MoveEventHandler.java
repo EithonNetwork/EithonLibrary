@@ -43,7 +43,6 @@ public class MoveEventHandler {
 			Logger.libraryWarning(
 					"Bad programming or duplicate follower names? Follower %s has obsolete calls to net.eithon.library.move.MoveEventHandler.addBlockMover().",
 					follower.getName());
-			return;
 		}
 		_generalSubscriptions.put(follower.getName(), follower);
 	}
