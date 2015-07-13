@@ -18,8 +18,8 @@ public class FileMisc {
 	}
 	
 	public static void makeSureDirectoriesExists(File file){
+		if (file.exists()) return;
 		if (file.isDirectory()) {
-			if (file.exists()) return;
 			file.mkdirs();
 			return;
 		}
@@ -40,6 +40,7 @@ public class FileMisc {
 	}
 
 	private static String[] filesToFileNames(String extension, File[] files) {
+		if (files == null) return null;
 		ArrayList<String> array = new ArrayList<String>();
 		for (File file : files) {
 			String fileName = file.getName();
