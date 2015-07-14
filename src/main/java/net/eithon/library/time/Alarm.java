@@ -3,6 +3,9 @@ package net.eithon.library.time;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import net.eithon.library.plugin.Logger;
+import net.eithon.library.plugin.Logger.DebugPrintLevel;
+
 class Alarm {
 	private UUID _id;
 	private LocalDateTime _when;
@@ -40,7 +43,9 @@ class Alarm {
 	{
 		synchronized(this) {
 			if (this._hasBeenSetOff) return false;
-			if (this._when.isBefore(LocalDateTime.now())) {
+			LocalDateTime now = LocalDateTime.now();
+			if (this._when.isBefore(now)) {
+				Logger.libraryDebug(DebugPrintLevel.VERBOSE, "Alarm %s triggered. Time now is %s.", toString(), now.toString());
 				this._hasBeenSetOff = true;
 				this._task.run();
 				return true;
