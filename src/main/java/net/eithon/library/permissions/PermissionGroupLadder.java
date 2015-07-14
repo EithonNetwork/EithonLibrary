@@ -24,7 +24,7 @@ public class PermissionGroupLadder {
 		this._isAccumulative = isAccumulative;
 		this._permissionGroups = permissionGroups;
 	}
-	
+
 	public boolean canUpdatePermissionGroups() { return this._permissionService != null; }
 
 	public int getLevel(String permissionName) {
@@ -44,20 +44,13 @@ public class PermissionGroupLadder {
 		verbose("updatePermissionGroups", "Enter player = %s, index = %d", player.getName(), levelStartAtOne);
 		Set<String> playerGroups = getPlayerPermissionGroups(player);
 		verbose("updatePermissionGroups", "playerGroups: %s", String.join(", ", playerGroups));
-		if (this._isAccumulative && (levelStartAtOne > 1)) {
-			verbose("updatePermissionGroups", "Add groups: %d-%d", 1, levelStartAtOne);
-			for (int i = 1; i < levelStartAtOne; i++) {
-				maybeAddGroup(player, i, playerGroups);
-			}		
-		}	
+		if (this._isAccumulative) addLowerLevels(player, levelStartAtOne, playerGroups);
+
 		verbose("updatePermissionGroups", "Add group: %d", levelStartAtOne);
 		maybeAddGroup(player, levelStartAtOne, playerGroups);
-		if (!this._isAccumulative && (levelStartAtOne > 1)) {
-			verbose("updatePermissionGroups", "Remove groups: %d-%d", 1, levelStartAtOne-1);
-			for (int i = 1; i < levelStartAtOne; i++) {
-				maybeRemoveGroup(player, i, playerGroups);
-			}		
-		}
+
+		if (!this._isAccumulative) removeLowerLevels(player, levelStartAtOne, playerGroups);
+
 		if (levelStartAtOne < this._permissionGroups.length) {
 			verbose("updatePermissionGroups", "Remove groups: %d-%d", levelStartAtOne+1, this._permissionGroups.length);
 			for (int i = levelStartAtOne+1; i <= this._permissionGroups.length; i++) {
@@ -65,6 +58,24 @@ public class PermissionGroupLadder {
 			}
 		}
 		verbose("updatePermissionGroups", "Leave");
+	}
+
+	private void addLowerLevels(Player player, int levelStartAtOne,
+			Set<String> playerGroups) {
+		if (levelStartAtOne <= 1) return;
+		verbose("updatePermissionGroups", "Add groups: %d-%d", 1, levelStartAtOne-1);
+		for (int i = 1; i < levelStartAtOne; i++) {
+			maybeAddGroup(player, i, playerGroups);
+		}		
+	}
+
+	private void removeLowerLevels(Player player, int levelStartAtOne,
+			Set<String> playerGroups) {
+		if (levelStartAtOne <= 1) return;
+		verbose("updatePermissionGroups", "Remove groups: %d-%d", 1, levelStartAtOne-1);
+		for (int i = 1; i < levelStartAtOne; i++) {
+			maybeRemoveGroup(player, i, playerGroups);
+		}		
 	}
 
 	public void reset(Player player) {
@@ -116,7 +127,7 @@ public class PermissionGroupLadder {
 	private Set<String> getPlayerPermissionGroups(Player player) {
 		return this._permissionService.getPlayerGroups(player.getUniqueId());
 	}
-	
+
 	private boolean contains(Set<String> setOfStrings, String searchFor)
 	{
 		for (String string : setOfStrings) {

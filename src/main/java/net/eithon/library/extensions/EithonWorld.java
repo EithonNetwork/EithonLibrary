@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import net.eithon.library.core.IUuidAndName;
 import net.eithon.library.json.IJson;
+import net.eithon.library.plugin.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -13,11 +14,13 @@ public class EithonWorld implements IJson<EithonWorld>, IUuidAndName{
 
 	private World _world = null;
 	private UUID _id = null;
+	private String _name = null;
 
 	public EithonWorld(World world) { 
 		this._world = world; 
 		if (world != null) {
 			this._id = world.getUID();
+			this._name = world.getName();
 		}
 	}
 
@@ -28,11 +31,18 @@ public class EithonWorld implements IJson<EithonWorld>, IUuidAndName{
 	public UUID getUniqueId() { return this._id; }
 
 	@Override
-	public String getName() { return this._world.getName(); }
+	public String getName() {
+		return this._world == null ? this._name : this._world.getName();
+	}
 
 	public World getWorld() { 
 		if (this._world != null) return this._world;
-		return Bukkit.getWorld(this._id);
+		this._world = Bukkit.getWorld(this._id);
+		if (this._world != null) return this._world;
+		this._world = Bukkit.getWorld(this._name);
+		if (this._world != null) return this._world;
+		Logger.libraryWarning("Could not find world %s (%s)", this._name, this._id.toString());
+		return null;
 	}	
 
 	public static EithonWorld getFromString(String worldIdOrName) {
@@ -64,6 +74,7 @@ public class EithonWorld implements IJson<EithonWorld>, IUuidAndName{
 	public EithonWorld fromJson(Object json) {
 		JSONObject jsonObject = (JSONObject) json;
 		this._id = UUID.fromString((String) jsonObject.get("id"));
+		this._name = (String) jsonObject.get("name");
 		return this;
 	}
 	
