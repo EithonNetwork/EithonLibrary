@@ -14,7 +14,7 @@ import org.bukkit.command.CommandSender;
 abstract class ConfigurableFormat {
 	private String _path;
 	private int _parameters;
-	private String _formatValue;
+	protected String _formatValue;
 	protected EithonPlugin _eithonPlugin;
 	String[] _parameterNames;
 	private boolean _useMarkUpForMessages;
