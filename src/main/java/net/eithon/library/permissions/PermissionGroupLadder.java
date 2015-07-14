@@ -45,19 +45,21 @@ public class PermissionGroupLadder {
 		Set<String> playerGroups = getPlayerPermissionGroups(player);
 		verbose("updatePermissionGroups", "playerGroups: %s", String.join(", ", playerGroups));
 		if (this._isAccumulative) addLowerLevels(player, levelStartAtOne, playerGroups);
-
-		verbose("updatePermissionGroups", "Add group: %d", levelStartAtOne);
+		verbose("updatePermissionGroups", "Add group for level %d", levelStartAtOne);
 		maybeAddGroup(player, levelStartAtOne, playerGroups);
-
 		if (!this._isAccumulative) removeLowerLevels(player, levelStartAtOne, playerGroups);
+		removeHigherLevels(player, levelStartAtOne, playerGroups);
+		verbose("updatePermissionGroups", "Leave");
+	}
 
+	private void removeHigherLevels(Player player, int levelStartAtOne,
+			Set<String> playerGroups) {
 		if (levelStartAtOne < this._permissionGroups.length) {
 			verbose("updatePermissionGroups", "Remove groups: %d-%d", levelStartAtOne+1, this._permissionGroups.length);
 			for (int i = levelStartAtOne+1; i <= this._permissionGroups.length; i++) {
 				maybeRemoveGroup(player, i, playerGroups);
 			}
 		}
-		verbose("updatePermissionGroups", "Leave");
 	}
 
 	private void addLowerLevels(Player player, int levelStartAtOne,
@@ -83,44 +85,33 @@ public class PermissionGroupLadder {
 	}
 
 	private void maybeAddGroup(Player player, int levelStartAtOne, Set<String> playerGroups) {
-		verbose("maybeAddGroup", "Enter for player %s, level %d", player.getName(), levelStartAtOne);
 		String levelGroup = getPermissionGroup(levelStartAtOne);
-		verbose("maybeAddGroup", "levelGroup: %s", levelGroup);
 		if (!contains(playerGroups, levelGroup)) {
-			verbose("maybeAddGroup", "Not found, so we will add the group %s for player %s", levelGroup, player.getName());
+			verbose("maybeAddGroup", "Group %s not found for player %s, so we will add it.", levelGroup, player.getName());
 			Config.C.addGroupCommand.execute(player.getName(), getPermissionGroup(levelStartAtOne));
 		}
-		verbose("maybeAddGroup", "Leave");
 	}
 
 	private void maybeRemoveGroup(Player player, int level, Set<String> playerGroups) {
-		verbose("maybeRemoveGroup", "Enter for player %s, level %d", player.getName(), level);
 		String levelGroup = getPermissionGroup(level);
-		verbose("maybeRemoveGroup", "levelGroup: %s", levelGroup);
 		if (contains(playerGroups, levelGroup)) {
-			verbose("maybeRemoveGroup", "Found, so we will remove the group %s for player %s", levelGroup, player.getName());
+			verbose("maybeRemoveGroup", "Group %s found for player %s, so we will remove it.", levelGroup, player.getName());
 			Config.C.removeGroupCommand.execute(player.getName(), getPermissionGroup(level));
 		}
-		verbose("maybeRemoveGroup", "Leave");
 	}
 
 	public int currentLevel(Player player) {
-		verbose("currentLevel", "Enter for player %s", player.getName());
 		if (this._permissionService == null) return -1;
 		Set<String> currentGroups = getPlayerPermissionGroups(player);
 		int levelStartAtOne = 0;
 		if ((currentGroups != null) && (currentGroups.size() > 0)) {
-			verbose("currentLevel", "Current groups: %s", String.join(", ", currentGroups));
 			for (int i = 1; i <= this._permissionGroups.length; i++) {
 				String groupName = getPermissionGroup(i);
-				verbose("currentLevel", "Check group: %s", groupName);
 				if (contains(currentGroups, groupName)) {
-					verbose("currentLevel", "Matches %s", groupName);
 					levelStartAtOne = i;	
 				}
 			}
 		}
-		verbose("currentLevel", "Leave %d", levelStartAtOne);
 		return levelStartAtOne;
 	}
 
