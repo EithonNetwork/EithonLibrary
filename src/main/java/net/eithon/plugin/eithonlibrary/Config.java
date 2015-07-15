@@ -16,9 +16,16 @@ public class Config {
 	}
 	public static class V {
 		public static int eithonDebugLevel;
+		public static int titleFadeInTicks;
+		public static int titleStayTicks;
+		public static int titleFadeOutTicks;
+		
 
 		static void load(Configuration config) {
 			eithonDebugLevel = config.getInt("eithon.DebugLevel", 4);
+			titleFadeInTicks = config.getInt("eithon.TitleFadeInTicks", 20);
+			titleStayTicks = config.getInt("eithon.TitleStayTicks", 60);
+			titleFadeOutTicks = config.getInt("eithon.TitleFadeOutTicks", 20);
 		}
 	}
 	public static class C {

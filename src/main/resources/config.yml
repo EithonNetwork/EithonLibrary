@@ -11,6 +11,18 @@ eithon:
   #
   DebugLevel: 1
 
+  #
+  # Delay (ticks) for title fade in
+  TitleFadeInTicks: 20
+
+  #
+  # Delay (ticks) for title stay on screen
+  TitleStayTicks: 60
+
+  #
+  # Delay (ticks) for title fade out
+  TitleFadeOutTicks: 20
+
 commands:
 
   #
