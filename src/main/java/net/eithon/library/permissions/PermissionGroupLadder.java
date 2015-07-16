@@ -43,7 +43,7 @@ public class PermissionGroupLadder {
 		verbose("updatePermissionGroups", "playerGroups: %s", String.join(", ", playerGroups));
 		if (this._isAccumulative) addLowerLevels(player, levelStartAtOne, playerGroups);
 		verbose("updatePermissionGroups", "Add group for level %d", levelStartAtOne);
-		maybeAddGroup(player, levelStartAtOne, playerGroups);
+		if (levelStartAtOne > 0) maybeAddGroup(player, levelStartAtOne, playerGroups);
 		if (!this._isAccumulative) removeLowerLevels(player, levelStartAtOne, playerGroups);
 		removeHigherLevels(player, levelStartAtOne, playerGroups);
 		verbose("updatePermissionGroups", "Leave");
