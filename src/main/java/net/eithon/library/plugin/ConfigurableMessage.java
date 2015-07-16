@@ -29,7 +29,7 @@ public class ConfigurableMessage extends ConfigurableFormat{
 			} else {
 				this._formatValue = this._formatValue.replace("[actionbar/]", "\n\n");
 			}
-			eithonPlugin.getEithonLogger().debug(DebugPrintLevel.VERBOSE, "FormatValue:", this._formatValue);
+			eithonPlugin.getEithonLogger().debug(DebugPrintLevel.VERBOSE, "FormatValue: \"%s\"", this._formatValue);
 		}
 		this._useWrapping = config.getInt("eithon.UseWrappingForMessages", 0) > 0;
 	}
