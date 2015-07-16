@@ -22,8 +22,6 @@ public class ConfigurableMessage extends ConfigurableFormat{
 		if (this._useTitle) {
 			if (this._formatValue.startsWith("[title/]")) {
 				this._formatValue = this._formatValue.substring(8);
-			} else {
-				this._formatValue = String.format("\n%s", this._formatValue);
 			}
 			if (this._formatValue.contains("[subtitle/]")) {
 				this._formatValue = this._formatValue.replace("[subtitle/]", "\n");
@@ -31,6 +29,7 @@ public class ConfigurableMessage extends ConfigurableFormat{
 			} else {
 				this._formatValue = this._formatValue.replace("[actionbar/]", "\n\n");
 			}
+			eithonPlugin.getEithonLogger().debug(DebugPrintLevel.VERBOSE, "FormatValue:", this._formatValue);
 		}
 		this._useWrapping = config.getInt("eithon.UseWrappingForMessages", 0) > 0;
 	}
