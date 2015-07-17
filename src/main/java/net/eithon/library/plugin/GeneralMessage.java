@@ -8,9 +8,9 @@ public class GeneralMessage {
 	public static ConfigurableMessage requiredPermission;
 	
 	public static void initialize(EithonPlugin plugin) {
-		expectedToBePlayer = plugin.getConfigurableMessage("messages.ExpectedToBePlayer", 1,
+		expectedToBePlayer = plugin.getConfiguration().getConfigurableMessage("messages.ExpectedToBePlayer", 1,
 				"Expected %s to be a Player.");
-		requiredPermission = plugin.getConfigurableMessage("messages.RequiredPermission", 1,
+		requiredPermission = plugin.getConfiguration().getConfigurableMessage("messages.RequiredPermission", 1,
 				"You must have permission %s.");
 	}
 }

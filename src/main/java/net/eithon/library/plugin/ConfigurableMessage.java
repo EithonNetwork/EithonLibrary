@@ -19,7 +19,18 @@ public class ConfigurableMessage extends ConfigurableFormat{
 		super(eithonPlugin, path, parameters, defaultValue, parameterNames);
 		Configuration config = eithonPlugin.getConfiguration();
 		this._useTitle = shouldTitleBeUsed(this._formatValue);
-		if (this._useTitle) this._formatValue = this._formatValue.substring(1);
+		if (this._useTitle) {
+			if (this._formatValue.startsWith("[title/]")) {
+				this._formatValue = this._formatValue.substring(8);
+			}
+			if (this._formatValue.contains("[subtitle/]")) {
+				this._formatValue = this._formatValue.replace("[subtitle/]", "\n");
+				this._formatValue = this._formatValue.replace("[actionbar/]", "\n");
+			} else {
+				this._formatValue = this._formatValue.replace("[actionbar/]", "\n\n");
+			}
+			eithonPlugin.getEithonLogger().debug(DebugPrintLevel.VERBOSE, "FormatValue: \"%s\"", this._formatValue);
+		}
 		this._useWrapping = config.getInt("eithon.UseWrappingForMessages", 0) > 0;
 	}
 
@@ -44,14 +55,16 @@ public class ConfigurableMessage extends ConfigurableFormat{
 
 	private static boolean shouldTitleBeUsed(String format) {
 		if (format == null) return false;
-		return format.startsWith("!");
+		return format.startsWith("[title/]") || format.startsWith("[subtitle/]") || format.startsWith("[actionbar/]");
 	}
 
 	private void sendTitle(Player player, String message) {
 		String[] lines = message.split("\\n");
 		String title = lines[0];
-		String subTitle = lines.length > 1 ? lines[1] : null;
-		Title.get().sendFloatingText(player, title, subTitle, Config.V.titleFadeInTicks, Config.V.titleStayTicks, Config.V.titleFadeOutTicks);
+		String subTitle = lines.length > 1 ? lines[1] : "";
+		String actionBar = lines.length > 2 ? lines[2] : "";
+		if (!title.equals("") || !subTitle.equals("")) Title.get().sendFloatingText(player, title, subTitle, Config.V.titleFadeInTicks, Config.V.titleStayTicks, Config.V.titleFadeOutTicks);
+		if (!actionBar.equals("")) Title.get().sendActionbarMessage(player, actionBar);
 	}
 
 	public void broadcastMessage(Object... args) {

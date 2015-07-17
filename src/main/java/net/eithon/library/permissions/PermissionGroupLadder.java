@@ -1,10 +1,8 @@
 package net.eithon.library.permissions;
 
-import java.util.Set;
-
 import net.eithon.library.extensions.EithonPlugin;
+import net.eithon.library.facades.ZPermissionsFacade;
 import net.eithon.library.plugin.Logger.DebugPrintLevel;
-import net.eithon.plugin.eithonlibrary.Config;
 
 import org.bukkit.entity.Player;
 import org.tyrannyofheaven.bukkit.zPermissions.ZPermissionsService;
@@ -20,7 +18,6 @@ public class PermissionGroupLadder {
 			boolean isAccumulative, 
 			String[] permissionGroups) {
 		this._eithonPlugin = eithonPlugin;
-		this._permissionService = PermissionMisc.connectToPermissionService(eithonPlugin);
 		this._isAccumulative = isAccumulative;
 		this._permissionGroups = permissionGroups;
 	}
@@ -40,71 +37,87 @@ public class PermissionGroupLadder {
 		return this._permissionGroups[levelStartAtOne-1];
 	}
 
-	public void updatePermissionGroups(Player player, int levelStartAtOne) {
+	public boolean updatePermissionGroups(Player player, int levelStartAtOne) {
+		boolean anyChanged = false;
+		boolean changed = false;
 		verbose("updatePermissionGroups", "Enter player = %s, index = %d", player.getName(), levelStartAtOne);
-		Set<String> playerGroups = getPlayerPermissionGroups(player);
+		String[] playerGroups = ZPermissionsFacade.getPlayerPermissionGroups(player);
 		verbose("updatePermissionGroups", "playerGroups: %s", String.join(", ", playerGroups));
-		if (this._isAccumulative) addLowerLevels(player, levelStartAtOne, playerGroups);
+		if (this._isAccumulative) changed = addLowerLevels(player, levelStartAtOne, playerGroups);
+		anyChanged = anyChanged || changed;
 		verbose("updatePermissionGroups", "Add group for level %d", levelStartAtOne);
-		maybeAddGroup(player, levelStartAtOne, playerGroups);
-		if (!this._isAccumulative) removeLowerLevels(player, levelStartAtOne, playerGroups);
-		removeHigherLevels(player, levelStartAtOne, playerGroups);
-		verbose("updatePermissionGroups", "Leave");
+		if (levelStartAtOne > 0) changed = maybeAddGroup(player, levelStartAtOne, playerGroups);
+		anyChanged = anyChanged || changed;
+		if (!this._isAccumulative) changed = removeLowerLevels(player, levelStartAtOne, playerGroups);
+		anyChanged = anyChanged || changed;
+		changed = removeHigherLevels(player, levelStartAtOne, playerGroups);
+		anyChanged = anyChanged || changed;
+		verbose("updatePermissionGroups", "Leave %s", anyChanged ? "TRUE" : "FALSE");
+		return anyChanged;
 	}
 
-	private void removeHigherLevels(Player player, int levelStartAtOne,
-			Set<String> playerGroups) {
+	private boolean removeHigherLevels(Player player, int levelStartAtOne,
+			String[] playerGroups) {
+		boolean anyChanged = false;
 		if (levelStartAtOne < this._permissionGroups.length) {
 			verbose("updatePermissionGroups", "Remove groups: %d-%d", levelStartAtOne+1, this._permissionGroups.length);
 			for (int i = levelStartAtOne+1; i <= this._permissionGroups.length; i++) {
-				maybeRemoveGroup(player, i, playerGroups);
+				boolean changed = maybeRemoveGroup(player, i, playerGroups);
+				anyChanged = anyChanged || changed;
 			}
 		}
+		return anyChanged;
 	}
 
-	private void addLowerLevels(Player player, int levelStartAtOne,
-			Set<String> playerGroups) {
-		if (levelStartAtOne <= 1) return;
+	private boolean addLowerLevels(Player player, int levelStartAtOne,
+			String[] playerGroups) {
+		if (levelStartAtOne <= 1) return false;
+		boolean anyChanged = false;
 		verbose("updatePermissionGroups", "Add groups: %d-%d", 1, levelStartAtOne-1);
 		for (int i = 1; i < levelStartAtOne; i++) {
-			maybeAddGroup(player, i, playerGroups);
-		}		
+			boolean changed = maybeAddGroup(player, i, playerGroups);
+			anyChanged = anyChanged || changed;
+		}	
+		return anyChanged;	
 	}
 
-	private void removeLowerLevels(Player player, int levelStartAtOne,
-			Set<String> playerGroups) {
-		if (levelStartAtOne <= 1) return;
+	private boolean removeLowerLevels(Player player, int levelStartAtOne,
+			String[] playerGroups) {
+		if (levelStartAtOne <= 1) return false;
+		boolean anyChanged = false;
 		verbose("updatePermissionGroups", "Remove groups: %d-%d", 1, levelStartAtOne-1);
 		for (int i = 1; i < levelStartAtOne; i++) {
-			maybeRemoveGroup(player, i, playerGroups);
-		}		
+			boolean changed = maybeRemoveGroup(player, i, playerGroups);
+			anyChanged = anyChanged || changed;
+		}
+		return anyChanged;
 	}
 
-	public void reset(Player player) {
-		updatePermissionGroups(player, 0);
+	public boolean reset(Player player) {
+		return updatePermissionGroups(player, 0);
 	}
 
-	private void maybeAddGroup(Player player, int levelStartAtOne, Set<String> playerGroups) {
+	private boolean maybeAddGroup(Player player, int levelStartAtOne, String[] playerGroups) {
 		String levelGroup = getPermissionGroup(levelStartAtOne);
-		if (!contains(playerGroups, levelGroup)) {
-			verbose("maybeAddGroup", "Group %s not found for player %s, so we will add it.", levelGroup, player.getName());
-			Config.C.addGroupCommand.execute(player.getName(), getPermissionGroup(levelStartAtOne));
-		}
+		if (contains(playerGroups, levelGroup)) return false;
+		verbose("maybeAddGroup", "Adding group %s for player %s.", levelGroup, player.getName());
+		ZPermissionsFacade.addPermissionGroup(player, getPermissionGroup(levelStartAtOne));
+		return true;
 	}
 
-	private void maybeRemoveGroup(Player player, int level, Set<String> playerGroups) {
+	private boolean maybeRemoveGroup(Player player, int level, String[] playerGroups) {
 		String levelGroup = getPermissionGroup(level);
-		if (contains(playerGroups, levelGroup)) {
-			verbose("maybeRemoveGroup", "Group %s found for player %s, so we will remove it.", levelGroup, player.getName());
-			Config.C.removeGroupCommand.execute(player.getName(), getPermissionGroup(level));
-		}
+		if (!contains(playerGroups, levelGroup)) return false;
+		verbose("maybeRemoveGroup", "Removing group %s for player %s.", levelGroup, player.getName());
+		ZPermissionsFacade.removePermissionGroup(player, getPermissionGroup(level));
+		return true;
 	}
 
 	public int currentLevel(Player player) {
 		if (this._permissionService == null) return -1;
-		Set<String> currentGroups = getPlayerPermissionGroups(player);
+		String[] currentGroups = ZPermissionsFacade.getPlayerPermissionGroups(player);
 		int levelStartAtOne = 0;
-		if ((currentGroups != null) && (currentGroups.size() > 0)) {
+		if ((currentGroups != null) && (currentGroups.length > 0)) {
 			for (int i = 1; i <= this._permissionGroups.length; i++) {
 				String groupName = getPermissionGroup(i);
 				if (contains(currentGroups, groupName)) {
@@ -115,13 +128,9 @@ public class PermissionGroupLadder {
 		return levelStartAtOne;
 	}
 
-	private Set<String> getPlayerPermissionGroups(Player player) {
-		return this._permissionService.getPlayerGroups(player.getUniqueId());
-	}
-
-	private boolean contains(Set<String> setOfStrings, String searchFor)
+	private boolean contains(String[] playerGroups, String searchFor)
 	{
-		for (String string : setOfStrings) {
+		for (String string : playerGroups) {
 			if (string.equalsIgnoreCase(searchFor)) return true;
 		}
 		return false;
