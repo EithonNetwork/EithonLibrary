@@ -42,11 +42,9 @@ public class ConfigurableMessage extends ConfigurableFormat{
 			sendTitle((Player) sender, message);
 		} else {
 			if (this._useWrapping) {
-				this._eithonPlugin.getEithonLogger().debug(DebugPrintLevel.VERBOSE, "Wrapping \"%s\".", message);
 				String[] messageArray = LineWrapper.wrapLine(message, 320);
 				sender.sendMessage(messageArray);
 			} else {
-				this._eithonPlugin.getEithonLogger().debug(DebugPrintLevel.VERBOSE, "sendMessage \"%s\".", message);
 				sender.sendMessage(message);
 			}
 		}
@@ -67,8 +65,18 @@ public class ConfigurableMessage extends ConfigurableFormat{
 		if (!actionBar.equals("")) Title.get().sendActionbarMessage(player, actionBar);
 	}
 
-	public void broadcastMessage(Object... args) {
+	private void sendTitle(String message) {
+		sendTitle(null, message);
+	}
+
+	public boolean broadcastMessage(Object... args) {
 		String message = getMessageWithColorCoding(args);
-		this._eithonPlugin.getServer().broadcastMessage(message);
+		if (message == null) return false;
+		if (this._useTitle) {
+			sendTitle(message);
+		} else {
+			this._eithonPlugin.getServer().broadcastMessage(message);
+		}
+		return true;
 	}
 }

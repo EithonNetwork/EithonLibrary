@@ -8,6 +8,7 @@ import net.eithon.library.extensions.EithonPlugin;
 import net.eithon.library.plugin.PluginMisc;
 import net.eithon.library.time.ICountDownListener;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 // Uses TitleManager, https://github.com/Puharesource/TitleManager
@@ -45,29 +46,39 @@ public class Title {
 
 	public void sendFloatingText(Player player, String title, String subTitle, int fadeIn, int stay, int fadeOut) {
 		if (canUseFloatingText()) {
-			new TitleObject(title, subTitle)
+			TitleObject titleObject = new TitleObject(title, subTitle)
 			.setFadeIn(fadeIn)
 			.setStay(stay)
-			.setFadeOut(fadeOut)
-			.send(player);
+			.setFadeOut(fadeOut);
+			if (player == null) titleObject.broadcast();
+			else titleObject.send(player);
 		} else {
-			player.sendMessage(String.format("%s\n%s", title, subTitle));
+			String message = String.format("%s\n%s", title, subTitle);
+			if (player == null) Bukkit.getServer().broadcastMessage(message);
+			else player.sendMessage(message);
 		}
 	}
 
 	public void sendActionbarMessage(Player player, String message) {
 		if (canUseFloatingText()) {
-			new ActionbarTitleObject(message).send(player);
+			ActionbarTitleObject titleObject = new ActionbarTitleObject(message);
+			if (player == null) titleObject.broadcast();
+			else titleObject.send(player);
 		} else {
-			player.sendMessage(message);
+			if (player == null) Bukkit.getServer().broadcastMessage(message);
+			else player.sendMessage(message);
 		}
 	}
 
 	public void sendHeaderAndFooter(Player player, String header, String footer) {
 		if (canUseFloatingText()) {
-			new TabTitleObject(header, footer).send(player);
+			TabTitleObject titleObject = new TabTitleObject(header, footer);
+			if (player == null) titleObject.broadcast();
+			else titleObject.send(player);
 		} else {
-			player.sendMessage(String.format("%s\n%s", header, footer));
+			String message = String.format("%s\n%s", header, footer);
+			if (player == null) Bukkit.getServer().broadcastMessage(message);
+			else player.sendMessage(message);
 		}
 	}
 	
