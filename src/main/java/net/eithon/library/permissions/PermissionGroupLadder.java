@@ -5,7 +5,6 @@ import net.eithon.library.facades.ZPermissionsFacade;
 import net.eithon.library.plugin.Logger.DebugPrintLevel;
 
 import org.bukkit.entity.Player;
-import org.tyrannyofheaven.bukkit.zPermissions.ZPermissionsService;
 
 public class PermissionGroupLadder {
 	private EithonPlugin _eithonPlugin;

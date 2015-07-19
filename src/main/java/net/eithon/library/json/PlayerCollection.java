@@ -2,13 +2,8 @@ package net.eithon.library.json;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.UUID;
-import java.util.function.Predicate;
 
 import net.eithon.library.core.IFactory;
 import net.eithon.library.core.IUuidAndName;
