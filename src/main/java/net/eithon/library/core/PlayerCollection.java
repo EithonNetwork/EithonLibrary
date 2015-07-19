@@ -1,10 +1,15 @@
 	package net.eithon.library.core;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 import net.eithon.library.extensions.EithonPlayer;
 
@@ -74,5 +79,23 @@ public class PlayerCollection<T> implements Iterable<T>, Serializable {
 	
 	public Iterator<T> iterator() {
 		return this.playerInfo.values().iterator();
+	}
+
+	public int size() {	return this.playerInfo.size(); }
+
+	public Object[] toArray() { return this.playerInfo.values().toArray(); }
+
+	public Collection<T> values() { return this.playerInfo.values(); }
+	
+	public List<T> sort(int maxItems, Predicate<T> removeIfPredicate, Comparator<T> comparator) {
+		List<T> items = new ArrayList<T>(this.playerInfo.values());
+		if (removeIfPredicate != null) items.removeIf(removeIfPredicate);
+		items.sort(comparator);
+		if (maxItems > 0) items = items.subList(0,  maxItems-1);
+		return items;
+	}
+
+	public List<T> sort(int maxItems, Comparator<T> comparator) {
+		return sort(maxItems, null, comparator);
 	}
 }

@@ -28,6 +28,10 @@ public class ZPermissionsFacade {
 		plugin.getEithonLogger().warning("The plugin %s will not work properly without the zPermissions plugin", plugin.getName());
 		return null;
 	}
+	
+	public static boolean isConnected() {
+		return zPermissionsService != null;
+	}
 
 	public static void addPermissionGroup(Player player, String groupName) {
 		Config.C.addGroupCommand.execute(player.getName(), groupName);

@@ -29,6 +29,7 @@ public final class Plugin extends EithonPlugin implements Listener {
 	@Override
 	public void onDisable() {
 		super.onDisable();
+		AlarmTrigger.get().disable();
 	}
 	
 	// Handle move by block

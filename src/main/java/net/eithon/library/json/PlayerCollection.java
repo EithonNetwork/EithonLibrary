@@ -158,25 +158,4 @@ implements Iterable<T>, IJsonDelta<PlayerCollection<T>>, Serializable
 		FileContent fileContent = FileContent.loadFromFile(file);
 		return new PlayerCollection<T>(this._infoInstance).fromJson(fileContent.getPayload());
 	}
-
-	public int size() {	return this.playerInfo.size(); }
-
-	public Object[] toArray() { return this.playerInfo.values().toArray(); }
-
-	public Collection<T> values() { return this.playerInfo.values(); }
-
-	@Deprecated
-	public T[] toArray(T[] playerTimes) { return this.playerInfo.values().toArray(playerTimes); }
-
-	public List<T> sort(int maxItems, Predicate<T> removeIfPredicate, Comparator<T> comparator) {
-		List<T> items = new ArrayList<T>(this.playerInfo.values());
-		if (removeIfPredicate != null) items.removeIf(removeIfPredicate);
-		items.sort(comparator);
-		if (maxItems > 0) items = items.subList(0,  maxItems-1);
-		return items;
-	}
-
-	public List<T> sort(int maxItems, Comparator<T> comparator) {
-		return sort(maxItems, null, comparator);
-	}
 }

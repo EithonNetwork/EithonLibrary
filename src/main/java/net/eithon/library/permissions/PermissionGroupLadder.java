@@ -11,7 +11,6 @@ public class PermissionGroupLadder {
 	private EithonPlugin _eithonPlugin;
 	private boolean _isAccumulative;
 	private String[] _permissionGroups;
-	private ZPermissionsService _permissionService = null;
 
 	public PermissionGroupLadder(
 			EithonPlugin eithonPlugin, 
@@ -22,7 +21,7 @@ public class PermissionGroupLadder {
 		this._permissionGroups = permissionGroups;
 	}
 
-	public boolean canUpdatePermissionGroups() { return this._permissionService != null; }
+	public boolean canUpdatePermissionGroups() { return ZPermissionsFacade.isConnected(); }
 
 	public int getLevel(String permissionName) {
 		for (int i = 0; i < this._permissionGroups.length; i++) {
@@ -114,7 +113,7 @@ public class PermissionGroupLadder {
 	}
 
 	public int currentLevel(Player player) {
-		if (this._permissionService == null) return -1;
+		if (!ZPermissionsFacade.isConnected()) return 0;
 		String[] currentGroups = ZPermissionsFacade.getPlayerPermissionGroups(player);
 		int levelStartAtOne = 0;
 		if ((currentGroups != null) && (currentGroups.length > 0)) {
