@@ -1,7 +1,11 @@
 package net.eithon.library.file;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -16,7 +20,7 @@ public class FileMisc {
 			directory.mkdirs();
 		}
 	}
-	
+
 	public static void makeSureDirectoriesExists(File file){
 		if (file.exists()) return;
 		if (file.isDirectory()) {
@@ -75,5 +79,15 @@ public class FileMisc {
 				return factor*Long.valueOf(f1.lastModified()).compareTo(f2.lastModified());
 			} });
 		return files;
+	}
+
+	public static void appendLine(File file, String line) throws IOException {
+		if (!file.exists()) {
+			FileMisc.makeSureParentDirectoryExists(file);
+			file.createNewFile();
+		}
+		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
+		out.println(line);
+		out.close();
 	}
 }
