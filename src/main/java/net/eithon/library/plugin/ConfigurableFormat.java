@@ -35,7 +35,7 @@ abstract class ConfigurableFormat {
 	}
 
 	public boolean hasContent() {
-		return (this._formatValue != null) && (this._formatValue.length() > 0);
+		return (this._formatValue != null) && !this._formatValue.isEmpty();
 	}
 
 	public String getMessage(Object... args) {
