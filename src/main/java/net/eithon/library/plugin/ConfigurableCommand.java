@@ -20,11 +20,13 @@ public class ConfigurableCommand extends ConfigurableFormat{
 	
 	public void executeAs(CommandSender sender, Object... args) {
 		String command = getMessage(args);
+		if (command.isEmpty()) return;
 		executeCommandAs(command, sender);
 	}
 	
 	public void execute(Object... args) {
 		String command = getMessage(args);
+		if (command.isEmpty()) return;
 		executeCommandAs(command, Bukkit.getServer().getConsoleSender());
 	}
 }
