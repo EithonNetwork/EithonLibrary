@@ -126,7 +126,7 @@ public class EithonPlayer implements CommandSender, IJson<EithonPlayer>, IUuidAn
 			if (worldName.equalsIgnoreCase(acceptableWorldName)) return true;
 		}
 		Config.M.expectedWorlds.sendMessage(getPlayer(), worldName,
-				CoreMisc.arrayToString((String[]) acceptableWorlds.toArray()));
+				CoreMisc.arrayToString(acceptableWorlds.toArray(new String[0])));
 		return false;
 	}
 
