@@ -51,7 +51,7 @@ public class FileMisc {
 			if (extension != null) fileName = fileName.replace(extension,"");
 			array.add(fileName);
 		}
-		return array.toArray(new String[]{""});
+		return array.toArray(new String[0]);
 	}
 
 	public static File[] getFiles(File folder, String extension) {

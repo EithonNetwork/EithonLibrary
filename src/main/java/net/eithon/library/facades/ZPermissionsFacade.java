@@ -42,7 +42,7 @@ public class ZPermissionsFacade {
 	}
 
 	public static String[] getPlayerPermissionGroups(Player player) {
-		return zPermissionsService.getPlayerGroups(player.getUniqueId()).toArray(new String[]{});
+		return zPermissionsService.getPlayerGroups(player.getUniqueId()).toArray(new String[0]);
 	}
 	
 	public static boolean hasPermissionGroup(Player player, String groupName) {
