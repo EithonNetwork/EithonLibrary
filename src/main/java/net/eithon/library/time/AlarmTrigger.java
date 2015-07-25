@@ -52,13 +52,23 @@ public class AlarmTrigger {
 	public UUID setAlarm(String name, LocalDateTime when, Runnable task)
 	{
 		this.isEnabledOrWarn();
-		
+
 		Alarm alarm; 
 		synchronized(this) {
 			alarm = new Alarm(name, when, task);
 			addToAlarmQueue(alarm);
 		}
 		return alarm.getId();
+	}
+
+	public boolean removeAlarm(UUID id)
+	{
+		synchronized (this) {
+			Alarm alarm = this._alarms.get(id);
+			if (alarm == null) return false;
+			this._alarms.remove(id);
+			return true;
+		}
 	}
 
 	public boolean resetAlarm(UUID id, long secondsToAlarm)
@@ -71,7 +81,7 @@ public class AlarmTrigger {
 	{
 		this.isEnabledOrWarn();
 		if (id == null) return false;
-		
+
 		Alarm alarm; 
 		synchronized(this) {
 			alarm = this._alarms.get(id);
@@ -96,7 +106,7 @@ public class AlarmTrigger {
 			addToAlarmQueue(alarm);
 		}
 	}
-	
+
 	public void repeatEveryDay(String name, LocalTime timeOfDay, IRepeatable task) {
 		LocalDateTime time = null;
 		LocalDateTime alarmToday = LocalDateTime.of(LocalDate.now(), timeOfDay);
