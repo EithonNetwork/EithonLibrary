@@ -121,12 +121,17 @@ public class EithonPlayer implements CommandSender, IJson<EithonPlayer>, IUuidAn
 	}
 
 	public boolean isInAcceptableWorldOrInformPlayer(List<String> acceptableWorlds) {
+		if (isInAcceptableWorld(acceptableWorlds)) return true;
+		Config.M.expectedWorlds.sendMessage(getPlayer(), getPlayer().getWorld().getName(),
+				CoreMisc.arrayToString(acceptableWorlds.toArray(new String[0])));
+		return false;
+	}
+
+	public boolean isInAcceptableWorld(List<String> acceptableWorlds) {
 		String worldName = getPlayer().getWorld().getName();
 		for (String acceptableWorldName : acceptableWorlds) {
 			if (worldName.equalsIgnoreCase(acceptableWorldName)) return true;
 		}
-		Config.M.expectedWorlds.sendMessage(getPlayer(), worldName,
-				CoreMisc.arrayToString(acceptableWorlds.toArray(new String[0])));
 		return false;
 	}
 
