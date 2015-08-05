@@ -16,6 +16,8 @@ class CoolDownInfo {
 		this._incidentQueue = new LinkedBlockingQueue<LocalDateTime>();
 	}
 	
+	void setCoolDownPeriod(long coolDownPeriodInSeconds) { this._coolDownPeriodInSeconds = coolDownPeriodInSeconds;	}
+	
 	boolean hasIncidents() {
 		removeOldIncidents();
 		return this._incidentQueue.size() > 0;

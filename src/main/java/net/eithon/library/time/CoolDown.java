@@ -45,6 +45,16 @@ public class CoolDown {
 		coolDownInfo.addIncident();
 	}
 	
+	public void addIncident(Player player, long coolDownPeriodInSeconds) {
+		CoolDownInfo coolDownInfo = this._players.get(player);
+		if (coolDownInfo == null) {
+			coolDownInfo = new CoolDownInfo(coolDownPeriodInSeconds, this._defaultAllowedNumberOfTimes);
+			this._players.put(player, coolDownInfo);
+		}
+		coolDownInfo.setCoolDownPeriod(coolDownPeriodInSeconds);
+		coolDownInfo.addIncident();
+	}
+	
 	public boolean isInCoolDownPeriod(Player player) {
 		return secondsLeft(player) > 0;
 	}
