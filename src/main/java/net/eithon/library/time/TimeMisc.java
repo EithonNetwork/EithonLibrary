@@ -24,6 +24,22 @@ public class TimeMisc {
 	}
 	
 	public static long stringToSeconds(String time) {
+		if (time.endsWith("s")) {
+			try {
+				time = time.substring(0, time.length()-1);
+				return Long.parseLong(time);
+			} catch (Exception e) {}
+		} else if (time.endsWith("m")) {
+			try {
+				time = time.substring(0, time.length()-1);
+				return Long.parseLong(time)*60;
+			} catch (Exception e) {}			
+		} else if (time.endsWith("h")) {
+			try {
+				time = time.substring(0, time.length()-1);
+				return Long.parseLong(time)*3600;
+			} catch (Exception e) {}			
+		}
 		String[] parts = time.split(":");
 		switch (parts.length) {
 		case 1:
