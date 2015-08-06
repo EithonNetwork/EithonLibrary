@@ -11,6 +11,7 @@ import java.util.List;
 import net.eithon.library.extensions.EithonPlugin;
 import net.eithon.library.file.FileMisc;
 import net.eithon.library.plugin.Logger.DebugPrintLevel;
+import net.eithon.library.time.TimeMisc;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -89,6 +90,31 @@ public class Configuration {
 		return value;
 	}
 
+	public long getSeconds(String path, long defaultValue)
+	{
+		long value;
+		try {
+			String valueAsString = this._config.getString(String.format("%d", defaultValue));
+			value = TimeMisc.stringToSeconds(valueAsString);
+		} catch (Exception ex) {
+			this._plugin.getEithonLogger().warning("Failed to read configuration \"%s\", will use default value (%d).",
+					path, defaultValue);
+			this._plugin.getEithonLogger().debug(DebugPrintLevel.MAJOR, "Exception: %s", ex.getMessage());
+			value = defaultValue;
+		}
+		this._plugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = %d" , path, value);
+		return value;
+	}
+
+	public long getSeconds(String path, String defaultValue)
+	{
+		long value;
+		String valueAsString = this._config.getString(defaultValue);
+		value = TimeMisc.stringToSeconds(valueAsString);
+		this._plugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = %d" , path, value);
+		return value;
+	}
+
 	public LocalTime getLocalTime(String path, LocalTime defaultValue) {
 		String string;
 		LocalTime value;
@@ -129,7 +155,7 @@ public class Configuration {
 		}
 		return result;
 	}
-	
+
 	public List<String> getStringList(String path)
 	{
 		List<String> result = null;
@@ -140,7 +166,7 @@ public class Configuration {
 			this._plugin.getEithonLogger().debug(DebugPrintLevel.MAJOR, "Exception: %s", ex.getMessage());
 			result = new ArrayList<String>();
 		}
-		
+
 		if (this._plugin.getEithonLogger().shouldDebug(DebugPrintLevel.MINOR)) {
 			String s = "";
 			boolean first = true;
