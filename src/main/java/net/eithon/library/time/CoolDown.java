@@ -68,7 +68,7 @@ public class CoolDown {
 	}
 	
 	public void removePlayer(Player player) {
-		_coolDowns.remove(player);
+		this._players.remove(player);
 	}
 	
 	@Deprecated
