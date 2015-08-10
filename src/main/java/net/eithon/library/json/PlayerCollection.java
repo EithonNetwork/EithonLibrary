@@ -12,6 +12,8 @@ import net.eithon.library.file.FileMisc;
 import net.eithon.library.plugin.Logger;
 import net.eithon.library.plugin.Logger.DebugPrintLevel;
 
+import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitScheduler;
 import org.json.simple.JSONArray;
 
 public class PlayerCollection<T extends IJson<T> & IUuidAndName>
@@ -152,5 +154,41 @@ implements Iterable<T>, IJsonDelta<PlayerCollection<T>>, Serializable
 	private PlayerCollection<T> loadDeltaFile(File file) {
 		FileContent fileContent = FileContent.loadFromFile(file);
 		return new PlayerCollection<T>(this._infoInstance).fromJson(fileContent.getPayload());
+	}
+
+	public void delayedSave(EithonPlugin plugin, String fileName, String title, long ticks) {
+		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+		scheduler.scheduleSyncDelayedTask(plugin, new Runnable() {
+			public void run() {
+				saveNow(plugin, fileName, title);
+			}
+		}, ticks);
+	}
+
+	void saveNow(EithonPlugin plugin, String fileName, String title)
+	{
+		plugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Saving %d items.", this.playerInfo.size());
+		File jsonFile = new File(plugin.getDataFolder(), fileName);
+		FileContent fileContent = new FileContent(title, 1, toJson());
+		fileContent.save(jsonFile);
+	}
+
+	public void delayedLoad(EithonPlugin plugin, String fileName, long ticks) {
+		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+		scheduler.scheduleSyncDelayedTask(plugin, new Runnable() {
+			public void run() {
+				loadNow(plugin, fileName);
+			}
+		}, ticks);
+	}
+
+	void loadNow(EithonPlugin plugin, String fileName) {
+		File file = new File(plugin.getDataFolder(), fileName);
+		FileContent fileContent = FileContent.loadFromFile(file);
+		if (fileContent == null) {
+			plugin.getEithonLogger().debug(DebugPrintLevel.MAJOR, "The file %s was empty.", fileName);
+			return;			
+		}
+		fromJson(fileContent.getPayload());
 	}
 }
