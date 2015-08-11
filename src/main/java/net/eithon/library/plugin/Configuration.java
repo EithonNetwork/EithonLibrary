@@ -94,7 +94,7 @@ public class Configuration {
 	{
 		long value;
 		try {
-			String valueAsString = this._config.getString(String.format("%d", defaultValue));
+			String valueAsString = this._config.getString(path, String.format("%d", defaultValue));
 			value = TimeMisc.stringToSeconds(valueAsString);
 		} catch (Exception ex) {
 			this._plugin.getEithonLogger().warning("Failed to read configuration \"%s\", will use default value (%d).",
@@ -109,7 +109,7 @@ public class Configuration {
 	public long getSeconds(String path, String defaultValue)
 	{
 		long value;
-		String valueAsString = this._config.getString(defaultValue);
+		String valueAsString = this._config.getString(path, defaultValue);
 		value = TimeMisc.stringToSeconds(valueAsString);
 		this._plugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = %d" , path, value);
 		return value;

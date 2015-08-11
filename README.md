@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 1.0.2 (2015-08-11)
+
+* BUG: getSeconds() did always return 0
+
 ### 1.0.1 (2015-08-11)
 
 * BUG: stringToSeconds had a null pointer exception.
