@@ -24,6 +24,7 @@ public class TimeMisc {
 	}
 	
 	public static long stringToSeconds(String time) {
+		if (time == null) return 0;
 		if (time.endsWith("s")) {
 			try {
 				time = time.substring(0, time.length()-1);
