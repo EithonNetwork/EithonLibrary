@@ -4,9 +4,11 @@ import net.eithon.library.extensions.EithonPlugin;
 import net.eithon.library.move.MoveEventHandler;
 import net.eithon.library.plugin.GeneralMessage;
 import net.eithon.library.plugin.Logger;
+import net.eithon.library.plugin.PermissionBasedMultiplier;
 import net.eithon.library.time.AlarmTrigger;
 
 import org.bukkit.block.Block;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -18,6 +20,7 @@ public final class Plugin extends EithonPlugin implements Listener {
 	public void onEnable() {
 		eithonPlugin = this;
 		super.onEnable();
+		PermissionBasedMultiplier.initialize();
 		Logger logger = getEithonLogger();
 		Logger.setDefaultDebug(logger);
 		Config.load(this);
