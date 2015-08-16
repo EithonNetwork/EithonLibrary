@@ -221,6 +221,35 @@ public class Configuration {
 		return result;
 	}
 
+	public List<Long> getSecondsList(String path)
+	{
+		List<String> strings = null;
+		try {
+			strings = this._config.getStringList(path);
+		} catch (Exception ex) {
+			this._plugin.getEithonLogger().warning("Failed to read configuration \"%s\".", path);
+			this._plugin.getEithonLogger().debug(DebugPrintLevel.MAJOR, "Exception: %s", ex.getMessage());
+			strings = new ArrayList<String>();
+		}
+
+		List<Long> result = new ArrayList<Long>();
+		for (String string : strings) {
+			long value = TimeMisc.stringToSeconds(string);
+			result.add(value);
+		}
+		if (this._plugin.getEithonLogger().shouldDebug(DebugPrintLevel.MINOR)) {
+			String s = "";
+			boolean first = true;
+			for (Long value : result) {
+				if (first) first = false;
+				else s += ", ";
+				s += value.toString();
+			}
+			this._plugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = [%s]" , path, s);
+		}
+		return result;
+	}
+
 	public List<String> getStringList(String path)
 	{
 		List<String> result = null;

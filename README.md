@@ -16,6 +16,7 @@ Eithon java code library for Minecraft.
 ### 1.1 ()
 
 * NEW: Introducing permission based multipliers
+* NEW: Added support for lists of TimeSpans in configuration files
 
 ### 1.0.2 (2015-08-11)
 
