@@ -13,6 +13,15 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 1.1.1 (2015-08-16)
+
+* BUG: Could not read PermissionBasedMultiplier
+
+### 1.1 (2015-08-16)
+
+* NEW: Introducing permission based multipliers
+* NEW: Added support for lists of TimeSpans in configuration files
+
 ### 1.0.2 (2015-08-11)
 
 * BUG: getSeconds() did always return 0
