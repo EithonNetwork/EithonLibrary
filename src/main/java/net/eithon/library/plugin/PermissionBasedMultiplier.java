@@ -46,13 +46,17 @@ public class PermissionBasedMultiplier implements ConfigurationSerializable  {
 		return pbm;
 	}
 
+	@SuppressWarnings("unchecked")
 	private static HashMap<String, Multiplier> toMultiplierMap(Map<String, Object> map) {
 		HashMap<String, Multiplier> newMap = new HashMap<String, Multiplier>();		
 		if (map == null) return newMap;
 		for (Entry<String, Object> entry : map.entrySet()) {
 			Object value = entry.getValue();
-			if (!(value instanceof Multiplier)) continue;
-			newMap.put(entry.getKey(), (Multiplier) value);
+			if (value instanceof Multiplier) {
+				newMap.put(entry.getKey(), (Multiplier) value);
+			} else if (value instanceof Map<?,?>) {
+				newMap.put(entry.getKey(), Multiplier.deserialize((Map<String, Object>) value));
+			}
 		}
 		return newMap;
 	}
@@ -63,5 +67,14 @@ public class PermissionBasedMultiplier implements ConfigurationSerializable  {
 		if (this._multiplierMap == null) return result.toString();
 		this._multiplierMap.forEach((key, value) -> result.append(String.format("\n  %s = %s", key, value == null ? "null" : value.toString())));
 		return result.toString();
+	}
+
+	public static PermissionBasedMultiplier getFromConfig(Configuration config,
+			String path) {
+		PermissionBasedMultiplier defaultValue = new PermissionBasedMultiplier();
+		Object object = config.getObject("multipliers.donationboard.mobKill", defaultValue);
+		if (object instanceof PermissionBasedMultiplier) return (PermissionBasedMultiplier) object;
+		Map<String, Object> map = config.getMap(path, true);
+		return deserialize(map);
 	}
 }
