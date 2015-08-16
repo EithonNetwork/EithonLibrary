@@ -70,11 +70,12 @@ public class Configuration {
 			result = this._config.get(path, defaultValue);
 		} catch (Exception ex) {
 			this._plugin.getEithonLogger().warning("Failed to read configuration \"%s\", will use default value (%s).",
-					path, defaultValue.toString());
+					path, defaultValue == null ? "null" : defaultValue.toString());
 			this._plugin.getEithonLogger().debug(DebugPrintLevel.MAJOR, "Exception: %s", ex.getMessage());
 			result = defaultValue;
 		}
-		this._plugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = %s" , path, result.toString());
+		this._plugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = %s" ,
+				path, result == null ? "null" : result.toString());
 		return result;
 	}
 
