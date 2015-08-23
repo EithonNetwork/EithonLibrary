@@ -1,6 +1,6 @@
 name: EithonLibrary
 main: net.eithon.plugin.eithonlibrary.Plugin
-version: 1.1.1
+version: 1.1.2
 author: vanbrayne
 depend: [Essentials]
 softdepend: [zPermissions, TitleManager]

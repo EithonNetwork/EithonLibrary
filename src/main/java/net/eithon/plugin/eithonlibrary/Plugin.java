@@ -19,12 +19,9 @@ public final class Plugin extends EithonPlugin implements Listener {
 	public void onEnable() {
 		eithonPlugin = this;
 		super.onEnable();
-		PermissionBasedMultiplier.initialize();
 		Logger logger = getEithonLogger();
 		Logger.setDefaultDebug(logger);
 		Config.load(this);
-		GeneralMessage.initialize(this);
-		AlarmTrigger.get().enable(this);
 		super.activate(null, this);
 	}
 

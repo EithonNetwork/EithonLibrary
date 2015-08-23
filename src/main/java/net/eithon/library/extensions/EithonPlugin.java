@@ -6,8 +6,11 @@ import java.util.HashMap;
 import net.eithon.library.file.FileMisc;
 import net.eithon.library.plugin.CommandParser;
 import net.eithon.library.plugin.Configuration;
+import net.eithon.library.plugin.GeneralMessage;
 import net.eithon.library.plugin.ICommandHandler;
 import net.eithon.library.plugin.Logger;
+import net.eithon.library.plugin.PermissionBasedMultiplier;
+import net.eithon.library.time.AlarmTrigger;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -27,9 +30,12 @@ public class EithonPlugin extends JavaPlugin implements Listener {
 	public void onEnable() {
 		this._logger = new Logger(this);
 		this._config = new Configuration(this);
+		PermissionBasedMultiplier.initialize();
 		this._config.enable();
 		this._logger.enable();
 		instances.put(getName(), this);
+		GeneralMessage.initialize(this);
+		AlarmTrigger.get().enable(this);
 	}
 
 	@Override

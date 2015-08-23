@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 1.1.2 (2015-08-23)
+
+* BUG: Could not read PermissionBasedMultiplier if using plugman
+
 ### 1.1.1 (2015-08-16)
 
 * BUG: Could not read PermissionBasedMultiplier
