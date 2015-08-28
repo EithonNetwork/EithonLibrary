@@ -14,7 +14,7 @@ public class Logger {
 		NONE, MAJOR, MINOR, VERBOSE
 	}
 	
-	static {
+	public static void initialize() {
 		debugLevelValues = DebugPrintLevel.values();
 	}
 	
