@@ -3,6 +3,7 @@ package net.eithon.library.extensions;
 import java.io.File;
 import java.util.HashMap;
 
+import net.eithon.library.facades.ZPermissionsFacade;
 import net.eithon.library.file.FileMisc;
 import net.eithon.library.plugin.CommandParser;
 import net.eithon.library.plugin.Configuration;
@@ -28,6 +29,7 @@ public class EithonPlugin extends JavaPlugin implements Listener {
 	
 	@Override
 	public void onEnable() {
+		Logger.initialize();
 		this._logger = new Logger(this);
 		this._config = new Configuration(this);
 		PermissionBasedMultiplier.initialize();
@@ -36,6 +38,7 @@ public class EithonPlugin extends JavaPlugin implements Listener {
 		instances.put(getName(), this);
 		GeneralMessage.initialize(this);
 		AlarmTrigger.get().enable(this);
+		ZPermissionsFacade.initialize(this);
 	}
 
 	@Override
