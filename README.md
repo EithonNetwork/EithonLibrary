@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 1.2.1 (2015-08-28)
+
+* BUG: Removed the "Did not expect file ... warning message.
+
 ### 1.2 (2015-08-28)
 
 * CHANGE: Should work better with plugman.
