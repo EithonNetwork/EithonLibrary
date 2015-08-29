@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 1.3 (2015-08-29)
+
+* NEW: Added method for checking if a string is in a collection.
+
 ### 1.2.2 (2015-08-29)
 
 * BUG: Wrapped lines with several colors ended up with the wrong color on new lines.

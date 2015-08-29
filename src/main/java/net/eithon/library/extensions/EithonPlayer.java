@@ -1,6 +1,6 @@
 package net.eithon.library.extensions;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
 
@@ -120,18 +120,16 @@ public class EithonPlayer implements CommandSender, IJson<EithonPlayer>, IUuidAn
 		return this._player.hasPermission(permission);
 	}
 
-	public boolean isInAcceptableWorldOrInformPlayer(List<String> acceptableWorlds) {
+	public boolean isInAcceptableWorldOrInformPlayer(Collection<String> acceptableWorlds) {
 		if (isInAcceptableWorld(acceptableWorlds)) return true;
 		Config.M.expectedWorlds.sendMessage(getPlayer(), getPlayer().getWorld().getName(),
 				CoreMisc.arrayToString(acceptableWorlds.toArray(new String[0])));
 		return false;
 	}
 
-	public boolean isInAcceptableWorld(List<String> acceptableWorlds) {
+	public boolean isInAcceptableWorld(Collection<String> acceptableWorlds) {
 		String worldName = getPlayer().getWorld().getName();
-		for (String acceptableWorldName : acceptableWorlds) {
-			if (worldName.equalsIgnoreCase(acceptableWorldName)) return true;
-		}
+		CoreMisc.isStringInCollectionIgnoreCase(worldName, acceptableWorlds);
 		return false;
 	}
 
