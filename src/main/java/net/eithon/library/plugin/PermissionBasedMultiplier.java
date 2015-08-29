@@ -72,7 +72,8 @@ public class PermissionBasedMultiplier implements ConfigurationSerializable  {
 	public static PermissionBasedMultiplier getFromConfig(Configuration config,
 			String path) {
 		PermissionBasedMultiplier defaultValue = new PermissionBasedMultiplier();
-		Object object = config.getObject("multipliers.donationboard.mobKill", defaultValue);
+		Object object = config.getObject(path, defaultValue);
+		if (object == null) return defaultValue;
 		if (object instanceof PermissionBasedMultiplier) return (PermissionBasedMultiplier) object;
 		Map<String, Object> map = config.getMap(path, true);
 		return deserialize(map);
