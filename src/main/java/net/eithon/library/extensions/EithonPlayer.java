@@ -129,8 +129,7 @@ public class EithonPlayer implements CommandSender, IJson<EithonPlayer>, IUuidAn
 
 	public boolean isInAcceptableWorld(Collection<String> acceptableWorlds) {
 		String worldName = getPlayer().getWorld().getName();
-		CoreMisc.isStringInCollectionIgnoreCase(worldName, acceptableWorlds);
-		return false;
+		return CoreMisc.isStringInCollectionIgnoreCase(worldName, acceptableWorlds);
 	}
 
 	@Override

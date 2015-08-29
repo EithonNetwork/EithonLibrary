@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 1.3.1 (2015-08-29)
+
+* BUG: Always returned false when checking if players current world was OK for flying.
+
 ### 1.3 (2015-08-29)
 
 * NEW: Added method for checking if a string is in a collection.
