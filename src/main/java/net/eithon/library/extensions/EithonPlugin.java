@@ -30,9 +30,9 @@ public class EithonPlugin extends JavaPlugin implements Listener {
 	@Override
 	public void onEnable() {
 		Logger.initialize();
+		PermissionBasedMultiplier.initialize();
 		this._logger = new Logger(this);
 		this._config = new Configuration(this);
-		PermissionBasedMultiplier.initialize();
 		this._config.enable();
 		this._logger.enable();
 		instances.put(getName(), this);
