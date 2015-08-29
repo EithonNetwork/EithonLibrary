@@ -1,5 +1,6 @@
 package net.eithon.library.core;
 
+import java.util.Collection;
 import java.util.IllegalFormatException;
 
 public class CoreMisc {
@@ -15,6 +16,13 @@ public class CoreMisc {
 			e.printStackTrace();
 		}
 		return message;
+	}
+
+	public static boolean isStringInCollectionIgnoreCase(String string, Collection<String> stringList) {
+		for (String item : stringList) {
+			if (item.equalsIgnoreCase(string)) return true;
+		}
+		return false;
 	}
 
 	public static String arrayToString(String[] stringList) {
