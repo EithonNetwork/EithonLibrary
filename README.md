@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 1.2.2 (2015-08-29)
+
+* BUG: Wrapped lines with several colors ended up with the wrong color on new lines.
+
 ### 1.2.1 (2015-08-28)
 
 * BUG: Removed the "Did not expect file ... warning message.

@@ -102,6 +102,9 @@ class Line {
 
 		// Get a stack over new color characters in the word
 		Stack<Character> colorStack = new Stack<Character>();
+		for (char c : this._activeChatColorCharacters.toCharArray()) {
+			colorStack.push(c);
+		}
 		boolean nextCharIsColorChar = false;
 		for (char c : word.toCharArray()) {
 			if (c == ChatColor.COLOR_CHAR) {
@@ -113,16 +116,19 @@ class Line {
 				nextCharIsColorChar = false;
 			}
 		}
-		for (char c : this._activeChatColorCharacters.toCharArray()) {
-			colorStack.push(c);
-		}
 
 		while (!colorStack.isEmpty()) {
 			Character c = colorStack.pop();
 			if (isOverridden(c, newActiveChatColorCharacters)) continue;
 			newActiveChatColorCharacters = Character.toString(c) + newActiveChatColorCharacters;
 		}
+		if (containsOnlyTheControlCharacter(newActiveChatColorCharacters)) newActiveChatColorCharacters = "";
 		this._activeChatColorCharacters = newActiveChatColorCharacters;
+	}
+
+	boolean containsOnlyTheControlCharacter(String newActiveChatColorCharacters) {
+		if (newActiveChatColorCharacters.length() != 1) return false;
+		return newActiveChatColorCharacters.charAt(0) == ChatColor.COLOR_CHAR;
 	}
 
 	private static boolean isOverridden(Character c, String chatColors) {

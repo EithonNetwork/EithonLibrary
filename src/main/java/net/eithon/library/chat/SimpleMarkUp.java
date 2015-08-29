@@ -156,7 +156,7 @@ public class SimpleMarkUp {
 				}
 			}
 
-			if (firstToken) parsedLine += activeCodes();
+			if (firstToken && !isInsideBrackets) parsedLine += activeCodes();
 			if (!isInsideBrackets || specialCharacter) {
 				hasContent = true;
 				parsedLine += token;
