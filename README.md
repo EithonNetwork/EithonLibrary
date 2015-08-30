@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### dev
+
+* BUG: Irritating message, "Did not expect file xxx to exist."
+
 ### 1.3.1 (2015-08-29)
 
 * BUG: Always returned false when checking if players current world was OK for flying.
