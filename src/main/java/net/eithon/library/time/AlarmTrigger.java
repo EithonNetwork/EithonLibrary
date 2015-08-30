@@ -1,8 +1,10 @@
 package net.eithon.library.time;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoField;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -108,10 +110,7 @@ public class AlarmTrigger {
 	}
 
 	public void repeatEveryDay(String name, LocalTime timeOfDay, IRepeatable task) {
-		LocalDateTime time = null;
-		LocalDateTime alarmToday = LocalDateTime.of(LocalDate.now(), timeOfDay);
-		LocalDateTime alarmTomorrow = LocalDateTime.of(LocalDate.now().plusDays(1),timeOfDay);
-		time = (LocalDateTime.now().isBefore(alarmToday)) ? alarmToday : alarmTomorrow;
+		LocalDateTime time = getNextTimeOnDayBasis(timeOfDay, 1);
 		Alarm alarm = new Alarm(name, time, new Runnable() {
 			public void run() {
 				boolean repeat = task.repeat();
@@ -119,6 +118,34 @@ public class AlarmTrigger {
 			}
 		});
 		addToAlarmQueue(alarm);
+	}
+
+	public void repeatEveryWeek(String name, DayOfWeek dayOfWeek, LocalTime timeOfDay, IRepeatable task) {
+		LocalDateTime time = null;
+		LocalDateTime now = LocalDateTime.now();
+		DayOfWeek nowDayOfWeek = now.getDayOfWeek();
+		if (nowDayOfWeek == dayOfWeek) {
+			time = getNextTimeOnDayBasis(timeOfDay, 7);
+		} else {
+			int day1 = nowDayOfWeek.get(ChronoField.DAY_OF_WEEK);
+			int day2 = dayOfWeek.get(ChronoField.DAY_OF_WEEK);
+			int daysToNext = day2-day1;
+			if (daysToNext < 0) daysToNext += 7;
+			time = LocalDateTime.of(LocalDate.now().plusDays(daysToNext),timeOfDay);
+		}
+		Alarm alarm = new Alarm(name, time, new Runnable() {
+			public void run() {
+				boolean repeat = task.repeat();
+				if (repeat) repeatEveryWeek(name, dayOfWeek, timeOfDay, task);
+			}
+		});
+		addToAlarmQueue(alarm);
+	}
+
+	LocalDateTime getNextTimeOnDayBasis(LocalTime timeOfDay, int daysLater) {
+		LocalDateTime alarmToday = LocalDateTime.of(LocalDate.now(), timeOfDay);
+		if (LocalDateTime.now().isBefore(alarmToday)) return alarmToday;
+		return LocalDateTime.of(LocalDate.now().plusDays(daysLater),timeOfDay);
 	}
 
 	private void addToAlarmQueue(Alarm alarm) {

@@ -15,6 +15,7 @@ Eithon java code library for Minecraft.
 
 ### dev
 
+* NEW: Support for weekly alarms.
 * BUG: Irritating message, "Did not expect file xxx to exist."
 
 ### 1.3.1 (2015-08-29)
