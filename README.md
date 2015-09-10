@@ -13,10 +13,11 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
-### dev
+### 1.4 (2015-09-10)
 
 * NEW: Support for weekly alarms.
 * BUG: Irritating message, "Did not expect file xxx to exist."
+* BUG: Line wrapping could be off by 1 character when centering lines.
 
 ### 1.3.1 (2015-08-29)
 
