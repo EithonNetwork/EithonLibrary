@@ -44,4 +44,8 @@ public class CoreMisc {
 		s +="]";
 		return s;
 	}
+
+	public static String collectionToString(Collection<String> stringList) {
+		return arrayToString(stringList.toArray(new String[0]));
+	}
 }

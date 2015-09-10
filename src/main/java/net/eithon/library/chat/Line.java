@@ -16,6 +16,8 @@ class Line {
 	private String _fillPrefix;
 	private Character _fillCharacter;
 	private String _fillPostfix;
+	private String _fillLeft;
+	private String _fillRight;
 
 	Line(int maxWidthInPixels)  {
 		this._maxWidthInPixels = maxWidthInPixels;
@@ -31,6 +33,8 @@ class Line {
 		this._fillPrefix = fillPrefix;
 		this._fillCharacter = fillCharacter;
 		this._fillPostfix = fillPostfix;
+		this._fillLeft = "";
+		this._fillRight = "";
 	}
 
 	boolean hasPendingSoftHyphen() { return this._hasPendingSoftHyphen; }
@@ -46,21 +50,31 @@ class Line {
 	@Override
 	public String toString() {
 		if (!this.hasContent()) return "";
-		String centeredPrefix = centeredPrefix();
-		return centeredPrefix + this._content.toString() + centeredPrefix;
+		calculateFill();
+		return this._fillLeft + this._content.toString() + this._fillRight;
 	}
 	
-	private String centeredPrefix() {
-		if (!shouldBeCentered()) return "";
-		String prefix = this._fillPrefix;
-		long prefixPixelsNeeded = (this._maxWidthInPixels-this._widthInPixels)/2;
+	private void calculateFill() {
+		if (!shouldBeCentered()) return;
+		StringBuilder fillLeft = new StringBuilder();
+		StringBuilder fillRight = new StringBuilder();
+		long pixelsNeededLeft = (this._maxWidthInPixels-this._widthInPixels)/2;
+		long pixelsNeededRight = this._maxWidthInPixels-this._widthInPixels-pixelsNeededLeft;
+		long remainingPixels = fillWithSpace(fillLeft, pixelsNeededLeft);
+		pixelsNeededRight += remainingPixels;
+		fillWithSpace(fillRight, pixelsNeededRight);
+		this._fillLeft = fillLeft.toString();
+		this._fillRight = fillRight.toString();
+	}
+
+	long fillWithSpace(StringBuilder stringToFill, long pixelsNeeded) {
+		stringToFill.append(this._fillPrefix);
 		int spaceWidth = FontPixels.get().pixelWidth(this._fillCharacter);
-		while (prefixPixelsNeeded-spaceWidth > 0) {
-			prefix += this._fillCharacter;
-			prefixPixelsNeeded -= spaceWidth;
-		}
-		prefix += this._fillPostfix;
-		return prefix;
+		long requiredSpaces = pixelsNeeded/spaceWidth;
+		for (long i = 0; i < requiredSpaces; i++) stringToFill.append(this._fillCharacter);
+		stringToFill.append(this._fillPostfix);
+		long remainingPixels = pixelsNeeded % spaceWidth;
+		return remainingPixels;
 	}
 
 	void reset() {
