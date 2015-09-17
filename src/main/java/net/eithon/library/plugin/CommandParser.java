@@ -141,10 +141,26 @@ public class CommandParser {
 		try {
 			return Integer.parseInt(this._args[index]);
 		} catch (Exception ex) { 
-			this._sender.sendMessage(String.format("Could not parse this as an integer: %s", this._args[index]));
+			this._sender.sendMessage(String.format("Could not parse this as an integer: %s, will default to %d", 
+					this._args[index], defaultValue));
 			showCommandSyntax();
 			return defaultValue; 
 		}
+	}
+
+	public boolean getArgumentBoolean(boolean defaultValue) {
+		return getArgumentBoolean(this._nextArgument++, defaultValue);
+	}
+
+	public boolean getArgumentBoolean(int index, boolean defaultValue) {
+		if (this._args.length <= index) return defaultValue;
+		String argument = getArgumentStringAsLowercase(index);
+		if (argument.matches("^(yes|true|1)$")) return true;
+		if (argument.matches("^(no|false|0)$")) return false;
+		this._sender.sendMessage(String.format("Could not parse this as a boolean: %s, will default to %s",
+				this._args[index], defaultValue ? "true" : "false"));
+		showCommandSyntax();
+		return defaultValue;
 	}
 
 	public long getArgumentTimeAsSeconds(long defaultValue) {
@@ -155,8 +171,9 @@ public class CommandParser {
 		if (this._args.length <= index) return defaultValue;
 		try {
 			return TimeMisc.stringToSeconds(this._args[index]);
-		} catch (Exception ex) { 
-			this._sender.sendMessage(String.format("Could not parse this as a time (format H:MM:SS): %s", this._args[index]));
+		} catch (Exception ex) {
+			this._sender.sendMessage(String.format("Could not parse this as a time (format H:MM:SS): %s, will default to %s.",
+					this._args[index], TimeMisc.secondsToString(defaultValue)));
 			showCommandSyntax();
 			return defaultValue; 
 		}
@@ -182,7 +199,7 @@ public class CommandParser {
 	}
 
 	public String getArgumentCommand(int index) {
-		String command =  getArgumentStringAsLowercase(index);
+		String command = getArgumentStringAsLowercase(index);
 		setCurrentCommand(command);
 		return command;
 	}

@@ -51,7 +51,11 @@ class Line {
 	public String toString() {
 		if (!this.hasContent()) return "";
 		calculateFill();
-		return this._fillLeft + this._content.toString() + this._fillRight;
+		String result = "";
+		if (this._fillLeft != null) result += this._fillLeft;
+		result += this._content.toString();
+		if (this._fillRight != null) result += this._fillRight;
+		return result;
 	}
 	
 	private void calculateFill() {
