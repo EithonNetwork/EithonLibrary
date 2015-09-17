@@ -13,6 +13,11 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 1.5 (2015-09-17)
+
+* NEW: CommandParser now can read boolean.
+* BUG: LineWrapper added null before and after lines that were not centered.
+
 ### 1.4 (2015-09-10)
 
 * NEW: Support for weekly alarms.
