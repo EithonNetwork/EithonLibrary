@@ -22,7 +22,7 @@ public class FontPixels
 	{
 		Integer width = pixelWidths.get(Character.toString(c));
 		if (width == null) {
-			String message = String.format("No pixel width for character '%s'", c);
+			String message = String.format("No pixel width for character '%s' (%d)", c, (int) c);
 			if (System.console() != null) System.console().printf("%s", message);
 			return 0;
 		}
@@ -63,13 +63,14 @@ public class FontPixels
 
 	private void initializeHashMap() 
 	{	
+		
 		pixelWidths.put ("\n", new Integer(0));
 		pixelWidths.put ("☺", new Integer(9));
 		pixelWidths.put ("☻", new Integer(9));
 		pixelWidths.put ("♥", new Integer(8));
 		pixelWidths.put ("♦", new Integer(8));
 		pixelWidths.put ("♣", new Integer(8));
-		pixelWidths.put ("♠ ", new Integer(8));
+		pixelWidths.put ("♠", new Integer(8));
 		pixelWidths.put ("•", new Integer(5));
 		pixelWidths.put ("◘", new Integer(9));
 		pixelWidths.put ("○", new Integer(7));
