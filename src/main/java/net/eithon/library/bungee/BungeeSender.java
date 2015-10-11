@@ -5,9 +5,11 @@ import java.io.ByteArrayOutputStream;
 import net.eithon.library.core.CoreMisc;
 import net.eithon.library.extensions.EithonPlugin;
 import net.eithon.library.plugin.Logger.DebugPrintLevel;
+import net.eithon.library.time.TimeMisc;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitScheduler;
 
 import com.google.common.collect.Iterables;
 import com.google.common.io.ByteArrayDataOutput;
@@ -44,6 +46,11 @@ class BungeeSender {
 	private boolean send(Player player, String subChannel, ByteArrayOutputStream message, String... arguments) {
 		verbose("send", String.format("Enter: Player=%s, subChannel=%s, message=%s", 
 				player == null? "NULL" : player.getName(), subChannel, message == null ? "NULL" : message.toString()));
+		if (player == null) {
+			verbose("send", "Player was null");
+			verbose("send", "Leave FALSE");
+			return false;
+		}
 		ByteArrayDataOutput out = ByteStreams.newDataOutput();
 		out.writeUTF(subChannel);
 		for (String argument : arguments) {
@@ -61,8 +68,17 @@ class BungeeSender {
 		return true;
 	}
 
-	private boolean send(String subChannel, ByteArrayOutputStream message, String... arguments) {
+	boolean send(String subChannel, ByteArrayOutputStream message, String... arguments) {
 		Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
+		if (player == null) {
+			BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+			scheduler.scheduleSyncDelayedTask(this._eithonPlugin, new Runnable() {
+				public void run() {
+					send(subChannel, message, arguments);
+				}
+			}, TimeMisc.secondsToTicks(1));
+			return true;
+		}
 		return send(player, subChannel, message, arguments);
 	}
 
@@ -71,7 +87,6 @@ class BungeeSender {
 	}
 
 	private boolean send(String subChannel, String... arguments) {
-		Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
-		return send(player, subChannel, null, arguments);
+		return send(subChannel, null, arguments);
 	}
 }
