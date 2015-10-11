@@ -16,6 +16,7 @@ Eithon java code library for Minecraft.
 ### 1.8 (2015-10-11)
 
 * NEW: Added EithonBungeeQuitEvent
+* CHANGE: Now has delay for join event.
 
 ### 1.7.2 (2015-10-11)
 
