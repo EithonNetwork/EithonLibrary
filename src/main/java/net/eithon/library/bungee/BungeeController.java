@@ -26,6 +26,7 @@ public class BungeeController {
 	}
 
 	public void createBungeeListener() {
+		
 		bungeeListener = new BungeeListener(this._eithonPlugin, this);
 		this._eithonPlugin.getServer().getMessenger().registerIncomingPluginChannel(this._eithonPlugin, "BungeeCord", bungeeListener);
 		this._bungeeSender.getServer();
