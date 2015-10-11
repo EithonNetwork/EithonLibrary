@@ -49,7 +49,9 @@ public class BungeeController {
 		DataOutputStream msgout = new DataOutputStream(msgbytes);
 		try {
 			msgout.writeUTF(player.getUniqueId().toString());
-			msgout.writeUTF(getHighestGroup(player));
+			String mainGroup = getHighestGroup(player);
+			if (mainGroup == null) mainGroup = "";
+			msgout.writeUTF(mainGroup);
 		} catch (IOException e) {
 			verbose("eithonBungeeJoinEvent", "Leave");
 			e.printStackTrace();

@@ -73,6 +73,7 @@ class BungeeListener implements PluginMessageListener {
 			verbose("eithonBungeeJoinEvent", String.format("player=%s", player.getName()));
 			String mainGroup = msgin.readUTF();
 			verbose("eithonBungeeJoinEvent", String.format("mainGroup=%s", mainGroup));
+			if (mainGroup.isEmpty()) mainGroup = null;
 			EithonBungeeJoinEvent e = new EithonBungeeJoinEvent(this._controller.getServerName(), player, mainGroup);
 			Bukkit.getServer().getPluginManager().callEvent(e);
 		} catch (IOException e) {
