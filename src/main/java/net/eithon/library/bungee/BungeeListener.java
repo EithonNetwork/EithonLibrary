@@ -38,7 +38,13 @@ public class BungeeListener implements PluginMessageListener {
 			getServer(in, subchannel);
 		} else if (subchannel.equals("Forward")) {
 			forward(in);
-		}
+		} else if (subchannel.equals("EtihonTest")) {
+			short len = in.readShort();
+			verbose("onPluginMessageReceived", String.format("len=%d", len));
+			byte[] msgbytes = new byte[len];
+			in.readFully(msgbytes);
+			eithonTest(msgbytes);
+	}
 		verbose("onPluginMessageReceived", "Leave");
 	}
 
@@ -58,7 +64,7 @@ public class BungeeListener implements PluginMessageListener {
 		verbose("forward", String.format("len=%d", len));
 		byte[] msgbytes = new byte[len];
 		in.readFully(msgbytes);
-		if (subchannel.equals("EithonTest")) {
+		if (subchannel.equals("EtihonTest")) {
 			eithonTest(msgbytes);
 		}
 		verbose("forward", "Leave");

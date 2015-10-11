@@ -57,9 +57,12 @@ abstract class ConfigurableFormat {
 
 	private String replaceParameters(String format,
 			HashMap<String, String> arguments) {
+		if (format == null) return null;
 		for (String parameterName : arguments.keySet()) {
 			String formalName = "%" + parameterName + "%";
-			format = format.replace(formalName, arguments.get(parameterName));
+			String value = arguments.get(parameterName);
+			if (value == null) continue;
+			format = format.replace(formalName, value);
 		}
 		return format;
 	}

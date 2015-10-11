@@ -69,7 +69,7 @@ public class BungeeSender {
 			return false;
 		}
 
-		boolean success = forward("All", "EtihonTest", msgbytes);
+		boolean success = forward("ALL", "EtihonTest", msgbytes);
 		verbose("eithonTest", "Leave TRUE");
 		return success;
 	}
