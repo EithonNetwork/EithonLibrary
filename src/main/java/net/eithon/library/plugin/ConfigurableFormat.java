@@ -61,7 +61,7 @@ abstract class ConfigurableFormat {
 		for (String parameterName : arguments.keySet()) {
 			String formalName = "%" + parameterName + "%";
 			String value = arguments.get(parameterName);
-			if (value == null) continue;
+			if (value == null) value = "";
 			format = format.replace(formalName, value);
 		}
 		return format;
