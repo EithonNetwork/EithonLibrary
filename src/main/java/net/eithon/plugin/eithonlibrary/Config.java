@@ -1,5 +1,7 @@
 package net.eithon.plugin.eithonlibrary;
 
+import java.util.List;
+
 import net.eithon.library.extensions.EithonPlugin;
 import net.eithon.library.plugin.ConfigurableCommand;
 import net.eithon.library.plugin.ConfigurableMessage;
@@ -19,6 +21,7 @@ public class Config {
 		public static int titleFadeInTicks;
 		public static int titleStayTicks;
 		public static int titleFadeOutTicks;
+		public static List<String> groupPriorities;
 		
 
 		static void load(Configuration config) {
@@ -26,6 +29,7 @@ public class Config {
 			titleFadeInTicks = config.getInt("eithon.TitleFadeInTicks", 20);
 			titleStayTicks = config.getInt("eithon.TitleStayTicks", 60);
 			titleFadeOutTicks = config.getInt("eithon.TitleFadeOutTicks", 20);
+			groupPriorities = config.getStringList("GroupPriorities");
 		}
 	}
 	public static class C {

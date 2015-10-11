@@ -1,3 +1,8 @@
+ #
+ # The importance order for groups. If a player has several groups, the first one of those found in this list is considered main.
+ #
+GroupPriorities: [Owner, Admin, Developer, Architect, Designer, Mod, Submod, Tourist, Trusted, Vip1, Vip2, Vip3, Builder, Legendary, Veteran, Citizen, Member, New, Funder, Founder, RetiredAdmin, RetiredArchitect, RetiredMod]
+
 eithon:
   UseMarkUpForMessages: 0
   UseWrappingForMessages: 0
