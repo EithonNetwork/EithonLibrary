@@ -3,8 +3,10 @@ package net.eithon.library.bungee;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.UUID;
 
 import net.eithon.library.core.CoreMisc;
+import net.eithon.library.extensions.EithonPlayer;
 import net.eithon.library.extensions.EithonPlugin;
 import net.eithon.library.plugin.Logger.DebugPrintLevel;
 
@@ -15,12 +17,14 @@ import org.bukkit.plugin.messaging.PluginMessageListener;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 
-public class BungeeListener implements PluginMessageListener {
+class BungeeListener implements PluginMessageListener {
 
 	private EithonPlugin _eithonPlugin;
+	private BungeeController _controller;
 
-	public BungeeListener(EithonPlugin eithonPlugin) {
+	public BungeeListener(EithonPlugin eithonPlugin, BungeeController controller) {
 		this._eithonPlugin = eithonPlugin;
+		this._controller = controller;
 	}
 
 	@Override
@@ -36,14 +40,12 @@ public class BungeeListener implements PluginMessageListener {
 		verbose("onPluginMessageReceived", String.format("subchannel=%s", subchannel));
 		if (subchannel.equals("GetServer")) {
 			getServer(in, subchannel);
-		} else if (subchannel.equals("Forward")) {
-			forward(in);
-		} else if (subchannel.equals("EtihonTest")) {
+		} else if (subchannel.equals("EithonBungeeJoinEvent")) {
 			short len = in.readShort();
 			verbose("onPluginMessageReceived", String.format("len=%d", len));
 			byte[] msgbytes = new byte[len];
 			in.readFully(msgbytes);
-			eithonTest(msgbytes);
+			eithonBungeeJoinEvent(msgbytes);
 	}
 		verbose("onPluginMessageReceived", "Leave");
 	}
@@ -52,41 +54,33 @@ public class BungeeListener implements PluginMessageListener {
 		verbose("getServer", "Enter");
 		String serverName = in.readUTF();
 		verbose("getServer", String.format("serverName=%s", serverName));
-		Bukkit.broadcastMessage(String.format("This BungeeCord server name is %s", serverName));
+		this._controller.setServerName(serverName);
 		verbose("getServer", "Leave");
 	}
 
-	private void forward(ByteArrayDataInput in) {
-		verbose("forward", "Enter");
-		String subchannel = in.readUTF();
-		verbose("forward", String.format("subchannel=%s", subchannel));
-		short len = in.readShort();
-		verbose("forward", String.format("len=%d", len));
-		byte[] msgbytes = new byte[len];
-		in.readFully(msgbytes);
-		if (subchannel.equals("EtihonTest")) {
-			eithonTest(msgbytes);
-		}
-		verbose("forward", "Leave");
-	}
-
-	private void eithonTest(byte[] msgbytes) {
-		verbose("eithonTest", String.format("Enter msgbytes=%s", msgbytes.toString()));
+	private void eithonBungeeJoinEvent(byte[] msgbytes) {
+		verbose("eithonBungeeJoinEvent", String.format("Enter msgbytes=%s", msgbytes.toString()));
 		DataInputStream msgin = new DataInputStream(new ByteArrayInputStream(msgbytes));
 		try {
-			String somedata = msgin.readUTF();
-			verbose("eithonTest", String.format("somedata=%s", somedata));
-			short somenumber = msgin.readShort();
-			verbose("eithonTest", String.format("somenumber=%d", somenumber));
-			String broadcastMessage = String.format("%s The magic number is %d", somedata, somenumber);
-			verbose("eithonTest", String.format("broadcast \"%s\"", broadcastMessage));
-			Bukkit.broadcastMessage(broadcastMessage);
+			String uuid = msgin.readUTF();
+			verbose("eithonBungeeJoinEvent", String.format("player uuid=%s", uuid));
+			UUID playerId = UUID.fromString(uuid);
+			EithonPlayer player = new EithonPlayer(playerId);
+			if (player.getOfflinePlayer() == null) {
+				verbose("eithonBungeeJoinEvent", "No user found, Leave");
+				return;				
+			}
+			verbose("eithonBungeeJoinEvent", String.format("player=%s", player.getName()));
+			String mainGroup = msgin.readUTF();
+			verbose("eithonBungeeJoinEvent", String.format("mainGroup=%s", mainGroup));
+			EithonBungeeJoinEvent e = new EithonBungeeJoinEvent(this._controller.getServerName(), player, mainGroup);
+			Bukkit.getServer().getPluginManager().callEvent(e);
 		} catch (IOException e) {
 			e.printStackTrace();
-			verbose("eithonTest", "FAIL and Leave");
+			verbose("eithonBungeeJoinEvent", "FAIL and Leave");
 			return;
 		}
-		verbose("eithonTest", "Leave");
+		verbose("eithonBungeeJoinEvent", "Leave");
 	}
 
 	private void verbose(String method, String format, Object... args) {

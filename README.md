@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 1.7 (2015-10-11)
+
+* NEW: Added EithonBungeeJoinEvent
+
 ### 1.6.1 (2015-10-11)
 
 * BUG: Added verbose logging to find bugs.

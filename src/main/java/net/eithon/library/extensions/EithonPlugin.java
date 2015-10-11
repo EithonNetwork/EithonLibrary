@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.HashMap;
 
 import net.eithon.library.bungee.BungeeController;
-import net.eithon.library.bungee.BungeeSender;
 import net.eithon.library.facades.ZPermissionsFacade;
 import net.eithon.library.file.FileMisc;
 import net.eithon.library.plugin.CommandParser;
@@ -17,6 +16,7 @@ import net.eithon.library.time.AlarmTrigger;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -45,11 +45,14 @@ public class EithonPlugin extends JavaPlugin implements Listener {
 		ZPermissionsFacade.initialize(this);
 	}
 	
-	public BungeeSender getBungeeSender() {
+	public void initializeBungee() {
 		if (this._bungeeController == null) {
 			this._bungeeController = new BungeeController(this);
 		}
-		return this._bungeeController.getBungeeSender();
+	}
+	
+	public boolean teleportPlayerToServer(Player player, String serverName) {
+		return this._bungeeController.connectToServer(player, serverName);
 	}
 
 	@Override
