@@ -69,17 +69,23 @@ class BungeeSender {
 	}
 
 	boolean send(String subChannel, ByteArrayOutputStream message, String... arguments) {
+		verbose("send", String.format("Enter: subChannel=%s, message=%s", 
+				subChannel, message == null ? "NULL" : message.toString()));
 		Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
 		if (player == null) {
+			verbose("send", "No player, will try again in one second.");
 			BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 			scheduler.scheduleSyncDelayedTask(this._eithonPlugin, new Runnable() {
 				public void run() {
 					send(subChannel, message, arguments);
 				}
 			}, TimeMisc.secondsToTicks(1));
+			verbose("send", "Leave, TRUE");
 			return true;
 		}
-		return send(player, subChannel, message, arguments);
+		boolean success = send(player, subChannel, message, arguments);
+		verbose("send", String.format("Leave, success = %s", success ? "TRUE" : "FALSE"));
+		return success;
 	}
 
 	private boolean send(Player player, String subChannel, String... arguments) {
