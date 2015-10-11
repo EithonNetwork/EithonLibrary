@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import net.eithon.library.core.CoreMisc;
@@ -45,19 +46,26 @@ public class BungeeController {
 			verbose("eithonBungeeJoinEvent", "Leave");
 			return;
 		}
+		String mainGroup = getHighestGroup(player);
+		if (mainGroup == null) mainGroup = "";
 		ByteArrayOutputStream msgbytes = new ByteArrayOutputStream();
 		DataOutputStream msgout = new DataOutputStream(msgbytes);
 		try {
 			msgout.writeUTF(player.getUniqueId().toString());
-			String mainGroup = getHighestGroup(player);
-			if (mainGroup == null) mainGroup = "";
 			msgout.writeUTF(mainGroup);
 		} catch (IOException e) {
 			verbose("eithonBungeeJoinEvent", "Leave");
 			e.printStackTrace();
 			return;
 		}
+		
+		// Local event
+		if (mainGroup.isEmpty()) mainGroup = null;
+		EithonBungeeJoinEvent e = new EithonBungeeJoinEvent(getServerName(), player, mainGroup);
+		Bukkit.getServer().getPluginManager().callEvent(e);
+		verbose("eithonBungeeJoinEvent", "Published local event");
 
+		// Forward event to all other servers
 		boolean success = this._bungeeSender.forwardToAll("EithonBungeeJoinEvent", msgbytes);
 		verbose("eithonBungeeJoinEvent", String.format("sucess = %s", success ? "TRUE" : "FALSE"));
 		verbose("eithonBungeeJoinEvent", "Leave");

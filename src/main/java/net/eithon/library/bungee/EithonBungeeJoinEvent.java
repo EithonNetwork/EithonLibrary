@@ -2,6 +2,7 @@ package net.eithon.library.bungee;
 
 import net.eithon.library.extensions.EithonPlayer;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
@@ -15,6 +16,10 @@ public class EithonBungeeJoinEvent extends Event {
 		this._serverName = serverName;
 		this._player = player;
 		this._mainGroup = mainGroup;
+	}
+
+	public EithonBungeeJoinEvent(String serverName, Player player, String mainGroup) {
+		this(serverName, new EithonPlayer(player), mainGroup);
 	}
 
 	public static HandlerList getHandlerList() {
