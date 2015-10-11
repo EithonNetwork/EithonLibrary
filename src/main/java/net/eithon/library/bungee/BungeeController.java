@@ -4,14 +4,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
 import net.eithon.library.core.CoreMisc;
 import net.eithon.library.extensions.EithonPlugin;
 import net.eithon.library.facades.ZPermissionsFacade;
 import net.eithon.library.plugin.Logger.DebugPrintLevel;
 import net.eithon.plugin.eithonlibrary.Config;
+
+import org.bukkit.entity.Player;
 
 public class BungeeController {
 
@@ -41,9 +40,17 @@ public class BungeeController {
 	public boolean connectToServer(Player player, String serverName) { return this._bungeeSender.connect(player, serverName);}
 
 	public void eithonBungeeJoinEvent(Player player) {
-		verbose("eithonBungeeJoinEvent", "Enter, player = %s", player == null ? "NULL" : player.getName());
+		eithonBungeeJoinQuitEvent(player, "EithonBungeeJoinEvent");
+	}
+
+	public void eithonBungeeQuitEvent(Player player) {
+		eithonBungeeJoinQuitEvent(player, "EithonBungeeQuitEvent");
+	}
+
+	private void eithonBungeeJoinQuitEvent(Player player, String eventName) {
+		verbose("eithonBungeeJoinQuitEvent", "Enter, player = %s", player == null ? "NULL" : player.getName());
 		if (player == null) {
-			verbose("eithonBungeeJoinEvent", "Leave");
+			verbose("eithonBungeeJoinQuitEvent", "Leave");
 			return;
 		}
 		String mainGroup = getHighestGroup(player);
@@ -57,36 +64,25 @@ public class BungeeController {
 			msgout.writeUTF(player.getUniqueId().toString());
 			msgout.writeUTF(mainGroup);
 		} catch (IOException e) {
-			verbose("eithonBungeeJoinEvent", "Leave");
+			verbose("eithonBungeeJoinQuitEvent", "Leave");
 			e.printStackTrace();
 			return;
 		}
-		
-		// Local event
-		if (mainGroup.isEmpty()) mainGroup = null;
-		if (serverName.isEmpty()) serverName = null;
-		EithonBungeeJoinEvent e = new EithonBungeeJoinEvent(serverName, player, mainGroup);
-		Bukkit.getServer().getPluginManager().callEvent(e);
-		verbose("eithonBungeeJoinEvent", "Published local event");
 
-		// Forward event to all other servers
-		boolean success = this._bungeeSender.forwardToAll("EithonBungeeJoinEvent", msgbytes);
-		verbose("eithonBungeeJoinEvent", String.format("sucess = %s", success ? "TRUE" : "FALSE"));
-		verbose("eithonBungeeJoinEvent", "Leave");
+		boolean success = this._bungeeSender.forwardToAll("eventName", msgbytes);
+		verbose("eithonBungeeJoinQuitEvent", String.format("sucess = %s", success ? "TRUE" : "FALSE"));
+		verbose("eithonBungeeJoinQuitEvent", "Leave");
 	}
 
-	private String getHighestGroup(Player player) {
-		verbose("getHighestGroup", "Enter, Player = %s", player.getName());
+	public static String getHighestGroup(Player player) {
 		String[] currentGroups = ZPermissionsFacade.getPlayerPermissionGroups(player);
 		for (String priorityGroup : Config.V.groupPriorities) {
 			for (String playerGroup : currentGroups) {
 				if (playerGroup.equalsIgnoreCase(priorityGroup)) {
-					verbose("getHighestGroup", "Leave, priorityGroup = %s", priorityGroup);
 					return priorityGroup;
 				}
 			}
 		}
-		verbose("getHighestGroup", "Leave, priorityGroup = null");
 		return null;
 	}
 

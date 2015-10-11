@@ -46,7 +46,13 @@ class BungeeListener implements PluginMessageListener {
 			byte[] msgbytes = new byte[len];
 			in.readFully(msgbytes);
 			eithonBungeeJoinEvent(msgbytes);
-	}
+		} else if (subchannel.equals("EithonBungeeQuitEvent")) {
+			short len = in.readShort();
+			verbose("onPluginMessageReceived", String.format("len=%d", len));
+			byte[] msgbytes = new byte[len];
+			in.readFully(msgbytes);
+			eithonBungeeQuitEvent(msgbytes);
+		}
 		verbose("onPluginMessageReceived", "Leave");
 	}
 
@@ -85,6 +91,35 @@ class BungeeListener implements PluginMessageListener {
 			return;
 		}
 		verbose("eithonBungeeJoinEvent", "Leave");
+	}
+	
+	private void eithonBungeeQuitEvent(byte[] msgbytes) {
+		verbose("eithonBungeeQuitEvent", String.format("Enter msgbytes=%s", msgbytes.toString()));
+		DataInputStream msgin = new DataInputStream(new ByteArrayInputStream(msgbytes));
+		try {
+			String serverName = msgin.readUTF();
+			verbose("eithonBungeeQuitEvent", String.format("serverName=%s", serverName));
+			if (serverName.isEmpty()) serverName = null;
+			String uuid = msgin.readUTF();
+			verbose("eithonBungeeQuitEvent", String.format("player uuid=%s", uuid));
+			UUID playerId = UUID.fromString(uuid);
+			EithonPlayer player = new EithonPlayer(playerId);
+			if (player.getOfflinePlayer() == null) {
+				verbose("eithonBungeeQuitEvent", "No user found, Leave");
+				return;				
+			}
+			verbose("eithonBungeeQuitEvent", String.format("player=%s", player.getName()));
+			String mainGroup = msgin.readUTF();
+			verbose("eithonBungeeQuitEvent", String.format("mainGroup=%s", mainGroup));
+			if (mainGroup.isEmpty()) mainGroup = null;
+			EithonBungeeQuitEvent e = new EithonBungeeQuitEvent(serverName, player, mainGroup);
+			Bukkit.getServer().getPluginManager().callEvent(e);
+		} catch (IOException e) {
+			e.printStackTrace();
+			verbose("eithonBungeeQuitEvent", "FAIL and Leave");
+			return;
+		}
+		verbose("eithonBungeeQuitEvent", "Leave");
 	}
 
 	private void verbose(String method, String format, Object... args) {
