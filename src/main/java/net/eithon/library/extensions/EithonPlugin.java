@@ -54,6 +54,10 @@ public class EithonPlugin extends JavaPlugin implements Listener {
 	public boolean teleportPlayerToServer(Player player, String serverName) {
 		return this._bungeeController.connectToServer(player, serverName);
 	}
+	
+	public String getBungeeServerName() {
+		return this._bungeeController.getServerName();
+	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {

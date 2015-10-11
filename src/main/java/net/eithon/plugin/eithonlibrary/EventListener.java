@@ -10,6 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 public class EventListener implements Listener {
 
@@ -39,13 +40,11 @@ public class EventListener implements Listener {
 		this._bungeeController.eithonBungeeJoinEvent(player);
 	}
 
-	/*
-	// Inform everyone that we a player has left the server
+	// Inform everyone that a player has left the server
 	@EventHandler
 	public void onPlayerQuitEvent(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
 		if (player == null) return;
-		this._controller.eithonBungeeQuitEvent(player);
+		this._bungeeController.eithonBungeeQuitEvent(player);
 	}
-	*/
 }
