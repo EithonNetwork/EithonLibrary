@@ -28,8 +28,6 @@ eithon:
   # Delay (ticks) for title fade out
   TitleFadeOutTicks: 20
 
-  
-
 commands:
 
   #

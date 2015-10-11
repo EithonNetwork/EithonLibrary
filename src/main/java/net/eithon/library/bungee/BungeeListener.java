@@ -62,6 +62,9 @@ class BungeeListener implements PluginMessageListener {
 		verbose("eithonBungeeJoinEvent", String.format("Enter msgbytes=%s", msgbytes.toString()));
 		DataInputStream msgin = new DataInputStream(new ByteArrayInputStream(msgbytes));
 		try {
+			String serverName = msgin.readUTF();
+			verbose("eithonBungeeJoinEvent", String.format("serverName=%s", serverName));
+			if (serverName.isEmpty()) serverName = null;
 			String uuid = msgin.readUTF();
 			verbose("eithonBungeeJoinEvent", String.format("player uuid=%s", uuid));
 			UUID playerId = UUID.fromString(uuid);
@@ -74,7 +77,7 @@ class BungeeListener implements PluginMessageListener {
 			String mainGroup = msgin.readUTF();
 			verbose("eithonBungeeJoinEvent", String.format("mainGroup=%s", mainGroup));
 			if (mainGroup.isEmpty()) mainGroup = null;
-			EithonBungeeJoinEvent e = new EithonBungeeJoinEvent(this._controller.getServerName(), player, mainGroup);
+			EithonBungeeJoinEvent e = new EithonBungeeJoinEvent(serverName, player, mainGroup);
 			Bukkit.getServer().getPluginManager().callEvent(e);
 		} catch (IOException e) {
 			e.printStackTrace();

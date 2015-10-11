@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 1.7.2 (2015-10-11)
+
+* BUG: Wrong server name was shown at join.
+
 ### 1.7.1 (2015-10-11)
 
 * BUG: Fixed numerous bugs for the EithonBungeeJoinEvent.

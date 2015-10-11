@@ -50,7 +50,10 @@ public class BungeeController {
 		if (mainGroup == null) mainGroup = "";
 		ByteArrayOutputStream msgbytes = new ByteArrayOutputStream();
 		DataOutputStream msgout = new DataOutputStream(msgbytes);
+		String serverName = getServerName();
+		if (serverName == null) serverName = "";
 		try {
+			msgout.writeUTF(serverName);
 			msgout.writeUTF(player.getUniqueId().toString());
 			msgout.writeUTF(mainGroup);
 		} catch (IOException e) {
@@ -61,7 +64,8 @@ public class BungeeController {
 		
 		// Local event
 		if (mainGroup.isEmpty()) mainGroup = null;
-		EithonBungeeJoinEvent e = new EithonBungeeJoinEvent(getServerName(), player, mainGroup);
+		if (serverName.isEmpty()) serverName = null;
+		EithonBungeeJoinEvent e = new EithonBungeeJoinEvent(serverName, player, mainGroup);
 		Bukkit.getServer().getPluginManager().callEvent(e);
 		verbose("eithonBungeeJoinEvent", "Published local event");
 
