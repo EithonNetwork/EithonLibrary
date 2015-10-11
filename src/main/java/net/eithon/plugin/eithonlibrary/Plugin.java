@@ -14,7 +14,6 @@ import org.bukkit.event.player.PlayerMoveEvent;
 
 public final class Plugin extends EithonPlugin implements Listener {
 	public static EithonPlugin eithonPlugin;
-	private BungeeController _bungeeController;
 	
 	@Override
 	public void onEnable() {
@@ -23,7 +22,6 @@ public final class Plugin extends EithonPlugin implements Listener {
 		Logger logger = getEithonLogger();
 		Logger.setDefaultDebug(logger);
 		Config.load(this);
-		this._bungeeController = new BungeeController(this);
 		super.activate(null, this);
 	}
 
@@ -31,10 +29,6 @@ public final class Plugin extends EithonPlugin implements Listener {
 	public void onDisable() {
 		super.onDisable();
 		AlarmTrigger.get().disable();
-	}
-	
-	public BungeeSender getBungeeSender() {
-		return this._bungeeController.getBungeeSender();
 	}
 	
 	// Handle move by block

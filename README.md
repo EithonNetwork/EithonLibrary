@@ -13,6 +13,14 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 1.6.1 (2015-10-11)
+
+* BUG: Added verbose logging to find bugs.
+
+### 1.6 (2015-10-11)
+
+* NEW: Added BungeeCord support
+
 ### 1.5 (2015-09-17)
 
 * NEW: CommandParser now can read boolean.

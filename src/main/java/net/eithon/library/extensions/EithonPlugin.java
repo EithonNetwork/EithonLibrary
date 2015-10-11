@@ -3,6 +3,8 @@ package net.eithon.library.extensions;
 import java.io.File;
 import java.util.HashMap;
 
+import net.eithon.library.bungee.BungeeController;
+import net.eithon.library.bungee.BungeeSender;
 import net.eithon.library.facades.ZPermissionsFacade;
 import net.eithon.library.file.FileMisc;
 import net.eithon.library.plugin.CommandParser;
@@ -24,11 +26,13 @@ public class EithonPlugin extends JavaPlugin implements Listener {
 	private Configuration _config;
 	private ICommandHandler _commandHandler;
 	private Listener _eventListener;
+	private BungeeController _bungeeController;
 
 	public EithonPlugin() {}
 	
 	@Override
 	public void onEnable() {
+		this._bungeeController = null;
 		Logger.initialize();
 		PermissionBasedMultiplier.initialize();
 		this._logger = new Logger(this);
@@ -39,6 +43,13 @@ public class EithonPlugin extends JavaPlugin implements Listener {
 		GeneralMessage.initialize(this);
 		AlarmTrigger.get().enable(this);
 		ZPermissionsFacade.initialize(this);
+	}
+	
+	public BungeeSender getBungeeSender() {
+		if (this._bungeeController == null) {
+			this._bungeeController = new BungeeController(this);
+		}
+		return this._bungeeController.getBungeeSender();
 	}
 
 	@Override
