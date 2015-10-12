@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 2.0 (2015-10-12)
+
+* NEW: Added an API
+
 ### 1.8.2 (2015-10-12)
 
 * BUG: Messages could queue up if no player was on a server.

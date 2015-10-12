@@ -1,11 +1,14 @@
 package net.eithon.library.bungee;
 
+import java.util.UUID;
+
 import net.eithon.library.core.CoreMisc;
 import net.eithon.library.extensions.EithonPlugin;
 import net.eithon.library.facades.ZPermissionsFacade;
 import net.eithon.library.plugin.Logger.DebugPrintLevel;
 import net.eithon.plugin.eithonlibrary.Config;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class BungeeController {
@@ -35,7 +38,9 @@ public class BungeeController {
 
 	public boolean connectToServer(Player player, String serverName) { return this._bungeeSender.connect(player, serverName);}
 
-	public void eithonBungeeJoinEvent(Player player) {
+	public void eithonBungeeJoinEvent(UUID playerId) {
+		Player player = Bukkit.getPlayer(playerId);
+		if (player == null) return;
 		eithonBungeeJoinQuitEvent(player, "EithonBungeeJoinEvent");
 	}
 
