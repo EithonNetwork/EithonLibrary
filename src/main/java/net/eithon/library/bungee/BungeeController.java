@@ -69,7 +69,7 @@ public class BungeeController {
 			return;
 		}
 
-		boolean success = this._bungeeSender.forwardToAll("eventName", msgbytes);
+		boolean success = this._bungeeSender.forwardToAll(eventName, msgbytes);
 		verbose("eithonBungeeJoinQuitEvent", String.format("sucess = %s", success ? "TRUE" : "FALSE"));
 		verbose("eithonBungeeJoinQuitEvent", "Leave");
 	}

@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 1.8.1 (2015-10-12)
+
+* BUG: BungeeController was sending the wrong subchannel.
+
 ### 1.8 (2015-10-11)
 
 * NEW: Added EithonBungeeQuitEvent

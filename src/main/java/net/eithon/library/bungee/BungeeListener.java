@@ -52,6 +52,8 @@ class BungeeListener implements PluginMessageListener {
 			byte[] msgbytes = new byte[len];
 			in.readFully(msgbytes);
 			eithonBungeeQuitEvent(msgbytes);
+		} else {
+			verbose("onPluginMessageReceived", String.format("Unknown subchannel: %s", subchannel));			
 		}
 		verbose("onPluginMessageReceived", "Leave");
 	}
