@@ -1,5 +1,7 @@
 package net.eithon.plugin.eithonlibrary;
 
+import java.util.UUID;
+
 import net.eithon.library.bungee.BungeeController;
 import net.eithon.library.extensions.EithonPlugin;
 import net.eithon.library.move.MoveEventHandler;
@@ -46,13 +48,14 @@ public class EventListener implements Listener {
 	}
 
 	private void delayedBungeeJoinEvent(Player player) {
+		final UUID playerId = player.getUniqueId();
 		final BungeeController bungeeController = this._bungeeController;
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		scheduler.scheduleSyncDelayedTask(this._eithonPlugin, new Runnable() {
 			public void run() {
-				bungeeController.eithonBungeeJoinEvent(player);
+				bungeeController.eithonBungeeJoinEvent(playerId);
 			}
-		}, TimeMisc.secondsToTicks(1));
+		}, TimeMisc.secondsToTicks(2));
 	}
 
 	// Inform everyone that a player has left the server

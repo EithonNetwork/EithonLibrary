@@ -1,8 +1,6 @@
 package net.eithon.library.bungee;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.util.UUID;
 
 import net.eithon.library.core.CoreMisc;
 import net.eithon.library.extensions.EithonPlugin;
@@ -10,6 +8,7 @@ import net.eithon.library.facades.ZPermissionsFacade;
 import net.eithon.library.plugin.Logger.DebugPrintLevel;
 import net.eithon.plugin.eithonlibrary.Config;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class BungeeController {
@@ -39,7 +38,9 @@ public class BungeeController {
 
 	public boolean connectToServer(Player player, String serverName) { return this._bungeeSender.connect(player, serverName);}
 
-	public void eithonBungeeJoinEvent(Player player) {
+	public void eithonBungeeJoinEvent(UUID playerId) {
+		Player player = Bukkit.getPlayer(playerId);
+		if (player == null) return;
 		eithonBungeeJoinQuitEvent(player, "EithonBungeeJoinEvent");
 	}
 
@@ -54,23 +55,12 @@ public class BungeeController {
 			return;
 		}
 		String mainGroup = getHighestGroup(player);
-		if (mainGroup == null) mainGroup = "";
-		ByteArrayOutputStream msgbytes = new ByteArrayOutputStream();
-		DataOutputStream msgout = new DataOutputStream(msgbytes);
+		verbose("eithonBungeeJoinQuitEvent", String.format("mainGroup=%s", mainGroup));
 		String serverName = getServerName();
-		if (serverName == null) serverName = "";
-		try {
-			msgout.writeUTF(serverName);
-			msgout.writeUTF(player.getUniqueId().toString());
-			msgout.writeUTF(mainGroup);
-		} catch (IOException e) {
-			verbose("eithonBungeeJoinQuitEvent", "Leave");
-			e.printStackTrace();
-			return;
-		}
-
-		boolean success = this._bungeeSender.forwardToAll("eventName", msgbytes);
-		verbose("eithonBungeeJoinQuitEvent", String.format("sucess = %s", success ? "TRUE" : "FALSE"));
+		verbose("eithonBungeeJoinQuitEvent", String.format("serverName=%s", serverName));
+		JoinQuitInfo info = new JoinQuitInfo(serverName, player.getUniqueId(), player.getName(), mainGroup);
+		boolean success = this._bungeeSender.forwardToAll(eventName, info.toJSONString());
+		verbose("eithonBungeeJoinQuitEvent", String.format("success=%s", success ? "TRUE" : "FALSE"));
 		verbose("eithonBungeeJoinQuitEvent", "Leave");
 	}
 

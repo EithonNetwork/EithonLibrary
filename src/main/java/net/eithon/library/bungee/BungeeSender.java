@@ -1,6 +1,8 @@
 package net.eithon.library.bungee;
 
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 import net.eithon.library.core.CoreMisc;
 import net.eithon.library.extensions.EithonPlugin;
@@ -20,12 +22,34 @@ class BungeeSender {
 
 	public BungeeSender(EithonPlugin eithonPlugin) {
 		this._eithonPlugin = eithonPlugin;
+	}		
+
+	private ByteArrayOutputStream toByteArrayOutputStream(String string) {
+		if (string == null) return null;
+		ByteArrayOutputStream msgbytes = new ByteArrayOutputStream();
+		DataOutputStream msgout = new DataOutputStream(msgbytes);
+		try {
+			msgout.writeUTF(string);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+		return msgbytes;
 	}
-	
+
+
+	boolean forwardToAll(String subChannel, String string) {
+		return forward("ALL", subChannel, toByteArrayOutputStream(string));
+	}
+
 	boolean forwardToAll(String subChannel, ByteArrayOutputStream msgbytes) {
 		return forward("ALL", subChannel, msgbytes);
 	}
-	
+
+	boolean forward(String server, String subChannel, String string) {
+		return send("Forward", toByteArrayOutputStream(string), server, subChannel);
+	}
+
 	boolean forward(String server, String subChannel, ByteArrayOutputStream msgbytes) {
 		return send("Forward", msgbytes, server, subChannel);
 	}

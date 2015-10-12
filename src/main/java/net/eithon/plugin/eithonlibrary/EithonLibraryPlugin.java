@@ -7,20 +7,21 @@ import net.eithon.library.time.AlarmTrigger;
 
 import org.bukkit.event.Listener;
 
-public final class Plugin extends EithonPlugin implements Listener {
-	public static EithonPlugin eithonPlugin;
+public final class EithonLibraryPlugin extends EithonPlugin implements Listener {
 	private BungeeController _bungeeController;
+	private EithonLibraryApi _api;
 	
 	@Override
 	public void onEnable() {
-		eithonPlugin = this;
 		super.onEnable();
 		Logger logger = getEithonLogger();
 		Logger.setDefaultDebug(logger);
 		Config.load(this);
 		this._bungeeController = new BungeeController(this);
 		this._bungeeController.createBungeeListener();
-		EventListener eventListener = new EventListener(eithonPlugin, this._bungeeController);
+		EventListener eventListener = new EventListener(this, this._bungeeController);
+		Controller controller = new Controller(this._bungeeController);
+		this._api = new EithonLibraryApi(controller);
 		super.activate(null, eventListener);
 	}
 
@@ -29,4 +30,6 @@ public final class Plugin extends EithonPlugin implements Listener {
 		super.onDisable();
 		AlarmTrigger.get().disable();
 	}
+	
+	public EithonLibraryApi getApi() {return this._api; }
 }

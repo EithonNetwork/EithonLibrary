@@ -3,7 +3,6 @@ package net.eithon.library.bungee;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.UUID;
 
 import net.eithon.library.core.CoreMisc;
 import net.eithon.library.extensions.EithonPlayer;
@@ -52,6 +51,8 @@ class BungeeListener implements PluginMessageListener {
 			byte[] msgbytes = new byte[len];
 			in.readFully(msgbytes);
 			eithonBungeeQuitEvent(msgbytes);
+		} else {
+			verbose("onPluginMessageReceived", String.format("Unknown subchannel: %s", subchannel));			
 		}
 		verbose("onPluginMessageReceived", "Leave");
 	}
@@ -68,21 +69,21 @@ class BungeeListener implements PluginMessageListener {
 		verbose("eithonBungeeJoinEvent", String.format("Enter msgbytes=%s", msgbytes.toString()));
 		DataInputStream msgin = new DataInputStream(new ByteArrayInputStream(msgbytes));
 		try {
-			String serverName = msgin.readUTF();
-			verbose("eithonBungeeJoinEvent", String.format("serverName=%s", serverName));
-			if (serverName.isEmpty()) serverName = null;
-			String uuid = msgin.readUTF();
-			verbose("eithonBungeeJoinEvent", String.format("player uuid=%s", uuid));
-			UUID playerId = UUID.fromString(uuid);
-			EithonPlayer player = new EithonPlayer(playerId);
+			String jsonString = msgin.readUTF();
+			JoinQuitInfo info = JoinQuitInfo.getFromJsonString(jsonString);
+			if (info.isTooOld()) {
+				verbose("eithonBungeeJoinEvent", "Event too old, Leave");
+				return;				
+			}
+			String serverName = info.getServerName();
+			EithonPlayer player = new EithonPlayer(info.getPlayerId());
 			if (player.getOfflinePlayer() == null) {
 				verbose("eithonBungeeJoinEvent", "No user found, Leave");
 				return;				
 			}
-			verbose("eithonBungeeJoinEvent", String.format("player=%s", player.getName()));
-			String mainGroup = msgin.readUTF();
-			verbose("eithonBungeeJoinEvent", String.format("mainGroup=%s", mainGroup));
-			if (mainGroup.isEmpty()) mainGroup = null;
+			String playerName = info.getPlayerName();
+			player.setNameIfHasNone(playerName);
+			String mainGroup = info.getMainGroup();
 			EithonBungeeJoinEvent e = new EithonBungeeJoinEvent(serverName, player, mainGroup);
 			Bukkit.getServer().getPluginManager().callEvent(e);
 		} catch (IOException e) {
@@ -97,21 +98,21 @@ class BungeeListener implements PluginMessageListener {
 		verbose("eithonBungeeQuitEvent", String.format("Enter msgbytes=%s", msgbytes.toString()));
 		DataInputStream msgin = new DataInputStream(new ByteArrayInputStream(msgbytes));
 		try {
-			String serverName = msgin.readUTF();
-			verbose("eithonBungeeQuitEvent", String.format("serverName=%s", serverName));
-			if (serverName.isEmpty()) serverName = null;
-			String uuid = msgin.readUTF();
-			verbose("eithonBungeeQuitEvent", String.format("player uuid=%s", uuid));
-			UUID playerId = UUID.fromString(uuid);
-			EithonPlayer player = new EithonPlayer(playerId);
-			if (player.getOfflinePlayer() == null) {
-				verbose("eithonBungeeQuitEvent", "No user found, Leave");
+			String jsonString = msgin.readUTF();
+			JoinQuitInfo info = JoinQuitInfo.getFromJsonString(jsonString);	
+			if (info.isTooOld()) {
+				verbose("eithonBungeeJoinEvent", "Event too old, Leave");
 				return;				
 			}
-			verbose("eithonBungeeQuitEvent", String.format("player=%s", player.getName()));
-			String mainGroup = msgin.readUTF();
-			verbose("eithonBungeeQuitEvent", String.format("mainGroup=%s", mainGroup));
-			if (mainGroup.isEmpty()) mainGroup = null;
+			String serverName = info.getServerName();
+			EithonPlayer player = new EithonPlayer(info.getPlayerId());
+			if (player.getOfflinePlayer() == null) {
+				verbose("eithonBungeeJoinEvent", "No user found, Leave");
+				return;				
+			}
+			String playerName = info.getPlayerName();
+			player.setNameIfHasNone(playerName);
+			String mainGroup = info.getMainGroup();
 			EithonBungeeQuitEvent e = new EithonBungeeQuitEvent(serverName, player, mainGroup);
 			Bukkit.getServer().getPluginManager().callEvent(e);
 		} catch (IOException e) {

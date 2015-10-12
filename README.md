@@ -13,6 +13,22 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 2.0.1 (2015-10-12)
+
+* BUG: Player name was empty on remote server where the user never has been logged in.
+
+### 2.0 (2015-10-12)
+
+* NEW: Added an API
+
+### 1.8.2 (2015-10-12)
+
+* BUG: Messages could queue up if no player was on a server.
+
+### 1.8.1 (2015-10-12)
+
+* BUG: BungeeController was sending the wrong subchannel.
+
 ### 1.8 (2015-10-11)
 
 * NEW: Added EithonBungeeQuitEvent
