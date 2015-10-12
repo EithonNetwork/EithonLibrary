@@ -58,7 +58,7 @@ public class BungeeController {
 		verbose("eithonBungeeJoinQuitEvent", String.format("mainGroup=%s", mainGroup));
 		String serverName = getServerName();
 		verbose("eithonBungeeJoinQuitEvent", String.format("serverName=%s", serverName));
-		JoinQuitInfo info = new JoinQuitInfo(serverName, player.getUniqueId(), mainGroup);
+		JoinQuitInfo info = new JoinQuitInfo(serverName, player.getUniqueId(), player.getName(), mainGroup);
 		boolean success = this._bungeeSender.forwardToAll(eventName, info.toJSONString());
 		verbose("eithonBungeeJoinQuitEvent", String.format("success=%s", success ? "TRUE" : "FALSE"));
 		verbose("eithonBungeeJoinQuitEvent", "Leave");

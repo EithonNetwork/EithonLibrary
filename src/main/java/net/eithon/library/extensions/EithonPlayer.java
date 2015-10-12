@@ -26,6 +26,8 @@ public class EithonPlayer implements CommandSender, IJson<EithonPlayer>, IUuidAn
 	private Player _player = null;
 	private OfflinePlayer _offlinePlayer = null;
 	private UUID _id = null;
+	private String _defaultName = null;
+	
 	public EithonPlayer(Player player) { 
 		this._player = player;
 		this._offlinePlayer = player;
@@ -62,7 +64,15 @@ public class EithonPlayer implements CommandSender, IJson<EithonPlayer>, IUuidAn
 	public UUID getUniqueId() { return this._id; }
 
 	@Override
-	public String getName() { return this._offlinePlayer.getName(); }
+	public String getName() {
+		String currentName = this._offlinePlayer.getName();
+		if ((currentName != null) && (!currentName.isEmpty())) return currentName;
+		return this._defaultName;
+	}
+
+	public void setNameIfHasNone(String playerName) {
+		this._defaultName = playerName;		
+	}
 	
 	public boolean isOnline() { return verifyPlayerIsOnline(); }
 
