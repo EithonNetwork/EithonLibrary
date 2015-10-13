@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 2.1 (2015-10-13)
+
+* NEW: Now has Bungee broadcast message.
+
 ### 2.0.1 (2015-10-12)
 
 * BUG: Player name was empty on remote server where the user never has been logged in.

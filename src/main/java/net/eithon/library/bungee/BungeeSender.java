@@ -24,34 +24,36 @@ class BungeeSender {
 		this._eithonPlugin = eithonPlugin;
 	}		
 
-	private ByteArrayOutputStream toByteArrayOutputStream(String string) {
-		if (string == null) return null;
+	private ByteArrayOutputStream toByteArrayOutputStream(ForwardHeader forwardHeader, String jsonString) {
+		verbose("toByteArrayOutputStream", "Enter");
+		if (forwardHeader == null) {
+			verbose("toByteArrayOutputStream", "No forwardHeader, return NULL");
+			return null;
+		}
 		ByteArrayOutputStream msgbytes = new ByteArrayOutputStream();
 		DataOutputStream msgout = new DataOutputStream(msgbytes);
 		try {
-			msgout.writeUTF(string);
+			msgout.writeUTF(forwardHeader.toJSONString());
+			msgout.writeUTF(jsonString == null ? "" : jsonString);
 		} catch (IOException e) {
 			e.printStackTrace();
+			verbose("toByteArrayOutputStream", "Fail to write bytes, return NULL");
 			return null;
 		}
+		verbose("toByteArrayOutputStream", "Leave");
 		return msgbytes;
 	}
 
 
-	boolean forwardToAll(String subChannel, String string) {
-		return forward("ALL", subChannel, toByteArrayOutputStream(string));
+	boolean forwardToAll(String command, String jsonString, boolean rejectOld) {
+		return forward("ALL", command, jsonString, rejectOld);
 	}
-
-	boolean forwardToAll(String subChannel, ByteArrayOutputStream msgbytes) {
-		return forward("ALL", subChannel, msgbytes);
-	}
-
-	boolean forward(String server, String subChannel, String string) {
-		return send("Forward", toByteArrayOutputStream(string), server, subChannel);
-	}
-
-	boolean forward(String server, String subChannel, ByteArrayOutputStream msgbytes) {
-		return send("Forward", msgbytes, server, subChannel);
+	
+	boolean forward(String server, String command, String jsonString, boolean rejectOld) {
+		String sourceServerName = this._eithonPlugin.getApi().getBungeeServerName();
+		ForwardHeader forwardHeader = new ForwardHeader(command, sourceServerName, rejectOld);
+		ByteArrayOutputStream message = toByteArrayOutputStream(forwardHeader, jsonString);
+		return send("Forward", message);
 	}
 
 	boolean getServer() {
@@ -62,9 +64,37 @@ class BungeeSender {
 		return send(player, "Connect", serverName);
 	}
 
-	private void verbose(String method, String format, Object... args) {
-		String message = CoreMisc.safeFormat(format, args);
-		this._eithonPlugin.getEithonLogger().debug(DebugPrintLevel.VERBOSE, "BungeeSender.%s: %s", method, message);
+	boolean send(String subChannel, ByteArrayOutputStream message, String... arguments) {
+		verbose("send", "Enter: subChannel=%s, message=%s", 
+				subChannel, message == null ? "NULL" : message.toString());
+		Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
+		if (player == null) {
+			verbose("send", "No player, will try again in one second.");
+			tryAgain(subChannel, message, arguments);
+			verbose("send", "Leave, TRUE");
+			return true;
+		}
+		boolean success = send(player, subChannel, message, arguments);
+		verbose("send", String.format("Leave, success = %s", success ? "TRUE" : "FALSE"));
+		return success;
+	}
+
+	void tryAgain(String subChannel, ByteArrayOutputStream message,
+			String... arguments) {
+		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+		scheduler.scheduleSyncDelayedTask(this._eithonPlugin, new Runnable() {
+			public void run() {
+				send(subChannel, message, arguments);
+			}
+		}, TimeMisc.secondsToTicks(1));
+	}
+
+	private boolean send(Player player, String subChannel, String... arguments) {
+		return send(player, subChannel, null, arguments);
+	}
+
+	private boolean send(String subChannel, String... arguments) {
+		return send(subChannel, null, arguments);
 	}
 
 	private boolean send(Player player, String subChannel, ByteArrayOutputStream message, String... arguments) {
@@ -92,31 +122,8 @@ class BungeeSender {
 		return true;
 	}
 
-	boolean send(String subChannel, ByteArrayOutputStream message, String... arguments) {
-		verbose("send", String.format("Enter: subChannel=%s, message=%s", 
-				subChannel, message == null ? "NULL" : message.toString()));
-		Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
-		if (player == null) {
-			verbose("send", "No player, will try again in one second.");
-			BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-			scheduler.scheduleSyncDelayedTask(this._eithonPlugin, new Runnable() {
-				public void run() {
-					send(subChannel, message, arguments);
-				}
-			}, TimeMisc.secondsToTicks(1));
-			verbose("send", "Leave, TRUE");
-			return true;
-		}
-		boolean success = send(player, subChannel, message, arguments);
-		verbose("send", String.format("Leave, success = %s", success ? "TRUE" : "FALSE"));
-		return success;
-	}
-
-	private boolean send(Player player, String subChannel, String... arguments) {
-		return send(player, subChannel, null, arguments);
-	}
-
-	private boolean send(String subChannel, String... arguments) {
-		return send(subChannel, null, arguments);
+	private void verbose(String method, String format, Object... args) {
+		String message = CoreMisc.safeFormat(format, args);
+		this._eithonPlugin.getEithonLogger().debug(DebugPrintLevel.VERBOSE, "BungeeSender.%s: %s", method, message);
 	}
 }

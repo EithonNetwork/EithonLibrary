@@ -3,7 +3,7 @@ package net.eithon.library.extensions;
 import java.io.File;
 import java.util.HashMap;
 
-import net.eithon.library.bungee.BungeeController;
+import net.eithon.library.facades.EithonLibraryFacade;
 import net.eithon.library.facades.ZPermissionsFacade;
 import net.eithon.library.file.FileMisc;
 import net.eithon.library.plugin.CommandParser;
@@ -13,10 +13,10 @@ import net.eithon.library.plugin.ICommandHandler;
 import net.eithon.library.plugin.Logger;
 import net.eithon.library.plugin.PermissionBasedMultiplier;
 import net.eithon.library.time.AlarmTrigger;
+import net.eithon.plugin.eithonlibrary.EithonLibraryApi;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -26,13 +26,12 @@ public class EithonPlugin extends JavaPlugin implements Listener {
 	private Configuration _config;
 	private ICommandHandler _commandHandler;
 	private Listener _eventListener;
-	private BungeeController _bungeeController;
+	private EithonLibraryApi _eithonLibraryApi;
 
 	public EithonPlugin() {}
 	
 	@Override
 	public void onEnable() {
-		this._bungeeController = null;
 		Logger.initialize();
 		PermissionBasedMultiplier.initialize();
 		this._logger = new Logger(this);
@@ -43,21 +42,10 @@ public class EithonPlugin extends JavaPlugin implements Listener {
 		GeneralMessage.initialize(this);
 		AlarmTrigger.get().enable(this);
 		ZPermissionsFacade.initialize(this);
+		this._eithonLibraryApi = new EithonLibraryFacade(this).getApi();
 	}
 	
-	public void initializeBungee() {
-		if (this._bungeeController == null) {
-			this._bungeeController = new BungeeController(this);
-		}
-	}
-	
-	public boolean teleportPlayerToServer(Player player, String serverName) {
-		return this._bungeeController.connectToServer(player, serverName);
-	}
-	
-	public String getBungeeServerName() {
-		return this._bungeeController.getServerName();
-	}
+	public EithonLibraryApi getApi() { return this._eithonLibraryApi;	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
