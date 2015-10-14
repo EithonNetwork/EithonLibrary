@@ -11,9 +11,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
-import com.google.common.io.ByteArrayDataInput;
-import com.google.common.io.ByteStreams;
-
 class BungeeListener implements PluginMessageListener {
 
 	private EithonPlugin _eithonPlugin;
@@ -32,43 +29,38 @@ class BungeeListener implements PluginMessageListener {
 			verbose("onPluginMessageReceived", String.format("Unknown channel: %s", channel));			
 			return;
 		}
-
-		ByteArrayDataInput in = ByteStreams.newDataInput(message);
-		String subchannel = in.readUTF();
+		
+		MessageIn msgIn = new MessageIn(message);
+		String subchannel = msgIn.readString();
 		verbose("onPluginMessageReceived", String.format("subchannel=%s", subchannel));
 		if (subchannel.equals("GetServer")) {
-			getServer(in, subchannel);
+			getServer(msgIn);
 		} else if (subchannel.equals("EithonLibraryForward")) {
-			short len = in.readShort();
-			verbose("onPluginMessageReceived", String.format("len=%d", len));
-			byte[] msgbytes = new byte[len];
-			in.readFully(msgbytes);
-			eithonLibraryForward(msgbytes);
+			eithonLibraryForward(msgIn);
 		} else {
 			this._eithonPlugin.getEithonLogger().error("Unknown subchannel: %s", subchannel);			
 		}
 		verbose("onPluginMessageReceived", "Leave");
 	}
 
-	private void getServer(ByteArrayDataInput in, String subchannel) {
+	private void getServer(MessageIn msgIn) {
 		verbose("getServer", "Enter");
-		String serverName = in.readUTF();
+		String serverName = msgIn.readString();
 		verbose("getServer", String.format("serverName=%s", serverName));
 		this._controller.setServerName(serverName);
 		verbose("getServer", "Leave");
 	}
 
-	private void eithonLibraryForward(byte[] message) {
+	private void eithonLibraryForward(MessageIn msgIn) {
 		verbose("eithonLibraryForward", "Enter");
-		ByteArrayDataInput in = ByteStreams.newDataInput(message);
-		String jsonString = in.readUTF();
-		verbose("eithonLibraryForward", String.format("forwardHeader=%s", jsonString));
-		ForwardHeader forwardHeader = ForwardHeader.getFromJsonString(jsonString);
+		String header = msgIn.readString();
+		verbose("eithonLibraryForward", String.format("forwardHeader=%s", header));
+		ForwardHeader forwardHeader = ForwardHeader.getFromJsonString(header);
 		if (forwardHeader.isTooOld()) {
 			verbose("eithonLibraryForward", "Message was too old, Leave");
 			return;
 		}
-		jsonString = in.readUTF();
+		String jsonString = msgIn.readString();
 		verbose("eithonLibraryForward", String.format("jsonObject=%s", jsonString));
 
 		String commandName = forwardHeader.getCommandName();

@@ -35,7 +35,6 @@ public class BungeeController {
 		eithonPlugin.getServer();
 	}
 
-
 	public String getServerName() { return this._serverName; }
 
 	public void setServerName(String serverName) { this._serverName = serverName; }
