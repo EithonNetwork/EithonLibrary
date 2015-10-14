@@ -23,8 +23,9 @@ class BungeeListener implements PluginMessageListener {
 
 	@Override
 	public void onPluginMessageReceived(String channel, Player player, byte[] message) {
-		verbose("onPluginMessageReceived", String.format("Enter: channel=%s, player=%s, message=%s",
-				channel, player == null ? "NULL" : player.getName(), message.toString()));
+		verbose("onPluginMessageReceived", "Enter: channel=%s, player=%s, message=%s",
+				channel, player == null ? "NULL" : player.getName(), message.toString());
+
 		if (!channel.equals("BungeeCord")) {
 			verbose("onPluginMessageReceived", String.format("Unknown channel: %s", channel));			
 			return;
@@ -34,45 +35,46 @@ class BungeeListener implements PluginMessageListener {
 		String subchannel = msgIn.readString();
 		verbose("onPluginMessageReceived", String.format("subchannel=%s", subchannel));
 		if (subchannel.equals("GetServer")) {
-			getServer(msgIn);
+			String serverName = msgIn.readString();
+			getServer(serverName);
 		} else if (subchannel.equals("EithonLibraryForward")) {
-			eithonLibraryForward(msgIn);
+			MessageIn body = new MessageIn(msgIn.readByteArray()); 
+			eithonLibraryForward(body);
 		} else {
 			this._eithonPlugin.getEithonLogger().error("Unknown subchannel: %s", subchannel);			
 		}
+		
 		verbose("onPluginMessageReceived", "Leave");
 	}
 
-	private void getServer(MessageIn msgIn) {
-		verbose("getServer", "Enter");
-		String serverName = msgIn.readString();
-		verbose("getServer", String.format("serverName=%s", serverName));
+	private void getServer(String serverName) {
+		verbose("getServer", "Enter, serverName=%s", serverName);
 		this._controller.setServerName(serverName);
 		verbose("getServer", "Leave");
 	}
 
-	private void eithonLibraryForward(MessageIn msgIn) {
+	private void eithonLibraryForward(MessageIn message) {
 		verbose("eithonLibraryForward", "Enter");
-		String header = msgIn.readString();
+		String header = message.readString();
 		verbose("eithonLibraryForward", String.format("forwardHeader=%s", header));
 		ForwardHeader forwardHeader = ForwardHeader.getFromJsonString(header);
 		if (forwardHeader.isTooOld()) {
 			verbose("eithonLibraryForward", "Message was too old, Leave");
 			return;
 		}
-		String jsonString = msgIn.readString();
-		verbose("eithonLibraryForward", String.format("jsonObject=%s", jsonString));
+		String body = message.readString();
+		verbose("eithonLibraryForward", String.format("jsonObject=%s", body));
 
 		String commandName = forwardHeader.getCommandName();
 		verbose("eithonLibraryForward", String.format("commandName=%s", commandName));
 		if (commandName.equals("JoinEvent")) {
-			JoinQuitInfo info = JoinQuitInfo.getFromJsonString(jsonString);
+			JoinQuitInfo info = JoinQuitInfo.getFromJsonString(body);
 			joinEvent(forwardHeader, info);
 		} else if (commandName.equals("QuitEvent")) {
-			JoinQuitInfo info = JoinQuitInfo.getFromJsonString(jsonString);
+			JoinQuitInfo info = JoinQuitInfo.getFromJsonString(body);
 			quitEvent(forwardHeader, info);
 		} else if (commandName.equals("BroadcastMessage")) {
-			MessageInfo info = MessageInfo.getFromJsonString(jsonString);
+			MessageInfo info = MessageInfo.getFromJsonString(body);
 			broadcastMessage(forwardHeader, info);
 		} else {
 			this._eithonPlugin.getEithonLogger().error("Unknown commandName: %s", commandName);			

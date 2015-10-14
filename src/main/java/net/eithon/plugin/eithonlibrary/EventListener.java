@@ -1,7 +1,5 @@
 package net.eithon.plugin.eithonlibrary;
 
-import java.util.UUID;
-
 import net.eithon.library.extensions.EithonPlugin;
 import net.eithon.library.move.MoveEventHandler;
 import net.eithon.library.time.TimeMisc;
@@ -44,13 +42,12 @@ public class EventListener implements Listener {
 		delayedBungeeJoinEvent(player);
 	}
 
-	private void delayedBungeeJoinEvent(Player player) {
-		final UUID playerId = player.getUniqueId();
+	private void delayedBungeeJoinEvent(final Player player) {
 		final EithonLibraryApi api = this._eithonPlugin.getApi();
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		scheduler.scheduleSyncDelayedTask(this._eithonPlugin, new Runnable() {
 			public void run() {
-				api.bungeeJoinEvent(playerId);
+				api.bungeeJoinEvent(player);
 			}
 		}, TimeMisc.secondsToTicks(2));
 	}

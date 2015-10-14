@@ -18,65 +18,58 @@ class Channel {
 		this._eithonPlugin = eithonPlugin;
 	}
 
-	boolean send(String subChannel, byte[] message, String... arguments) {
-		verbose("send", "Enter: subChannel=%s, message=%s", 
-				subChannel, message == null ? "NULL" : message.toString());
-		Player player = getPlayer(subChannel, message, arguments);
+	boolean send(String subChannel) {
+		return send(subChannel, (MessageOut) null, (String[]) null);
+	}
+
+	boolean send(String subChannel, String... arguments) {
+		return send(subChannel, (MessageOut) null, arguments);
+	}
+
+	boolean send(String subChannel, MessageOut msgOut, String... arguments) {
+		verbose("send", "Enter: subChannel=%s", subChannel);
+		Player player = getPlayer(subChannel, msgOut, arguments);
 		if (player == null) {
-			verbose("send", "No player found, will try later. Return TRUE.");
+			this._eithonPlugin.getEithonLogger().warning("No player found, will try later.");
 			return true;
 		}
-		boolean success = send(player, subChannel, message, arguments);
+		boolean success = send(player, subChannel, msgOut, arguments);
 		verbose("send", "Leave, success = %s", success ? "TRUE" : "FALSE");
 		return success;
 	}
 
-	private Player getPlayer(String subChannel, byte[] message, String... arguments) {
-		Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
-		if (player == null) {
-			verbose("send", "No player, will try again in one second.");
-			tryAgain(subChannel, message, arguments);
-			verbose("send", "Leave, TRUE");
-			return null;
-		}
-		return player;
-	}
-
-	private void tryAgain(String subChannel, byte[] message, String... arguments) {
-		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		scheduler.scheduleSyncDelayedTask(this._eithonPlugin, new Runnable() {
-			public void run() {
-				send(subChannel, message, arguments);
-			}
-		}, TimeMisc.secondsToTicks(1));
-	}
-
 	boolean send(Player player, String subChannel, String... arguments) {
-		return send(player, subChannel, null, arguments);
+		return send(player, subChannel, (MessageOut) null, arguments);
 	}
 
-	boolean send(String subChannel, String... arguments) {
-		return send(subChannel, null, arguments);
-	}
+	private boolean send(Player player, String subChannel, MessageOut message, String... arguments) {
+		verbose("send", "Enter: Player=%s, subChannel=%s", 
+				player == null? "NULL" : player.getName(), subChannel);
 
-	private boolean send(Player player, String subChannel, byte[] message, String... arguments) {
-		verbose("send", String.format("Enter: Player=%s, subChannel=%s, message=%s", 
-				player == null? "NULL" : player.getName(), subChannel, message == null ? "NULL" : message.toString()));
+		if (player == null) return send(subChannel, message, arguments);
 
-		if (player == null) {
-			verbose("send", "Player was null");
-			verbose("send", "Leave FALSE");
-			return false;
-		}
-		
 		MessageOut messageOut = new MessageOut();
 		messageOut.add(subChannel);
 		messageOut.add(arguments);
-		messageOut.add(message);
-
+		messageOut.add(message.toByteArray());
 		player.sendPluginMessage(this._eithonPlugin, "BungeeCord", messageOut.toByteArray());
+		
 		verbose("send", "Leave TRUE");
 		return true;
+	}
+
+	private Player getPlayer(String subChannel, MessageOut msgOut, String... arguments) {
+		Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
+		if (player == null) {
+			BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+			scheduler.scheduleSyncDelayedTask(this._eithonPlugin, new Runnable() {
+				public void run() {
+					send(subChannel, msgOut, arguments);
+				}
+			}, TimeMisc.secondsToTicks(1));
+			return null;
+		}
+		return player;
 	}
 
 	private void verbose(String method, String format, Object... args) {

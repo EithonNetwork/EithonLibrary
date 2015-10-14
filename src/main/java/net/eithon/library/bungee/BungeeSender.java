@@ -17,12 +17,17 @@ class BungeeSender {
 		return forward("ALL", command, jsonString, rejectOld);
 	}
 
-	boolean forward(String server, String command, String jsonString, boolean rejectOld) {
+	boolean forward(String destinationServer, String command, String body, boolean rejectOld) {
 		String sourceServerName = this._eithonPlugin.getApi().getBungeeServerName();
-		ForwardHeader forwardHeader = new ForwardHeader(command, sourceServerName, rejectOld);
+		ForwardHeader header = new ForwardHeader(command, sourceServerName, rejectOld);
+		MessageOut data = new MessageOut()
+		.add(header.toJSONString())
+		.add(body);
 		MessageOut msgout = new MessageOut()
-		.add(forwardHeader.toJSONString(), jsonString);
-		return this._messageChannel.send("Forward", msgout.toByteArray());
+		.add(destinationServer)
+		.add("EithonLibraryForward")
+		.add(data.toByteArray());
+		return this._messageChannel.send("Forward", msgout);
 	}
 
 	boolean getServer() {
