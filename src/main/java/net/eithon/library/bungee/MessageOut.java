@@ -10,8 +10,8 @@ class MessageOut {
 		this._out = ByteStreams.newDataOutput();
 	}
 
-	MessageOut add(String... strings) {
-		for (String argument : strings) {
+	MessageOut add(String... arguments) {
+		for (String argument : arguments) {
 			if (argument != null) {
 				this._out.writeUTF(argument);
 			}
@@ -20,8 +20,8 @@ class MessageOut {
 	}
 
 	MessageOut add(byte[] byteArray) {
-		if (byteArray == null) return this;
-		this._out.writeShort(byteArray.length);
+		short length = (short) (byteArray == null ? 0 : byteArray.length);
+		this._out.writeShort(length);
 		if (byteArray.length > 0) this._out.write(byteArray);
 		return this;
 	}

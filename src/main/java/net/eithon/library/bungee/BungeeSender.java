@@ -1,6 +1,8 @@
 package net.eithon.library.bungee;
 
+import net.eithon.library.core.CoreMisc;
 import net.eithon.library.extensions.EithonPlugin;
+import net.eithon.library.plugin.Logger.DebugPrintLevel;
 
 import org.bukkit.entity.Player;
 
@@ -18,16 +20,16 @@ class BungeeSender {
 	}
 
 	boolean forward(String destinationServer, String command, String body, boolean rejectOld) {
-		String sourceServerName = this._eithonPlugin.getApi().getBungeeServerName();
+		verbose("forward", "Enter; destinationServer=%s, command = %s", destinationServer, command);
+		String sourceServerName = "sourceServerName"; // this._eithonPlugin.getApi().getBungeeServerName();
 		ForwardHeader header = new ForwardHeader(command, sourceServerName, rejectOld);
+		verbose("send", "header = %s", header.toJSONString());
 		MessageOut data = new MessageOut()
 		.add(header.toJSONString())
 		.add(body);
-		MessageOut msgout = new MessageOut()
-		.add(destinationServer)
-		.add("EithonLibraryForward")
-		.add(data.toByteArray());
-		return this._messageChannel.send("Forward", msgout);
+		boolean success = this._messageChannel.send("Forward", data, destinationServer, "EithonLibraryForward");
+		verbose("forward", "Leave, success = %s", success ? "TRUE" : "FALSE");
+		return success;
 	}
 
 	boolean getServer() {
@@ -36,5 +38,10 @@ class BungeeSender {
 
 	boolean connect(Player player, String serverName) {
 		return this._messageChannel.send(player, "Connect", serverName);
+	}
+
+	private void verbose(String method, String format, Object... args) {
+		String message = CoreMisc.safeFormat(format, args);
+		this._eithonPlugin.getEithonLogger().debug(DebugPrintLevel.VERBOSE, "BungeeSender.%s: %s", method, message);
 	}
 }

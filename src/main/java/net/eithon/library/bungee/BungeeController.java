@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 
 public class BungeeController {
 
-	private static BungeeListener bungeeListener;
+	static BungeeListener bungeeListener;
 	private BungeeSender _bungeeSender;
 	private EithonPlugin _eithonPlugin;
 	private String _serverName;

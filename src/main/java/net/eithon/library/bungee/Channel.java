@@ -45,17 +45,40 @@ class Channel {
 	private boolean send(Player player, String subChannel, MessageOut message, String... arguments) {
 		verbose("send", "Enter: Player=%s, subChannel=%s", 
 				player == null? "NULL" : player.getName(), subChannel);
-
-		if (player == null) return send(subChannel, message, arguments);
-
+		if (player == null) {
+			verbose("send", "Player was null, will try another send method");
+			boolean success = send(subChannel, message, arguments);
+			verbose("send", "Leave, success = %s", success ? "TRUE" : "FALSE");
+			return success;
+		}
 		MessageOut messageOut = new MessageOut();
 		messageOut.add(subChannel);
 		messageOut.add(arguments);
-		messageOut.add(message.toByteArray());
+		if (message != null) messageOut.add(message.toByteArray());
+		//simulateBungee(player, messageOut);
 		player.sendPluginMessage(this._eithonPlugin, "BungeeCord", messageOut.toByteArray());
 		
 		verbose("send", "Leave TRUE");
 		return true;
+	}
+
+	private void simulateBungee(Player player, MessageOut messageOut) {
+		verbose("simulateBungee", "Enter");
+		MessageIn messageIn = new MessageIn(messageOut.toByteArray());
+		String subchannel = messageIn.readString();
+		verbose("simulateBungee", "subchannel=%s", subchannel);
+		if (subchannel.equals("Forward")) {
+			verbose("simulateBungee", "Repack Forward message");
+			String destinationServer = messageIn.readString();
+			verbose("simulateBungee", "destinationServer=%s", destinationServer);
+			String pluginChannel = messageIn.readString();
+			verbose("simulateBungee", "pluginChannel=%s", pluginChannel);
+			byte[] body = messageIn.readByteArray();
+			messageOut = new MessageOut()
+			.add(pluginChannel)
+			.add(body);
+		}
+		BungeeController.bungeeListener.onPluginMessageReceived("BungeeCord", player, messageOut.toByteArray());
 	}
 
 	private Player getPlayer(String subChannel, MessageOut msgOut, String... arguments) {
