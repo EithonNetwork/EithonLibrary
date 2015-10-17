@@ -1,6 +1,5 @@
 package net.eithon.library.bungee;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import net.eithon.library.json.IJson;
@@ -8,19 +7,17 @@ import net.eithon.library.json.IJson;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-public class JoinQuitInfo  implements IJson<JoinQuitInfo>{
-	private String _mainGroup;
+public class JoinQuitInfo  implements IJson<JoinQuitInfo> {
 	private String _serverName;
+	private String _mainGroup;
 	private String _playerName;
 	private UUID _playerId;
-	private LocalDateTime _sendTime;
 	
 	public JoinQuitInfo() {
-		this._mainGroup = null;
 		this._serverName = null;
+		this._mainGroup = null;
 		this._playerName = null;
 		this._playerId = null;
-		this._sendTime = null;
 	}
 	
 	public JoinQuitInfo(String serverName, UUID playerId, String playerName, String mainGroup) {
@@ -28,19 +25,12 @@ public class JoinQuitInfo  implements IJson<JoinQuitInfo>{
 		this._playerId = playerId;
 		this._playerName = playerName;
 		this._mainGroup = mainGroup;
-		this._sendTime = null;
 	}
 	
-	public String getMainGroup() { return this._mainGroup; }
 	public String getServerName() { return this._serverName; }
+	public String getMainGroup() { return this._mainGroup; }
 	public String getPlayerName() { return this._playerName; }
 	public UUID getPlayerId() { return this._playerId; }
-	public LocalDateTime getSendTime() { return this._sendTime; }
-
-	public boolean isTooOld() {
-		if (this._sendTime == null) return false;
-		return LocalDateTime.now().minusSeconds(30).isAfter(this._sendTime);
-	}
 	
 	public String toJSONString() {
 		return ((JSONObject) toJson()).toJSONString();
@@ -59,7 +49,6 @@ public class JoinQuitInfo  implements IJson<JoinQuitInfo>{
 		json.put("mainGroup", this._mainGroup);
 		json.put("playerId", this._playerId == null ? null : this._playerId.toString());
 		json.put("playerName", this._playerName);
-		json.put("sendTime", LocalDateTime.now().toString());
 		return json;
 	}
 
@@ -75,11 +64,6 @@ public class JoinQuitInfo  implements IJson<JoinQuitInfo>{
 			this._playerId = UUID.fromString(uuid);
 		}
 		this._playerName = (String) jsonObject.get("playerName");
-		this._sendTime = null;
-		String sendTime = (String) jsonObject.get("sendTime");
-		if (sendTime != null) {
-			this._sendTime = LocalDateTime.parse(sendTime);
-		}
 		return this;
 	}
 

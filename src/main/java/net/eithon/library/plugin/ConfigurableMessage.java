@@ -72,11 +72,23 @@ public class ConfigurableMessage extends ConfigurableFormat{
 	public boolean broadcastMessage(Object... args) {
 		String message = getMessageWithColorCoding(args);
 		if (message == null) return false;
+		broadcastToThisServer(message);
+		return true;
+	}
+
+	public void broadcastToThisServer(String message) {
+		if (message == null) return;
 		if (this._useTitle) {
 			sendTitle(message);
 		} else {
 			this._eithonPlugin.getServer().broadcastMessage(message);
 		}
-		return true;
+	}
+
+	public boolean broadcastMessageToAllServers(Object... args) {
+		String message = getMessageWithColorCoding(args);
+		if (message == null) return false;
+		broadcastToThisServer(message);
+		return this._eithonPlugin.getApi().bungeeBroadcastMessage(message, this._useTitle);
 	}
 }

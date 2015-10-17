@@ -18,10 +18,8 @@ public final class EithonLibraryPlugin extends EithonPlugin implements Listener 
 		Logger.setDefaultDebug(logger);
 		Config.load(this);
 		this._bungeeController = new BungeeController(this);
-		this._bungeeController.createBungeeListener();
-		EventListener eventListener = new EventListener(this, this._bungeeController);
-		Controller controller = new Controller(this._bungeeController);
-		this._api = new EithonLibraryApi(controller);
+		EventListener eventListener = new EventListener(this);
+		this._api = new EithonLibraryApi(this._bungeeController);
 		super.activate(null, eventListener);
 	}
 

@@ -18,14 +18,6 @@ public class Logger {
 		debugLevelValues = DebugPrintLevel.values();
 	}
 	
-	private int toInt(DebugPrintLevel level) {
-		for (int i = 0; i < debugLevelValues.length; i++) {
-			if (debugLevelValues[i] == level) return i;
-		}
-		warning("Did not recognize a debug level.");
-		return 0;
-	}
-	
 	public static void setDefaultDebug(Logger debug) {
 		defaultDebug = debug;
 	}
@@ -35,26 +27,18 @@ public class Logger {
 	}
 	
 	public void enable() {
-		int level = this._plugin.getConfiguration().getInt("eithon.DebugLevel", 3);
-		switch (level) {
-		case 0:
-			this._debugLevel = DebugPrintLevel.NONE;
-			break;
-		case 1:
-			this._debugLevel = DebugPrintLevel.MAJOR;
-			break;
-		case 2:
-			this._debugLevel = DebugPrintLevel.MINOR;
-			break;
-		case 3:
-			this._debugLevel = DebugPrintLevel.VERBOSE;
-			break;
-		default:
-			this._debugLevel = DebugPrintLevel.VERBOSE;
-			warning("Unknown debug level (%d). Debug level was set to %d (VERBOSE).", level, 3);
-			break;
-		}
+		this._debugLevelAsInt = this._plugin.getConfiguration().getInt("eithon.DebugLevel", 3);
+		this._debugLevel = fromInt(this._debugLevelAsInt);
+	}
+	
+	public void setDebugLevel(DebugPrintLevel level) {
+		this._debugLevel = level;
 		this._debugLevelAsInt = toInt(this._debugLevel);
+	}
+	
+	public void setDebugLevel(int level) {
+		this._debugLevelAsInt = level;
+		this._debugLevel = fromInt(this._debugLevelAsInt);
 	}
 
 	public static void consolePrintF(String format, Object... args) {
@@ -141,6 +125,23 @@ public class Logger {
 			this._plugin.getLogger().severe(message);
 		} catch (Exception e) {
 			consolePrint(message);
+		}
+	}
+	
+	private int toInt(DebugPrintLevel level) {
+		for (int i = 0; i < debugLevelValues.length; i++) {
+			if (debugLevelValues[i] == level) return i;
+		}
+		warning("Did not recognize a debug level.");
+		return 0;
+	}
+	
+	public DebugPrintLevel fromInt(int level) {
+		try {
+		return debugLevelValues[level];
+		} catch (Exception e) {
+			warning("Unknown debug level (%d). Debug level was set to %d (VERBOSE).", level, 3);
+			return DebugPrintLevel.VERBOSE;
 		}
 	}
 

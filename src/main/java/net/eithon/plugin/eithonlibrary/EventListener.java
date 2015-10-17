@@ -1,8 +1,5 @@
 package net.eithon.plugin.eithonlibrary;
 
-import java.util.UUID;
-
-import net.eithon.library.bungee.BungeeController;
 import net.eithon.library.extensions.EithonPlugin;
 import net.eithon.library.move.MoveEventHandler;
 import net.eithon.library.time.TimeMisc;
@@ -19,12 +16,10 @@ import org.bukkit.scheduler.BukkitScheduler;
 
 public class EventListener implements Listener {
 
-	private BungeeController _bungeeController;
 	private EithonPlugin _eithonPlugin;
 
-	public EventListener(EithonPlugin eithonPlugin, BungeeController controller) {
+	public EventListener(EithonPlugin eithonPlugin) {
 		this._eithonPlugin = eithonPlugin;
-		this._bungeeController = controller;
 	}
 	
 	// Handle move by block
@@ -47,13 +42,12 @@ public class EventListener implements Listener {
 		delayedBungeeJoinEvent(player);
 	}
 
-	private void delayedBungeeJoinEvent(Player player) {
-		final UUID playerId = player.getUniqueId();
-		final BungeeController bungeeController = this._bungeeController;
+	private void delayedBungeeJoinEvent(final Player player) {
+		final EithonLibraryApi api = this._eithonPlugin.getApi();
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		scheduler.scheduleSyncDelayedTask(this._eithonPlugin, new Runnable() {
 			public void run() {
-				bungeeController.eithonBungeeJoinEvent(playerId);
+				api.bungeeJoinEvent(player);
 			}
 		}, TimeMisc.secondsToTicks(2));
 	}
@@ -63,6 +57,6 @@ public class EventListener implements Listener {
 	public void onPlayerQuitEvent(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
 		if (player == null) return;
-		this._bungeeController.eithonBungeeQuitEvent(player);
+		this._eithonPlugin.getApi().bungeeQuitEvent(player);
 	}
 }
