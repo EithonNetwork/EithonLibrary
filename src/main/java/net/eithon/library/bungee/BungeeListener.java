@@ -84,7 +84,7 @@ class BungeeListener implements PluginMessageListener {
 
 	private void joinEvent(ForwardHeader forwardHeader, JoinQuitInfo info) {
 		verbose("joinEvent", "Enter");
-		String serverName = forwardHeader.getSourceServerName();
+		String serverName = info.getServerName();
 		EithonPlayer player = new EithonPlayer(info.getPlayerId());
 		if (player.getOfflinePlayer() == null) {
 			verbose("joinEvent", "No user found, Leave");
@@ -100,7 +100,7 @@ class BungeeListener implements PluginMessageListener {
 
 	private void quitEvent(ForwardHeader forwardHeader, JoinQuitInfo info) {
 		verbose("quitEvent", "Enter");
-		String serverName = forwardHeader.getSourceServerName();
+		String serverName = info.getServerName();
 		EithonPlayer player = new EithonPlayer(info.getPlayerId());
 		if (player.getOfflinePlayer() == null) {
 			verbose("quitEvent", "No user found, Leave");

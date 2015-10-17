@@ -21,7 +21,7 @@ class BungeeSender {
 
 	boolean forward(String destinationServer, String command, String body, boolean rejectOld) {
 		verbose("forward", "Enter; destinationServer=%s, command = %s", destinationServer, command);
-		String sourceServerName = "sourceServerName"; // this._eithonPlugin.getApi().getBungeeServerName();
+		String sourceServerName =  this._eithonPlugin.getApi().getBungeeServerName();
 		ForwardHeader header = new ForwardHeader(command, sourceServerName, rejectOld);
 		verbose("send", "header = %s", header.toJSONString());
 		MessageOut data = new MessageOut()
