@@ -62,6 +62,7 @@ class Channel {
 		return true;
 	}
 
+	/*
 	private void simulateBungee(Player player, MessageOut messageOut) {
 		verbose("simulateBungee", "Enter");
 		MessageIn messageIn = new MessageIn(messageOut.toByteArray());
@@ -80,6 +81,7 @@ class Channel {
 		}
 		BungeeController.bungeeListener.onPluginMessageReceived("BungeeCord", player, messageOut.toByteArray());
 	}
+	*/
 
 	private Player getPlayer(String subChannel, MessageOut msgOut, String... arguments) {
 		Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);

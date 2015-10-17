@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 2.2 (2015-10-17)
+
+* NEW: Added possibility to update the debug level without reloading the configuration file.
+
 ### 2.1 (2015-10-13)
 
 * NEW: Now has Bungee broadcast message.

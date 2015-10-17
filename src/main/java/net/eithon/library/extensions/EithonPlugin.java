@@ -68,15 +68,9 @@ public class EithonPlugin extends JavaPlugin implements Listener {
 	public void onDisable() {
 		this._commandHandler = null;
 		this._eventListener = null;
+		instances.remove(getName());
 	}
 	
-	@Deprecated
-	public static EithonPlugin get(JavaPlugin plugin) {
-		EithonPlugin eithonPlugin = getByName(plugin.getName());
-		return eithonPlugin;
-	}
-	
-	@Deprecated
 	public static EithonPlugin getByName(String name) {
 		return instances.get(name);
 	}
