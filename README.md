@@ -17,6 +17,7 @@ Eithon java code library for Minecraft.
 
 * BUG: Used the wrong method.
 * BUG: Never initiated bungeeServerName.
+* BUG: Null bungeeServer name should be considered prime server.
 
 ### 2.3 (2015-10-18)
 

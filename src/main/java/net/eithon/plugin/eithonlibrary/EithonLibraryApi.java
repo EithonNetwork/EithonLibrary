@@ -28,7 +28,9 @@ public class EithonLibraryApi {
 	}
 	
 	public boolean isPrimaryBungeeServer() {
-		return isPrimaryBungeeServer(getBungeeServerName());
+		String bungeeServerName = getBungeeServerName();
+		if (bungeeServerName == null) return true;
+		return isPrimaryBungeeServer(bungeeServerName);
 	}
 
 	public boolean bungeeBroadcastMessage(String message, boolean useTitle) {
