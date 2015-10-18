@@ -11,6 +11,7 @@ class MessageOut {
 	}
 
 	MessageOut add(String... arguments) {
+		if (arguments == null) return this;
 		for (String argument : arguments) {
 			if (argument != null) {
 				this._out.writeUTF(argument);

@@ -13,6 +13,12 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 2.3.1 (2015-10-18)
+
+* BUG: Used the wrong method.
+* BUG: Never initiated bungeeServerName.
+* BUG: Null bungeeServer name should be considered prime server.
+
 ### 2.3 (2015-10-18)
 
 * CHANGE: Refactoring

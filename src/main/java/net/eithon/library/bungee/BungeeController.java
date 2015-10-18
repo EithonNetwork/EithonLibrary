@@ -21,6 +21,7 @@ public class BungeeController {
 		this._eithonPlugin = eithonPlugin;
 		createBungeeSender(eithonPlugin);
 		createBungeeListener(eithonPlugin);
+		this._bungeeSender.getServer();
 	}
 
 	public void createBungeeSender(EithonPlugin eithonPlugin) {
@@ -31,7 +32,6 @@ public class BungeeController {
 	private void createBungeeListener(EithonPlugin eithonPlugin) {
 		bungeeListener = new BungeeListener(eithonPlugin, this);
 		eithonPlugin.getServer().getMessenger().registerIncomingPluginChannel(eithonPlugin, "BungeeCord", bungeeListener);
-		eithonPlugin.getServer();
 	}
 
 	public String getServerName() { return this._serverName; }
@@ -57,18 +57,18 @@ public class BungeeController {
 		return success;
 	}
 
-	public boolean sendEventToServer(String targetServerName, String eventName,
+	public boolean sendEventToServer(String targetServerName, String name,
 			IJsonObject<?> data, boolean rejectOld) {
 		JSONObject jsonObject = data == null ? null : data.toJsonObject();
 		String jsonString = jsonObject == null ? null : jsonObject.toJSONString();
-		verbose("sendEventToServer", "Enter, targetServerName = %s, eventName= %s, json=%s",
-				targetServerName, eventName, jsonString);
+		verbose("sendEventToServer", "Enter, targetServerName = %s, name= %s, json=%s",
+				targetServerName, name, jsonString);
 		if (targetServerName == null) {
 			verbose("sendEventToServer", "targetServerName NULL, Leave");
 			return false;
 		}
 		String thisServerName = this.getServerName();
-		EithonBungeeEvent info = new EithonBungeeEvent(thisServerName, eventName, jsonObject);
+		EithonBungeeEvent info = new EithonBungeeEvent(thisServerName, name, jsonObject);
 		boolean success = this._bungeeSender.forward(targetServerName, "CallEvent", info, rejectOld);
 		verbose("sendEventToServer", String.format("Leave, success=%s", success ? "TRUE" : "FALSE"));
 		return success;
