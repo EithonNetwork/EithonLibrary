@@ -78,6 +78,11 @@ class Channel {
 			messageOut = new MessageOut()
 			.add(pluginChannel)
 			.add(body);
+		} else if (subchannel.equals("GetServer")) {
+			verbose("simulateBungee", "Repack getServer message");
+			messageOut = new MessageOut()
+			.add(subchannel)
+			.add("main");
 		}
 		BungeeController.bungeeListener.onPluginMessageReceived("BungeeCord", player, messageOut.toByteArray());
 	}

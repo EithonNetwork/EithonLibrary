@@ -57,7 +57,7 @@ public class BungeeController {
 		return success;
 	}
 
-	public boolean sendEventToServer(String targetServerName, String name,
+	public boolean sendDataToServer(String targetServerName, String name,
 			IJsonObject<?> data, boolean rejectOld) {
 		JSONObject jsonObject = data == null ? null : data.toJsonObject();
 		String jsonString = jsonObject == null ? null : jsonObject.toJSONString();
