@@ -9,7 +9,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 public class EithonBungeeEvent extends Event implements IJson<EithonBungeeEvent>, IJsonObject<EithonBungeeEvent>  {
-	private static HandlerList handlers;
+	private static final HandlerList handlers = new HandlerList();
 	private String _sourceServerName;
 	private String _name;
 	private JSONObject _data;
