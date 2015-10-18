@@ -3,14 +3,14 @@ package net.eithon.library.extensions;
 import java.util.UUID;
 
 import net.eithon.library.core.IUuidAndName;
-import net.eithon.library.json.IJson;
+import net.eithon.library.json.JsonObject;
 import net.eithon.library.plugin.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.json.simple.JSONObject;
 
-public class EithonWorld implements IJson<EithonWorld>, IUuidAndName{
+public class EithonWorld extends JsonObject<EithonWorld> implements IUuidAndName{
 
 	private World _world = null;
 	private UUID _id = null;

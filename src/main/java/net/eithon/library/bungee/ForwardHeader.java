@@ -2,12 +2,12 @@ package net.eithon.library.bungee;
 
 import java.time.LocalDateTime;
 
-import net.eithon.library.json.IJson;
+import net.eithon.library.json.JsonObject;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-public class ForwardHeader implements IJson<ForwardHeader>{
+public class ForwardHeader extends JsonObject<ForwardHeader>{
 	private String _commandName;
 	private String _sourceServerName;
 	private LocalDateTime _messageSendTime;

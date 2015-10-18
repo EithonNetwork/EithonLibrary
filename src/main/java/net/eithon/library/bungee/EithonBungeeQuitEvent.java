@@ -3,23 +3,17 @@ package net.eithon.library.bungee;
 import net.eithon.library.extensions.EithonPlayer;
 
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class EithonBungeeQuitEvent extends Event {
+public class EithonBungeeQuitEvent extends EithonBungeeJoinQuitEvent {
 	private static final HandlerList handlers = new HandlerList();
-	private EithonPlayer _player;
-	private String _mainGroup;
-	private String _serverName;
 
-	public EithonBungeeQuitEvent(String serverName, EithonPlayer player, String mainGroup) {
-		this._serverName = serverName;
-		this._player = player;
-		this._mainGroup = mainGroup;
+	public EithonBungeeQuitEvent(String thisServerName, String thatServerName, EithonPlayer player, String mainGroup) {
+		super(thisServerName, thatServerName, player, mainGroup);
 	}
 
-	public EithonBungeeQuitEvent(String serverName, Player player, String mainGroup) {
-		this(serverName, new EithonPlayer(player), mainGroup);
+	public EithonBungeeQuitEvent(String thisServerName, String thatServerName, Player player, String mainGroup) {
+		this(thisServerName, thatServerName, new EithonPlayer(player), mainGroup);
 	}
 
 	public static HandlerList getHandlerList() {
@@ -30,10 +24,4 @@ public class EithonBungeeQuitEvent extends Event {
 	public HandlerList getHandlers() {
 		return handlers;
 	}
-
-	public EithonPlayer getPlayer() { return this._player; }
-
-	public String getMainGroup() { return this._mainGroup; }
-
-	public String getServerName() { return this._serverName; }
 }

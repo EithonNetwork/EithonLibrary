@@ -3,10 +3,12 @@ package net.eithon.library.bungee;
 import net.eithon.library.core.CoreMisc;
 import net.eithon.library.extensions.EithonPlugin;
 import net.eithon.library.facades.ZPermissionsFacade;
+import net.eithon.library.json.IJsonObject;
 import net.eithon.library.plugin.Logger.DebugPrintLevel;
 import net.eithon.plugin.eithonlibrary.Config;
 
 import org.bukkit.entity.Player;
+import org.json.simple.JSONObject;
 
 public class BungeeController {
 
@@ -39,36 +41,53 @@ public class BungeeController {
 	public boolean connectToServer(Player player, String serverName) { return this._bungeeSender.connect(player, serverName);}
 
 	public void joinEvent(Player player) {
-		eithonBungeeJoinQuitEvent(player, "JoinEvent");
+		joinQuitEvent(player, "JoinEvent");
 	}
 
 	public void quitEvent(Player player) {
-		eithonBungeeJoinQuitEvent(player, "QuitEvent");
+		joinQuitEvent(player, "QuitEvent");
 	}
 
 	public boolean broadcastMessage(String message, boolean useTitle) {
 		verbose("broadcastMessage", "Enter, message = %s", message);
 		MessageInfo info = new MessageInfo(message, useTitle);
-		boolean success = this._bungeeSender.forwardToAll("BroadcastMessage", info.toJSONString(), true);
+		boolean success = this._bungeeSender.forwardToAll("BroadcastMessage", info, true);
 		verbose("broadcastMessage", String.format("success=%s", success ? "TRUE" : "FALSE"));
 		verbose("broadcastMessage", "Leave");
 		return success;
 	}
 
-	private boolean eithonBungeeJoinQuitEvent(Player player, String eventName) {
-		verbose("eithonBungeeJoinQuitEvent", "Enter, player = %s", player == null ? "NULL" : player.getName());
+	public boolean sendEventToServer(String targetServerName, String eventName,
+			IJsonObject<?> data, boolean rejectOld) {
+		JSONObject jsonObject = data == null ? null : data.toJsonObject();
+		String jsonString = jsonObject == null ? null : jsonObject.toJSONString();
+		verbose("sendEventToServer", "Enter, targetServerName = %s, eventName= %s, json=%s",
+				targetServerName, eventName, jsonString);
+		if (targetServerName == null) {
+			verbose("sendEventToServer", "targetServerName NULL, Leave");
+			return false;
+		}
+		String thisServerName = this.getServerName();
+		EithonBungeeEvent info = new EithonBungeeEvent(thisServerName, eventName, jsonObject);
+		boolean success = this._bungeeSender.forward(targetServerName, "CallEvent", info, rejectOld);
+		verbose("sendEventToServer", String.format("Leave, success=%s", success ? "TRUE" : "FALSE"));
+		return success;
+	}
+
+	private boolean joinQuitEvent(Player player, String eventName) {
+		verbose("joinQuitEvent", "Enter, player = %s", player == null ? "NULL" : player.getName());
 		if (player == null) {
-			verbose("eithonBungeeJoinQuitEvent", "Player NULL, Leave");
+			verbose("joinQuitEvent", "Player NULL, Leave");
 			return false;
 		}
 		String mainGroup = getHighestGroup(player);
-		verbose("eithonBungeeJoinQuitEvent", String.format("mainGroup=%s", mainGroup));
+		verbose("joinQuitEvent", String.format("mainGroup=%s", mainGroup));
 		String serverName = getServerName();
-		verbose("eithonBungeeJoinQuitEvent", String.format("serverName=%s", serverName));
+		verbose("joinQuitEvent", String.format("serverName=%s", serverName));
 		JoinQuitInfo info = new JoinQuitInfo(serverName, player.getUniqueId(), player.getName(), mainGroup);
-		boolean success = this._bungeeSender.forwardToAll(eventName, info.toJSONString(), true);
-		verbose("eithonBungeeJoinQuitEvent", String.format("success=%s", success ? "TRUE" : "FALSE"));
-		verbose("eithonBungeeJoinQuitEvent", "Leave");
+		boolean success = this._bungeeSender.forwardToAll(eventName, info, true);
+		verbose("joinQuitEvent", String.format("success=%s", success ? "TRUE" : "FALSE"));
+		verbose("joinQuitEvent", "Leave");
 		return success;
 	}
 

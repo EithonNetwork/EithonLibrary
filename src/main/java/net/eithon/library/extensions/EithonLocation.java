@@ -1,6 +1,6 @@
 package net.eithon.library.extensions;
 
-import net.eithon.library.json.IJson;
+import net.eithon.library.json.JsonObject;
 import net.eithon.library.plugin.Logger;
 
 import org.bukkit.Location;
@@ -9,7 +9,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.json.simple.JSONObject;
 
-public class EithonLocation implements IJson<EithonLocation>{
+public class EithonLocation extends JsonObject<EithonLocation>{
 
 	private Location _location;
 	private EithonWorld _eithonWorld;
