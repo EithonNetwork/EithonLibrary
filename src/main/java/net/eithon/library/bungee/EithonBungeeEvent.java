@@ -26,7 +26,7 @@ public class EithonBungeeEvent extends Event implements IJson<EithonBungeeEvent>
 	}
 	
 	public String getSourceServerName() { return this._sourceServerName; }
-	public String getEventName() { return this._name; }
+	public String getName() { return this._name; }
 	public JSONObject getData() { return this._data; }
 	
 	public static EithonBungeeEvent getFromJsonString(String jsonString) {

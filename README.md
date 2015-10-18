@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 2.3.1 (2015-10-18)
+
+* BUG: Used the wrong method.
+
 ### 2.3 (2015-10-18)
 
 * CHANGE: Refactoring
