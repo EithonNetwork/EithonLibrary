@@ -15,10 +15,14 @@ import net.eithon.library.plugin.Logger.DebugPrintLevel;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
-public class PlayerCollection<T extends IJson<T> & IUuidAndName>
+public class PlayerCollection<T extends IJson<T> & IJsonObject<T> & IUuidAndName>
 extends net.eithon.library.core.PlayerCollection<T> 
-implements Iterable<T>, IJsonDelta<PlayerCollection<T>>, Serializable
+implements Iterable<T>,
+IJson<PlayerCollection<T>>, IJsonObject<PlayerCollection<T>>, 
+IJsonDelta<PlayerCollection<T>>, IJsonObjectDelta<PlayerCollection<T>>,
+Serializable
 {
 	private static final long serialVersionUID = 1L;
 	private T _infoInstance;
@@ -190,5 +194,28 @@ implements Iterable<T>, IJsonDelta<PlayerCollection<T>>, Serializable
 			return;			
 		}
 		fromJson(fileContent.getPayload());
+	}
+
+	@Override
+	public JSONObject toJsonObject() {
+		return toJsonObjectDelta(true);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public JSONObject toJsonObjectDelta(boolean saveAll) {
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("array", (JSONObject) toJsonDelta(saveAll));
+		return jsonObject;
+	}
+
+	@Override
+	public String toJsonString() {
+		return toJsonObject().toJSONString();
+	}
+
+	@Override
+	public PlayerCollection<T> fromJsonObject(JSONObject json) {
+		return fromJson(json.get("array"));
 	}
 }

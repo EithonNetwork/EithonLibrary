@@ -2,12 +2,12 @@ package net.eithon.library.bungee;
 
 import java.util.UUID;
 
-import net.eithon.library.json.IJson;
+import net.eithon.library.json.JsonObject;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-public class JoinQuitInfo  implements IJson<JoinQuitInfo> {
+public class JoinQuitInfo  extends JsonObject<JoinQuitInfo> {
 	private String _serverName;
 	private String _mainGroup;
 	private String _playerName;

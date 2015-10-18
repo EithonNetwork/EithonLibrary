@@ -19,7 +19,7 @@ import org.bukkit.scheduler.BukkitScheduler;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-public class FileContent implements IJson<FileContent>{
+public class FileContent extends JsonObject<FileContent>{
 	private String _name;
 	private long _version;
 	private Object _payload;

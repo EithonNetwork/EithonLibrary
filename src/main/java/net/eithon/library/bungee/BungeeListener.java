@@ -73,6 +73,9 @@ class BungeeListener implements PluginMessageListener {
 		} else if (commandName.equals("QuitEvent")) {
 			JoinQuitInfo info = JoinQuitInfo.getFromJsonString(body);
 			quitEvent(forwardHeader, info);
+		} else if (commandName.equals("CallEvent")) {
+			EithonBungeeEvent info = EithonBungeeEvent.getFromJsonString(body);
+			Bukkit.getServer().getPluginManager().callEvent(info);
 		} else if (commandName.equals("BroadcastMessage")) {
 			MessageInfo info = MessageInfo.getFromJsonString(body);
 			broadcastMessage(forwardHeader, info);
@@ -84,7 +87,7 @@ class BungeeListener implements PluginMessageListener {
 
 	private void joinEvent(ForwardHeader forwardHeader, JoinQuitInfo info) {
 		verbose("joinEvent", "Enter");
-		String serverName = info.getServerName();
+		String thatServerName = info.getServerName();
 		EithonPlayer player = new EithonPlayer(info.getPlayerId());
 		if (player.getOfflinePlayer() == null) {
 			verbose("joinEvent", "No user found, Leave");
@@ -93,14 +96,15 @@ class BungeeListener implements PluginMessageListener {
 		String playerName = info.getPlayerName();
 		player.setNameIfHasNone(playerName);
 		String mainGroup = info.getMainGroup();
-		EithonBungeeJoinEvent e = new EithonBungeeJoinEvent(serverName, player, mainGroup);
+		String thisServerName = this._controller.getServerName();
+		EithonBungeeJoinEvent e = new EithonBungeeJoinEvent(thisServerName, thatServerName, player, mainGroup);
 		Bukkit.getServer().getPluginManager().callEvent(e);
 		verbose("joinEvent", "Leave");
 	}
 
 	private void quitEvent(ForwardHeader forwardHeader, JoinQuitInfo info) {
 		verbose("quitEvent", "Enter");
-		String serverName = info.getServerName();
+		String thatServerName = info.getServerName();
 		EithonPlayer player = new EithonPlayer(info.getPlayerId());
 		if (player.getOfflinePlayer() == null) {
 			verbose("quitEvent", "No user found, Leave");
@@ -109,7 +113,8 @@ class BungeeListener implements PluginMessageListener {
 		String playerName = info.getPlayerName();
 		player.setNameIfHasNone(playerName);
 		String mainGroup = info.getMainGroup();
-		EithonBungeeQuitEvent e = new EithonBungeeQuitEvent(serverName, player, mainGroup);
+		String thisServerName = this._controller.getServerName();
+		EithonBungeeQuitEvent e = new EithonBungeeQuitEvent(thisServerName, thatServerName, player, mainGroup);
 		Bukkit.getServer().getPluginManager().callEvent(e);
 		verbose("quitEvent", "Leave");
 	}
