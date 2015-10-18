@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import net.eithon.library.core.CoreMisc;
 import net.eithon.library.core.IUuidAndName;
-import net.eithon.library.json.IJson;
+import net.eithon.library.json.JsonObject;
 import net.eithon.library.plugin.GeneralMessage;
 import net.eithon.plugin.eithonlibrary.Config;
 
@@ -21,7 +21,7 @@ import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
 import org.json.simple.JSONObject;
 
-public class EithonPlayer implements CommandSender, IJson<EithonPlayer>, IUuidAndName{
+public class EithonPlayer extends JsonObject<EithonPlayer> implements CommandSender, IUuidAndName{
 
 	private Player _player = null;
 	private OfflinePlayer _offlinePlayer = null;

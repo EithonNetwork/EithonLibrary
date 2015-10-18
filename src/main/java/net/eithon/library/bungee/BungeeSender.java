@@ -2,6 +2,7 @@ package net.eithon.library.bungee;
 
 import net.eithon.library.core.CoreMisc;
 import net.eithon.library.extensions.EithonPlugin;
+import net.eithon.library.json.IJsonObject;
 import net.eithon.library.plugin.Logger.DebugPrintLevel;
 
 import org.bukkit.entity.Player;
@@ -15,18 +16,18 @@ class BungeeSender {
 		this._messageChannel = new Channel(eithonPlugin);
 	}
 
-	boolean forwardToAll(String command, String jsonString, boolean rejectOld) {
-		return forward("ALL", command, jsonString, rejectOld);
+	boolean forwardToAll(String command, IJsonObject<?> info, boolean rejectOld) {
+		return forward("ALL", command, info, rejectOld);
 	}
 
-	boolean forward(String destinationServer, String command, String body, boolean rejectOld) {
+	boolean forward(String destinationServer, String command, IJsonObject<?> info, boolean rejectOld) {
 		verbose("forward", "Enter; destinationServer=%s, command = %s", destinationServer, command);
-		String sourceServerName = "sourceServerName"; // this._eithonPlugin.getApi().getBungeeServerName();
+		String sourceServerName =  this._eithonPlugin.getApi().getBungeeServerName();
 		ForwardHeader header = new ForwardHeader(command, sourceServerName, rejectOld);
 		verbose("send", "header = %s", header.toJSONString());
 		MessageOut data = new MessageOut()
 		.add(header.toJSONString())
-		.add(body);
+		.add(info.toJsonString());
 		boolean success = this._messageChannel.send("Forward", data, destinationServer, "EithonLibraryForward");
 		verbose("forward", "Leave, success = %s", success ? "TRUE" : "FALSE");
 		return success;

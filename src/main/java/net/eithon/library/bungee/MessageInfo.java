@@ -1,11 +1,11 @@
 package net.eithon.library.bungee;
 
-import net.eithon.library.json.IJson;
+import net.eithon.library.json.JsonObject;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-public class MessageInfo  implements IJson<MessageInfo>{
+public class MessageInfo  extends JsonObject<MessageInfo>{
 	private String _message;
 	private boolean _useTitle;
 	
@@ -22,7 +22,7 @@ public class MessageInfo  implements IJson<MessageInfo>{
 	public String getMessage() { return this._message; }
 	public boolean getUseTitle() { return this._useTitle; }
 	
-	public String toJSONString() {
+	public String toJsonString() {
 		return ((JSONObject) toJson()).toJSONString();
 	}
 	

@@ -1,6 +1,7 @@
 package net.eithon.plugin.eithonlibrary;
 
 import net.eithon.library.bungee.BungeeController;
+import net.eithon.library.json.IJsonObject;
 
 import org.bukkit.entity.Player;
 
@@ -13,6 +14,21 @@ public class EithonLibraryApi {
 	
 	public String getBungeeServerName() {
 		return this._controller.getServerName();
+	}
+	
+	public String getPrimaryBungeeServerName() {
+		return Config.V.primaryBungeeServer;
+	}
+	
+	public boolean isPrimaryBungeeServer(String bungeeServerName) {
+		if (bungeeServerName == null) return false;
+		String primaryBungeeServerName = getPrimaryBungeeServerName();
+		if (primaryBungeeServerName == null) return false;
+		return bungeeServerName.equalsIgnoreCase(primaryBungeeServerName);
+	}
+	
+	public boolean isPrimaryBungeeServer() {
+		return isPrimaryBungeeServer(getBungeeServerName());
 	}
 
 	public boolean bungeeBroadcastMessage(String message, boolean useTitle) {
@@ -29,5 +45,9 @@ public class EithonLibraryApi {
 
 	public void bungeeQuitEvent(Player player) {
 		this._controller.quitEvent(player);
+	}
+
+	public boolean bungeeSendDataToServer(String serverName, String name, IJsonObject<?> data, boolean rejectOld) {
+		return this._controller.sendEventToServer(serverName, name, data, rejectOld);
 	}
 }

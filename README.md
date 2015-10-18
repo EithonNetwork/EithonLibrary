@@ -13,7 +13,15 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
-### 2.2 (2015-10-17)
+### 2.3 (2015-10-18)
+
+* CHANGE: Refactoring
+
+### 2.2.1 (2015-10-18)
+
+* BUG: SourceServerName was a constant.
+
+### 2.2 (2015-10-18)
 
 * NEW: Added possibility to update the debug level without reloading the configuration file.
 
