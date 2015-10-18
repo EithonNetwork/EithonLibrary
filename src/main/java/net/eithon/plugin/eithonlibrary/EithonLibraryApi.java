@@ -50,6 +50,6 @@ public class EithonLibraryApi {
 	}
 
 	public boolean bungeeSendDataToServer(String serverName, String name, IJsonObject<?> data, boolean rejectOld) {
-		return this._controller.sendEventToServer(serverName, name, data, rejectOld);
+		return this._controller.sendDataToServer(serverName, name, data, rejectOld);
 	}
 }
