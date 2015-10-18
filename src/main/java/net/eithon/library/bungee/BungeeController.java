@@ -21,6 +21,7 @@ public class BungeeController {
 		this._eithonPlugin = eithonPlugin;
 		createBungeeSender(eithonPlugin);
 		createBungeeListener(eithonPlugin);
+		this._bungeeSender.getServer();
 	}
 
 	public void createBungeeSender(EithonPlugin eithonPlugin) {
@@ -31,7 +32,6 @@ public class BungeeController {
 	private void createBungeeListener(EithonPlugin eithonPlugin) {
 		bungeeListener = new BungeeListener(eithonPlugin, this);
 		eithonPlugin.getServer().getMessenger().registerIncomingPluginChannel(eithonPlugin, "BungeeCord", bungeeListener);
-		eithonPlugin.getServer();
 	}
 
 	public String getServerName() { return this._serverName; }
