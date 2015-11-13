@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 3.0 (2015-11-13)
+
+* CHANGE: Optimization of PlayerMoveEvent
+
 ### 2.3.2 (2015-10-18)
 
 * BUG: Trying to fix BungeeChord.

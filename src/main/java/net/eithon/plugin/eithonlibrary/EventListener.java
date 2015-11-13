@@ -5,7 +5,6 @@ import net.eithon.library.move.MoveEventHandler;
 import net.eithon.library.time.TimeMisc;
 
 import org.bukkit.Bukkit;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,12 +25,7 @@ public class EventListener implements Listener {
 	@EventHandler
 	public void onPlayerMoveEvent(PlayerMoveEvent event) {
 		if (event.isCancelled()) return;
-		if (isSameBlock(event.getFrom().getBlock(), event.getTo().getBlock())) return;
 		MoveEventHandler.handle(event);
-	}
-	
-	private static boolean isSameBlock(Block from, Block to) {
-		return (from.getX() == to.getX()) && (from.getZ() == to.getZ()) && (from.getY() == to.getY());
 	}
 
 	// Inform everyone that we have a new player on the server

@@ -1,23 +1,25 @@
 package net.eithon.library.move;
 
-import java.util.HashMap;
-
 import net.eithon.library.core.PlayerCollection;
-import net.eithon.library.plugin.Logger;
 
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 public class MoveEventHandler {
 	private static PlayerCollection<BlockMover> _playerSubscriptions = new PlayerCollection<BlockMover>();
-	private static HashMap<String, IBlockMoverFollower> _generalSubscriptions = new HashMap<String, IBlockMoverFollower>();
 	
 	public static void handle(PlayerMoveEvent event) {
-		for (IBlockMoverFollower follower : _generalSubscriptions.values()) {
-			follower.moveEventHandler(event);
-			if (event.isCancelled()) return;
-		}
-		BlockMover mover = _playerSubscriptions.get(event.getPlayer());
+		Block fromBlock = event.getFrom().getBlock();
+		Block toBlock = event.getTo().getBlock();
+		if (isSameBlock(fromBlock, toBlock)) return;
+		
+		Player player = event.getPlayer();
+		EithonPlayerMoveOneBlockEvent e = 
+				new EithonPlayerMoveOneBlockEvent(player, fromBlock, toBlock);
+		player.getServer().getPluginManager().callEvent(e);
+		
+		BlockMover mover = _playerSubscriptions.get(player);
 		if (mover == null) return;
 		mover.informFollowers(event);
 	}
@@ -37,18 +39,8 @@ public class MoveEventHandler {
 		mover.removeFollower(follower);
 		if (!mover.hasFollowers()) _playerSubscriptions.remove(player);
 	}
-
-	public static void addBlockMover(IBlockMoverFollower follower) {
-		if (_generalSubscriptions.containsKey(follower.getName())) {
-			Logger.libraryWarning(
-					"Bad programming or duplicate follower names? Follower %s has obsolete calls to net.eithon.library.move.MoveEventHandler.addBlockMover().",
-					follower.getName());
-		}
-		_generalSubscriptions.put(follower.getName(), follower);
-	}
-
-	public static void removeBlockMover(IBlockMoverFollower follower) {
-		if (!_generalSubscriptions.containsKey(follower.getName())) return;
-		_generalSubscriptions.remove(follower.getName());
+	
+	private static boolean isSameBlock(Block from, Block to) {
+		return (from.getX() == to.getX()) && (from.getZ() == to.getZ()) && (from.getY() == to.getY());
 	}
 }
