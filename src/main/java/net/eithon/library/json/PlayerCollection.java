@@ -9,8 +9,8 @@ import net.eithon.library.core.IFactory;
 import net.eithon.library.core.IUuidAndName;
 import net.eithon.library.extensions.EithonPlugin;
 import net.eithon.library.file.FileMisc;
-import net.eithon.library.plugin.Logger;
-import net.eithon.library.plugin.Logger.DebugPrintLevel;
+import net.eithon.library.plugin.EithonLogger;
+import net.eithon.library.plugin.EithonLogger.DebugPrintLevel;
 
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -54,9 +54,9 @@ Serializable
 	public Object toJsonDelta(boolean saveAll) {
 		JSONArray json = new JSONArray();
 		for (T value : this.playerInfo.values()) {
-			Logger.libraryDebug(DebugPrintLevel.MINOR, "Collecting delta for player %s", value.getName());
+			EithonLogger.libraryDebug(DebugPrintLevel.MINOR, "Collecting delta for player %s", value.getName());
 			if (!(value instanceof IJson<?>)) {
-				Logger.libraryError("%s must implement interface IJson", value.toString());
+				EithonLogger.libraryError("%s must implement interface IJson", value.toString());
 				return null;
 			}
 			Object infoAsJson = null;
@@ -65,14 +65,14 @@ Serializable
 				infoAsJson = info.toJson();
 			} else {
 				if (!(value instanceof IJsonDelta<?>)) {
-					Logger.libraryError("%s must implement interface IJsonDelta", value.toString());
+					EithonLogger.libraryError("%s must implement interface IJsonDelta", value.toString());
 					return null;
 				}
 				IJsonDelta<T> info = (IJsonDelta<T>) value;
 				infoAsJson = info.toJsonDelta(false);			
 			}
 			if (infoAsJson != null) json.add(infoAsJson);
-			else Logger.libraryDebug(DebugPrintLevel.MINOR, "No delta found for player %s", value.getName());
+			else EithonLogger.libraryDebug(DebugPrintLevel.MINOR, "No delta found for player %s", value.getName());
 		}
 		return json;
 	}

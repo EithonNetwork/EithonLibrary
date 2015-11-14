@@ -3,8 +3,8 @@ package net.eithon.library.plugin;
 import net.eithon.library.core.CoreMisc;
 import net.eithon.library.extensions.EithonPlugin;
 
-public class Logger {
-	private static Logger defaultDebug = null;
+public class EithonLogger {
+	private static EithonLogger defaultDebug = null;
 	private static DebugPrintLevel[] debugLevelValues = null;
 	private EithonPlugin _plugin = null;
 	private DebugPrintLevel _debugLevel = DebugPrintLevel.NONE;
@@ -18,11 +18,11 @@ public class Logger {
 		debugLevelValues = DebugPrintLevel.values();
 	}
 	
-	public static void setDefaultDebug(Logger debug) {
+	public static void setDefaultDebug(EithonLogger debug) {
 		defaultDebug = debug;
 	}
 	
-	public Logger(EithonPlugin plugin) { 
+	public EithonLogger(EithonPlugin plugin) { 
 		this._plugin = plugin; 
 	}
 	
