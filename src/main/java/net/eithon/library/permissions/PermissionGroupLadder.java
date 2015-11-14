@@ -2,7 +2,7 @@ package net.eithon.library.permissions;
 
 import net.eithon.library.extensions.EithonPlugin;
 import net.eithon.library.facades.ZPermissionsFacade;
-import net.eithon.library.plugin.Logger.DebugPrintLevel;
+import net.eithon.library.plugin.EithonLogger.DebugPrintLevel;
 
 import org.bukkit.entity.Player;
 

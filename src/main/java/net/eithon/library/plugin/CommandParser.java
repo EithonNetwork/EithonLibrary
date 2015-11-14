@@ -60,7 +60,7 @@ public class CommandParser {
 
 	public boolean hasCorrectNumberOfArgumentsOrShowSyntax(int min, int max) {
 		if (hasCorrectNumberOfArguments(min, max)) return true;
-		Logger.libraryInfo("Expected %d to %d arguments, had %d arguments", min, max, this._args.length);
+		EithonLogger.libraryInfo("Expected %d to %d arguments, had %d arguments", min, max, this._args.length);
 		showCommandSyntax();
 		return false;
 	}

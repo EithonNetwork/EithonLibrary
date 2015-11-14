@@ -9,8 +9,8 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import net.eithon.library.extensions.EithonPlugin;
-import net.eithon.library.plugin.Logger;
-import net.eithon.library.plugin.Logger.DebugPrintLevel;
+import net.eithon.library.plugin.EithonLogger;
+import net.eithon.library.plugin.EithonLogger.DebugPrintLevel;
 
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -156,7 +156,7 @@ public class AlarmTrigger {
 	private boolean isEnabledOrWarn()
 	{
 		if (this._plugin != null) return true;
-		Logger.libraryWarning("The AlarmTrigger has not been enabled");
+		EithonLogger.libraryWarning("The AlarmTrigger has not been enabled");
 		return false;
 	}
 
@@ -183,7 +183,7 @@ public class AlarmTrigger {
 		{
 			Alarm firstAlarm = getFirstAlarm();
 			while ((firstAlarm != null) && firstAlarm.maybeSetOff()) {
-				Logger.libraryDebug(DebugPrintLevel.VERBOSE, "Alarm was set off: %s", firstAlarm.toString());
+				EithonLogger.libraryDebug(DebugPrintLevel.VERBOSE, "Alarm was set off: %s", firstAlarm.toString());
 				if (firstAlarm.hasBeenSetOff()) this._alarms.remove(this._firstAlarmId);
 				this._firstAlarmId = getFirstAlarmId();
 				firstAlarm = getFirstAlarm();			

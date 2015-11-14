@@ -3,8 +3,8 @@ package net.eithon.library.time;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import net.eithon.library.plugin.Logger;
-import net.eithon.library.plugin.Logger.DebugPrintLevel;
+import net.eithon.library.plugin.EithonLogger;
+import net.eithon.library.plugin.EithonLogger.DebugPrintLevel;
 
 class Alarm {
 	private UUID _id;
@@ -45,7 +45,7 @@ class Alarm {
 			if (this._hasBeenSetOff) return false;
 			LocalDateTime now = LocalDateTime.now();
 			if (this._when.isBefore(now)) {
-				Logger.libraryDebug(DebugPrintLevel.VERBOSE, "Alarm %s triggered. Time now is %s.", toString(), now.toString());
+				EithonLogger.libraryDebug(DebugPrintLevel.VERBOSE, "Alarm %s triggered. Time now is %s.", toString(), now.toString());
 				this._hasBeenSetOff = true;
 				this._task.run();
 				return true;
