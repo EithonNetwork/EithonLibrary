@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import net.eithon.library.core.IUuidAndName;
 import net.eithon.library.json.JsonObject;
-import net.eithon.library.plugin.EithonLogger;
+import net.eithon.library.plugin.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -41,7 +41,7 @@ public class EithonWorld extends JsonObject<EithonWorld> implements IUuidAndName
 		if (this._world != null) return this._world;
 		this._world = Bukkit.getWorld(this._name);
 		if (this._world != null) return this._world;
-		EithonLogger.libraryWarning("Could not find world %s (%s)", this._name, this._id.toString());
+		Logger.libraryWarning("Could not find world %s (%s)", this._name, this._id.toString());
 		return null;
 	}	
 

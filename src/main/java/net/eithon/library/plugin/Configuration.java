@@ -13,7 +13,7 @@ import java.util.Map;
 
 import net.eithon.library.extensions.EithonPlugin;
 import net.eithon.library.file.FileMisc;
-import net.eithon.library.plugin.EithonLogger.DebugPrintLevel;
+import net.eithon.library.plugin.Logger.DebugPrintLevel;
 import net.eithon.library.time.TimeMisc;
 
 import org.bukkit.configuration.ConfigurationSection;

@@ -10,7 +10,7 @@ import net.eithon.library.plugin.CommandParser;
 import net.eithon.library.plugin.Configuration;
 import net.eithon.library.plugin.GeneralMessage;
 import net.eithon.library.plugin.ICommandHandler;
-import net.eithon.library.plugin.EithonLogger;
+import net.eithon.library.plugin.Logger;
 import net.eithon.library.plugin.PermissionBasedMultiplier;
 import net.eithon.library.time.AlarmTrigger;
 import net.eithon.plugin.eithonlibrary.EithonLibraryApi;
@@ -22,7 +22,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class EithonPlugin extends JavaPlugin implements Listener {
 	private static HashMap<String, EithonPlugin> instances = new HashMap<String, EithonPlugin>();
-	private EithonLogger _logger;
+	private Logger _logger;
 	private Configuration _config;
 	private ICommandHandler _commandHandler;
 	private Listener _eventListener;
@@ -32,9 +32,9 @@ public class EithonPlugin extends JavaPlugin implements Listener {
 	
 	@Override
 	public void onEnable() {
-		EithonLogger.initialize();
+		Logger.initialize();
 		PermissionBasedMultiplier.initialize();
-		this._logger = new EithonLogger(this);
+		this._logger = new Logger(this);
 		this._config = new Configuration(this);
 		this._config.enable();
 		this._logger.enable();
@@ -77,7 +77,7 @@ public class EithonPlugin extends JavaPlugin implements Listener {
 
 	public Configuration getConfiguration() { return this._config; }
 
-	public EithonLogger getEithonLogger() { return this._logger; }
+	public Logger getEithonLogger() { return this._logger; }
 	
 	public File getDataFile(String fileName) {
 		return FileMisc.getPluginDataFile(this, fileName);

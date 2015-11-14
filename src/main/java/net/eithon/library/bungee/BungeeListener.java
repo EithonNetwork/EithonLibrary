@@ -3,7 +3,7 @@ package net.eithon.library.bungee;
 import net.eithon.library.core.CoreMisc;
 import net.eithon.library.extensions.EithonPlayer;
 import net.eithon.library.extensions.EithonPlugin;
-import net.eithon.library.plugin.EithonLogger.DebugPrintLevel;
+import net.eithon.library.plugin.Logger.DebugPrintLevel;
 import net.eithon.library.title.Title;
 import net.eithon.plugin.eithonlibrary.Config;
 

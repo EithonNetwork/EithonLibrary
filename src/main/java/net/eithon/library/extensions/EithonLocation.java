@@ -1,7 +1,7 @@
 package net.eithon.library.extensions;
 
 import net.eithon.library.json.JsonObject;
-import net.eithon.library.plugin.EithonLogger;
+import net.eithon.library.plugin.Logger;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -85,7 +85,7 @@ public class EithonLocation extends JsonObject<EithonLocation>{
 		float pitch = (float) (double) jsonObject.get("pitch");
 		World world = this._eithonWorld.getWorld();
 		if (world == null) {
-			EithonLogger.libraryWarning("EithonLocation.fromJson: Could not find world %s", this._eithonWorld.getName());
+			Logger.libraryWarning("EithonLocation.fromJson: Could not find world %s", this._eithonWorld.getName());
 			return null;
 		}
 		this._location = new Location(world, x, y, z, yaw, pitch);

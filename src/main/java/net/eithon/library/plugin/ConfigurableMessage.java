@@ -2,7 +2,7 @@ package net.eithon.library.plugin;
 
 import net.eithon.library.chat.LineWrapper;
 import net.eithon.library.extensions.EithonPlugin;
-import net.eithon.library.plugin.EithonLogger.DebugPrintLevel;
+import net.eithon.library.plugin.Logger.DebugPrintLevel;
 import net.eithon.library.title.Title;
 import net.eithon.plugin.eithonlibrary.Config;
 

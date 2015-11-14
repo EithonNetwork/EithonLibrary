@@ -9,8 +9,8 @@ import java.io.Reader;
 import java.io.Writer;
 
 import net.eithon.library.file.FileMisc;
-import net.eithon.library.plugin.EithonLogger;
-import net.eithon.library.plugin.EithonLogger.DebugPrintLevel;
+import net.eithon.library.plugin.Logger;
+import net.eithon.library.plugin.Logger.DebugPrintLevel;
 
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
@@ -72,12 +72,12 @@ public class FileContent extends JsonObject<FileContent>{
 			Writer writer = new FileWriter(file);
 			data.writeJSONString(writer);
 			writer.close();
-			EithonLogger.libraryDebug(DebugPrintLevel.MAJOR, "Saved \"%s\".", file.getName());
+			Logger.libraryDebug(DebugPrintLevel.MAJOR, "Saved \"%s\".", file.getName());
 			if (archiveFile != null) archiveFile(file, archiveFile);
 		} catch (IOException e) {
-			EithonLogger.libraryWarning("Can't create file \"%s\" for save: %s", file.getName(), e.getMessage());
+			Logger.libraryWarning("Can't create file \"%s\" for save: %s", file.getName(), e.getMessage());
 		} catch (Exception e) {
-			EithonLogger.libraryError("Failed to save file \"%s\": %s", file.getName(), e.getMessage());
+			Logger.libraryError("Failed to save file \"%s\": %s", file.getName(), e.getMessage());
 		}
 	}
 
@@ -95,20 +95,20 @@ public class FileContent extends JsonObject<FileContent>{
 			reader = new FileReader(file);
 			Object o = JSONValue.parseWithException(reader);
 			if (o == null) {
-				EithonLogger.libraryDebug(DebugPrintLevel.MINOR, "Load; parse returned null.");
+				Logger.libraryDebug(DebugPrintLevel.MINOR, "Load; parse returned null.");
 				return false;
 			}
 			if (!(o instanceof JSONObject)) {
-				EithonLogger.libraryError("Could not cast content of file \"%s\" to a JSONObject.");
+				Logger.libraryError("Could not cast content of file \"%s\" to a JSONObject.");
 				return false;
 			}
 			data = (JSONObject) o;
 			reader.close();
-			EithonLogger.libraryDebug(DebugPrintLevel.MAJOR, "Loaded \"%s\".", file.getName());
+			Logger.libraryDebug(DebugPrintLevel.MAJOR, "Loaded \"%s\".", file.getName());
 		} catch (FileNotFoundException e) {
-			EithonLogger.libraryWarning("Can't open file \"%s\" for load: %s", file.getName(), e.getMessage());
+			Logger.libraryWarning("Can't open file \"%s\" for load: %s", file.getName(), e.getMessage());
 		} catch (Exception e) {
-			EithonLogger.libraryError("Failed to load file \"%s\": %s", file.getName(), e.getMessage());
+			Logger.libraryError("Failed to load file \"%s\": %s", file.getName(), e.getMessage());
 			e.printStackTrace();
 		} finally {
 			if (reader != null) try { reader.close(); } catch (IOException e) {}
@@ -135,9 +135,9 @@ public class FileContent extends JsonObject<FileContent>{
 		try {
 			FileMisc.makeSureParentDirectoryExists(archiveFile);
 			FileUtils.copyFile(file, archiveFile);
-			EithonLogger.libraryInfo("Archived player statistics to file \"%s\".", archiveFile.getName());
+			Logger.libraryInfo("Archived player statistics to file \"%s\".", archiveFile.getName());
 		} catch (IOException e) {
-			EithonLogger.libraryError("Failed to archive player statistics to file \"%s\".", archiveFile.getName());
+			Logger.libraryError("Failed to archive player statistics to file \"%s\".", archiveFile.getName());
 			e.printStackTrace();
 			return;
 		}
