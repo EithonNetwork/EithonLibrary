@@ -1,8 +1,6 @@
 package net.eithon.library.bungee;
 
-import net.eithon.library.core.CoreMisc;
 import net.eithon.library.extensions.EithonPlugin;
-import net.eithon.library.plugin.Logger.DebugPrintLevel;
 import net.eithon.library.time.TimeMisc;
 
 import org.bukkit.Bukkit;
@@ -27,14 +25,12 @@ class Channel {
 	}
 
 	boolean send(String subChannel, MessageOut msgOut, String... arguments) {
-		verbose("send", "Enter: subChannel=%s", subChannel);
 		Player player = getPlayer(subChannel, msgOut, arguments);
 		if (player == null) {
 			this._eithonPlugin.getEithonLogger().warning("No player found, will try later.");
 			return true;
 		}
 		boolean success = send(player, subChannel, msgOut, arguments);
-		verbose("send", "Leave, success = %s", success ? "TRUE" : "FALSE");
 		return success;
 	}
 
@@ -43,12 +39,8 @@ class Channel {
 	}
 
 	private boolean send(Player player, String subChannel, MessageOut message, String... arguments) {
-		verbose("send", "Enter: Player=%s, subChannel=%s", 
-				player == null? "NULL" : player.getName(), subChannel);
 		if (player == null) {
-			verbose("send", "Player was null, will try another send method");
 			boolean success = send(subChannel, message, arguments);
-			verbose("send", "Leave, success = %s", success ? "TRUE" : "FALSE");
 			return success;
 		}
 		MessageOut messageOut = new MessageOut();
@@ -57,8 +49,6 @@ class Channel {
 		if (message != null) messageOut.add(message.toByteArray());
 		//simulateBungee(player, messageOut);
 		player.sendPluginMessage(this._eithonPlugin, "BungeeCord", messageOut.toByteArray());
-		
-		verbose("send", "Leave TRUE");
 		return true;
 	}
 
@@ -100,10 +90,5 @@ class Channel {
 			return null;
 		}
 		return player;
-	}
-
-	private void verbose(String method, String format, Object... args) {
-		String message = CoreMisc.safeFormat(format, args);
-		this._eithonPlugin.getEithonLogger().debug(DebugPrintLevel.VERBOSE, "MessageChannel.%s: %s", method, message);
 	}
 }
