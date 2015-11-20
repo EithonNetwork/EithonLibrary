@@ -6,6 +6,7 @@ import net.eithon.library.test.mock.MockEithonLibrary;
 import net.eithon.library.test.mock.MockMinecraft;
 
 import org.bukkit.Bukkit;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -37,7 +38,14 @@ public class BungeeControllerTest {
 		// Initialize the BungeeController
 
 		BungeeController controller = new BungeeController(mockEithonLibrary.getEithonPlugin());
-		controller.getServerName();
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String serverName = controller.getServerName();
+		Assert.assertEquals("main", serverName);
 		
 		mockMinecraft.verify();
 		mockEithonLibrary.verify();
