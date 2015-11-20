@@ -76,7 +76,7 @@ class BungeeListener implements PluginMessageListener {
 		} else if (commandName.equals("CallEvent")) {
 			EithonBungeeEvent info = EithonBungeeEvent.getFromJsonString(body);
 			verbose("eithonLibraryForward", "Calling EithonBungeeEvent %s (%s)", info.getName(), info.getData().toJSONString());
-			Bukkit.getServer().getPluginManager().callEvent(info);
+			this._eithonPlugin.getServer().getPluginManager().callEvent(info);
 		} else if (commandName.equals("BroadcastMessage")) {
 			MessageInfo info = MessageInfo.getFromJsonString(body);
 			broadcastMessage(forwardHeader, info);

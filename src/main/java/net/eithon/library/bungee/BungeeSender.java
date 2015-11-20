@@ -10,9 +10,11 @@ import org.bukkit.entity.Player;
 class BungeeSender {
 	private EithonPlugin _eithonPlugin;
 	private Channel _messageChannel;
+	private BungeeController _bungeeController;
 
-	public BungeeSender(EithonPlugin eithonPlugin) {
+	public BungeeSender(EithonPlugin eithonPlugin, BungeeController bungeeController) {
 		this._eithonPlugin = eithonPlugin;
+		this._bungeeController = bungeeController;
 		this._messageChannel = new Channel(eithonPlugin);
 	}
 
@@ -22,7 +24,7 @@ class BungeeSender {
 
 	boolean forward(String destinationServer, String command, IJsonObject<?> info, boolean rejectOld) {
 		verbose("forward", "Enter; destinationServer=%s, command = %s", destinationServer, command);
-		String sourceServerName =  this._eithonPlugin.getApi().getBungeeServerName();
+		String sourceServerName =  this._bungeeController.getServerName();
 		ForwardHeader header = new ForwardHeader(command, sourceServerName, rejectOld);
 		verbose("send", "header = %s", header.toJSONString());
 		MessageOut data = new MessageOut()

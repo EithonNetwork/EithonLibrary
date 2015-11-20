@@ -12,7 +12,7 @@ import org.json.simple.JSONObject;
 
 public class BungeeController {
 
-	private static BungeeListener bungeeListener;
+	private BungeeListener _bungeeListener;
 	private BungeeSender _bungeeSender;
 	private EithonPlugin _eithonPlugin;
 	private String _serverName;
@@ -21,17 +21,20 @@ public class BungeeController {
 		this._eithonPlugin = eithonPlugin;
 		createBungeeSender(eithonPlugin);
 		createBungeeListener(eithonPlugin);
-		this._bungeeSender.getServer();
 	}
 
 	public void createBungeeSender(EithonPlugin eithonPlugin) {
 		eithonPlugin.getServer().getMessenger().registerOutgoingPluginChannel(eithonPlugin, "BungeeCord");
-		this._bungeeSender = new BungeeSender(eithonPlugin);
+		this._bungeeSender = new BungeeSender(eithonPlugin, this);
 	}
 
 	private void createBungeeListener(EithonPlugin eithonPlugin) {
-		bungeeListener = new BungeeListener(eithonPlugin, this);
-		eithonPlugin.getServer().getMessenger().registerIncomingPluginChannel(eithonPlugin, "BungeeCord", bungeeListener);
+		this._bungeeListener = new BungeeListener(eithonPlugin, this);
+		eithonPlugin.getServer().getMessenger().registerIncomingPluginChannel(eithonPlugin, "BungeeCord", this._bungeeListener);
+	}
+
+	public void initialize() {
+		this._bungeeSender.getServer();
 	}
 
 	public String getServerName() { return this._serverName; }
@@ -103,7 +106,7 @@ public class BungeeController {
 		return null;
 	}
 
-	public static void simulateBungee(Player player, byte[] message) {
+	public void simulateSendPluginMessage(Player player, byte[] message) {
 		MessageOut messageOut;
 		MessageIn messageIn = new MessageIn(message);
 		String subchannel = messageIn.readString();
@@ -117,12 +120,17 @@ public class BungeeController {
 		} else if (subchannel.equals("GetServer")) {
 			messageOut = new MessageOut()
 			.add(subchannel)
-			.add("main");
+			.add(this._eithonPlugin.getServer().getName());
 		} else {
 			messageOut = new MessageOut()
 			.add(message);
 		}
-		bungeeListener.onPluginMessageReceived("BungeeCord", player, messageOut.toByteArray());
+		this.simulateReceivePluginMessage(player, messageOut);
+	}
+
+	private void simulateReceivePluginMessage(Player player,
+			MessageOut messageOut) {
+		this._bungeeListener.onPluginMessageReceived("BungeeCord", player, messageOut.toByteArray());
 	}
 
 	private void verbose(String method, String format, Object... args) {

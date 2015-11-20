@@ -1,6 +1,7 @@
 package net.eithon.library.test.bungee;
 
 import net.eithon.library.bungee.BungeeController;
+import net.eithon.library.extensions.EithonPlayer;
 import net.eithon.library.extensions.EithonPlugin;
 import net.eithon.library.test.mock.MockEithonLibrary;
 import net.eithon.library.test.mock.MockMinecraft;
@@ -16,38 +17,67 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @PrepareForTest({EithonPlugin.class, Bukkit.class})
 public class BungeeControllerTest {
 	@Test
-	public void testBungeeControllerInit() 
+	public void testBungeeControllerConstructor() 
 	{
-		MockMinecraft mockMinecraft = new MockMinecraft();
-		MockEithonLibrary mockEithonLibrary = new MockEithonLibrary(mockMinecraft.getServer());
+		MockMinecraft mockCentralServer = new MockMinecraft("central");
+		MockEithonLibrary mockCentralEithonLibrary = new MockEithonLibrary(mockCentralServer.getServer());
 		
-		// Initialize the BungeeController
-
-		BungeeController controller = new BungeeController(mockEithonLibrary.getEithonPlugin());
+		// Create the BungeeController
+		BungeeController central = new BungeeController(mockCentralEithonLibrary.getEithonPlugin());
 		
-		mockMinecraft.verify();
-		mockEithonLibrary.verify();
+		mockCentralServer.verify();
+		mockCentralEithonLibrary.verify();
 	}
 	
 	@Test
 	public void testGetServerName() 
 	{
-		MockMinecraft mockMinecraft = new MockMinecraft();
-		MockEithonLibrary mockEithonLibrary = new MockEithonLibrary(mockMinecraft.getServer());
+		MockMinecraft mockCentralServer = new MockMinecraft("central");
+		MockEithonLibrary mockCentralEithonLibrary = new MockEithonLibrary(mockCentralServer.getServer());
 		
-		// Initialize the BungeeController
+		// Create and initialize the BungeeController
+		BungeeController central = new BungeeController(mockCentralEithonLibrary.getEithonPlugin());
+		
+		// Mock for bungee
+		mockCentralServer.mockBungee(central);
+		
+		// Prepare server name
+		central.initialize();
+		
+		// Get server name
+		String serverName = central.getServerName();
+		Assert.assertEquals("central", serverName);
+		
+		mockCentralServer.verify();
+		mockCentralEithonLibrary.verify();
+	}
+	
+	@Test
+	public void testForward() 
+	{
+		MockMinecraft mockCentralServer = new MockMinecraft("central");
+		MockEithonLibrary mockCentralEithonLibrary = new MockEithonLibrary(mockCentralServer.getServer());
+		
+		MockMinecraft mockRemoteServer = new MockMinecraft("remote");
+		MockEithonLibrary mockRemoteEithonLibrary = new MockEithonLibrary(mockRemoteServer.getServer());
+		
+		// Create the central BungeeController
+		BungeeController central = new BungeeController(mockCentralEithonLibrary.getEithonPlugin());
+		
+		// Create the remote BungeeController
+		BungeeController remote = new BungeeController(mockCentralEithonLibrary.getEithonPlugin());
 
-		BungeeController controller = new BungeeController(mockEithonLibrary.getEithonPlugin());
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		String serverName = controller.getServerName();
-		Assert.assertEquals("main", serverName);
+		// Connect them
+		mockCentralServer.mockBungee(remote);
+		mockRemoteServer.mockBungee(central);
 		
-		mockMinecraft.verify();
-		mockEithonLibrary.verify();
+		EithonPlayer eithonPlayer = new EithonPlayer(mockCentralServer.getPlayer());
+		
+		PlayerStatistics playerStatistics = new PlayerStatistics(eithonPlayer);
+		PlayerStatistics.initialize(mockCentralEithonLibrary.getLogger());
+		central.sendDataToServer("remote", "Test", playerStatistics, false);
+		
+		mockCentralServer.verify();
+		mockCentralEithonLibrary.verify();
 	}
 }

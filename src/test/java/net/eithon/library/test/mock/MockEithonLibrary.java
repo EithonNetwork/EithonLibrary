@@ -31,4 +31,6 @@ public class MockEithonLibrary {
 	}
 
 	public EithonPlugin getEithonPlugin() { return this._eithonPlugin; }
+
+	public Logger getLogger() { return this._logger; }
 }
