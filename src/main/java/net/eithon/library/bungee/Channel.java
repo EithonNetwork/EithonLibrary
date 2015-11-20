@@ -52,32 +52,6 @@ class Channel {
 		return true;
 	}
 
-	/*
-	private void simulateBungee(Player player, MessageOut messageOut) {
-		verbose("simulateBungee", "Enter");
-		MessageIn messageIn = new MessageIn(messageOut.toByteArray());
-		String subchannel = messageIn.readString();
-		verbose("simulateBungee", "subchannel=%s", subchannel);
-		if (subchannel.equals("Forward")) {
-			verbose("simulateBungee", "Repack Forward message");
-			String destinationServer = messageIn.readString();
-			verbose("simulateBungee", "destinationServer=%s", destinationServer);
-			String pluginChannel = messageIn.readString();
-			verbose("simulateBungee", "pluginChannel=%s", pluginChannel);
-			byte[] body = messageIn.readByteArray();
-			messageOut = new MessageOut()
-			.add(pluginChannel)
-			.add(body);
-		} else if (subchannel.equals("GetServer")) {
-			verbose("simulateBungee", "Repack getServer message");
-			messageOut = new MessageOut()
-			.add(subchannel)
-			.add("main");
-		}
-		BungeeController.bungeeListener.onPluginMessageReceived("BungeeCord", player, messageOut.toByteArray());
-	}
-	*/
-
 	private Player getPlayer(String subChannel, MessageOut msgOut, String... arguments) {
 		Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
 		if (player == null) {

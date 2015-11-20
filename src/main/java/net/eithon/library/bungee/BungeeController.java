@@ -12,7 +12,7 @@ import org.json.simple.JSONObject;
 
 public class BungeeController {
 
-	static BungeeListener bungeeListener;
+	private static BungeeListener bungeeListener;
 	private BungeeSender _bungeeSender;
 	private EithonPlugin _eithonPlugin;
 	private String _serverName;
@@ -101,6 +101,28 @@ public class BungeeController {
 			}
 		}
 		return null;
+	}
+
+	public static void simulateBungee(Player player, byte[] message) {
+		MessageOut messageOut;
+		MessageIn messageIn = new MessageIn(message);
+		String subchannel = messageIn.readString();
+		if (subchannel.equals("Forward")) {
+			String destinationServer = messageIn.readString();
+			String pluginChannel = messageIn.readString();
+			byte[] body = messageIn.readByteArray();
+			messageOut = new MessageOut()
+			.add(pluginChannel)
+			.add(body);
+		} else if (subchannel.equals("GetServer")) {
+			messageOut = new MessageOut()
+			.add(subchannel)
+			.add("main");
+		} else {
+			messageOut = new MessageOut()
+			.add(message);
+		}
+		bungeeListener.onPluginMessageReceived("BungeeCord", player, messageOut.toByteArray());
 	}
 
 	private void verbose(String method, String format, Object... args) {
