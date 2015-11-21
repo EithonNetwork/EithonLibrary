@@ -26,12 +26,14 @@ public class MockMinecraft {
 	private Server _server;
 	private Class<Bukkit> _bukkitClass;
 	private PluginManager _pluginManager;
+	private ArrayList<Object> _eithonBungeeEventListeners;
 
 	public MockMinecraft(String serverName) {
+		this._eithonBungeeEventListeners = new ArrayList<Object>();
 		// Create a mock messenger
 		this._messenger = EasyMock.createNiceMock(Messenger.class);
 		PowerMock.replay(this._messenger);
-		
+
 		// Create a mock messenger
 		this._pluginManager = EasyMock.createNiceMock(PluginManager.class);
 		Capture<Event> capturedEvent = new Capture<Event>();
@@ -45,7 +47,7 @@ public class MockMinecraft {
 		})
 		.anyTimes();
 		EasyMock.replay(this._pluginManager);
-		
+
 		// Create a mock Server
 		this._server = EasyMock.createNiceMock(Server.class);
 		EasyMock.expect(this._server.getMessenger()).andReturn(this._messenger).anyTimes();
@@ -53,22 +55,28 @@ public class MockMinecraft {
 		EasyMock.expect(this._server.getPluginManager()).andReturn(this._pluginManager).anyTimes();
 		EasyMock.replay(this._server);
 	}
-	
+
+	public void addBungeeEventListener(IEithonBungeeEventListener listener) {
+		this._eithonBungeeEventListeners.add(listener);
+	}
+
 	protected void onEvent(Event event) {
 		if (event instanceof EithonBungeeEvent) {
 			EithonBungeeEvent ebe = (EithonBungeeEvent) event;
-			String j = ebe.getData().toJSONString();
-			String a = ebe.getName();
+			for (Object object : this._eithonBungeeEventListeners) {
+				IEithonBungeeEventListener listener = (IEithonBungeeEventListener) object;
+				listener.onBungeeEvent(ebe);
+			}
 		}
 	}
 
 	public void mockBungee(final BungeeController senderServer, final BungeeController receiverServer) {
-		
+
 		// Create a mock player
 		final Player mockPlayer = EasyMock.createNiceMock(Player.class);
 		this._player = mockPlayer;
-		String uuid = UUID.randomUUID().toString();
-		EasyMock.expect(this._player.getUniqueId()).andReturn(UUID.fromString(uuid)).anyTimes();
+		UUID uuid = UUID.randomUUID();
+		EasyMock.expect(this._player.getUniqueId()).andReturn(uuid).anyTimes();
 		Capture<byte[]> capturedMessage = new Capture<byte[]>();
 		this._player.sendPluginMessage(
 				EasyMock.anyObject(), 
@@ -90,7 +98,10 @@ public class MockMinecraft {
 		// Create a mock Bukkit
 		this._bukkitClass = Bukkit.class;
 		PowerMock.mockStatic(this._bukkitClass);
+		EasyMock.expect(Bukkit.getPlayer((UUID)EasyMock.anyObject())).andReturn(mockPlayer);
+		EasyMock.expectLastCall().anyTimes();
 		EasyMock.expect(Bukkit.getOnlinePlayers()).andReturn((Collection)playerCollection);
+		EasyMock.expectLastCall().anyTimes();
 		PowerMock.replay(this._bukkitClass);
 	}
 

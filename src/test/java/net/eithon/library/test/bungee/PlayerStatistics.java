@@ -26,8 +26,6 @@ public class PlayerStatistics extends JsonObjectDelta<PlayerStatistics> implemen
 	private LocalDateTime _lastConsecutiveDay;
 	private TimeStatistics _timeInfo;
 
-	// Non-saved, internal variables
-	private LocalDateTime _startTime;
 	private LocalDateTime _lastAliveTime;
 	private boolean _hasBeenUpdated;
 	private String _afkDescription;
@@ -54,7 +52,6 @@ public class PlayerStatistics extends JsonObjectDelta<PlayerStatistics> implemen
 		this._lastChatActivity = null;
 		resetConsecutiveDays();
 		this._timeInfo = new TimeStatistics();
-		this._startTime = null;
 		this._hasBeenUpdated = false;
 		this._afkDescription = null;
 		this._lastAliveTime = LocalDateTime.now();
