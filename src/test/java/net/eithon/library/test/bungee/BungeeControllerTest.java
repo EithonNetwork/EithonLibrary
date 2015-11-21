@@ -70,7 +70,9 @@ public class BungeeControllerTest {
 		mockBungee.addBungeeEventListener(new IEithonBungeeEventListener() {
 			@Override
 			public void onBungeeEvent(EithonBungeeEvent event) {
-				testForwardRemoteEvent(event);
+				Assert.assertEquals("Test", event.getName());
+				assertEquals(playerStatistics, PlayerStatistics.getFromJson(event.getData()));
+				Assert.assertEquals(mockBungee.getCentralEithonPlugin().getServer().getName(), event.getSourceServerName());
 			}
 		});
 		mockBungee.getCentralBungeeController()
@@ -79,11 +81,9 @@ public class BungeeControllerTest {
 		mockBungee.verify();
 	}
 
-	void testForwardRemoteEvent(EithonBungeeEvent event) {
-		if (event.getName().equalsIgnoreCase("test")) {
-			PlayerStatistics playerStatistics = PlayerStatistics.getFromJson(event.getData());
-			String sourceServer = event.getSourceServerName();
-			String a = sourceServer + playerStatistics.toJsonString();
-		}
+	void assertEquals(PlayerStatistics expected,
+			PlayerStatistics actual) {
+		Assert.assertEquals(expected.getBlocksCreated(), actual.getBlocksCreated());
+		Assert.assertEquals(expected.getAfkDescription(), actual.getAfkDescription());
 	}
 }

@@ -26,8 +26,8 @@ public class TimeStatistics extends JsonObject<TimeStatistics>{
 
 	public TimeStatistics()
 	{
-		this._previousStartTime = null;
-		this._previousIntervalInSeconds = 0;
+		this._previousStartTime = LocalDateTime.now();
+		this._previousIntervalInSeconds = 123;
 		resetTotalPlayTime();
 	}
 
@@ -80,10 +80,10 @@ public class TimeStatistics extends JsonObject<TimeStatistics>{
 	}
 
 	public void resetTotalPlayTime() {
-		this._firstStartTime = null;
-		this._totalPlayTimeInSeconds = 0;
-		this._intervals = 0;
-		this._longestIntervalInSeconds = 0;
+		this._firstStartTime = LocalDateTime.now();
+		this._totalPlayTimeInSeconds = 63;
+		this._intervals = 4;
+		this._longestIntervalInSeconds = 25;
 		resetIfNewDay();
 	}
 

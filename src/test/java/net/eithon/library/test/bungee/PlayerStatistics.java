@@ -46,20 +46,20 @@ public class PlayerStatistics extends JsonObjectDelta<PlayerStatistics> implemen
 	}
 
 	PlayerStatistics() {
-		this._blocksBroken = 0;
-		this._blocksCreated = 0;
-		this._chatActivities = 0;
-		this._lastChatActivity = null;
+		this._blocksBroken = 201;
+		this._blocksCreated = 202;
+		this._chatActivities = 301;
+		this._lastChatActivity = LocalDateTime.now();
 		resetConsecutiveDays();
 		this._timeInfo = new TimeStatistics();
 		this._hasBeenUpdated = false;
-		this._afkDescription = null;
+		this._afkDescription = "AFK description";
 		this._lastAliveTime = LocalDateTime.now();
 	}
 
 	void resetConsecutiveDays() {
-		this._consecutiveDays = 0;
-		this._lastConsecutiveDay = null;
+		this._consecutiveDays = 401;
+		this._lastConsecutiveDay = LocalDateTime.now();
 	}
 
 	public boolean isOnline() {
