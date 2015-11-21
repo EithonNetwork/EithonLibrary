@@ -106,7 +106,7 @@ public class BungeeController {
 		return null;
 	}
 
-	public void simulateSendPluginMessage(Player player, byte[] message) {
+	public void simulateSendPluginMessage(BungeeController receiverServer, Player player, byte[] message) {
 		MessageOut messageOut;
 		MessageIn messageIn = new MessageIn(message);
 		String subchannel = messageIn.readString();
@@ -125,7 +125,7 @@ public class BungeeController {
 			messageOut = new MessageOut()
 			.add(message);
 		}
-		this.simulateReceivePluginMessage(player, messageOut);
+		receiverServer.simulateReceivePluginMessage(player, messageOut);
 	}
 
 	private void simulateReceivePluginMessage(Player player,

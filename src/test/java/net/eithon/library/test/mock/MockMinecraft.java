@@ -16,9 +16,7 @@ import org.bukkit.plugin.messaging.Messenger;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.hamcrest.core.IsInstanceOf;
 import org.powermock.api.easymock.PowerMock;
-import org.powermock.api.easymock.internal.invocationcontrol.EasyMockMethodInvocationControl;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 
 @PrepareForTest({Bukkit.class})
@@ -64,7 +62,7 @@ public class MockMinecraft {
 		}
 	}
 
-	public void mockBungee(final BungeeController remote) {
+	public void mockBungee(final BungeeController senderServer, final BungeeController receiverServer) {
 		
 		// Create a mock player
 		final Player mockPlayer = EasyMock.createNiceMock(Player.class);
@@ -79,7 +77,7 @@ public class MockMinecraft {
 		EasyMock.expectLastCall()
 		.andAnswer(new IAnswer<Object>() {
 			public Object answer() {
-				remote.simulateSendPluginMessage(mockPlayer, capturedMessage.getValue());
+				senderServer.simulateSendPluginMessage(receiverServer, mockPlayer, capturedMessage.getValue());
 				//return the value to be returned by the method (null for void)
 				return null;
 			}

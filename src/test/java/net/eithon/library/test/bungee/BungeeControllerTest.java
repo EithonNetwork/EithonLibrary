@@ -24,6 +24,10 @@ public class BungeeControllerTest {
 		
 		// Create the BungeeController
 		BungeeController central = new BungeeController(mockCentralEithonLibrary.getEithonPlugin());
+		mockCentralServer.mockBungee(central,  central);
+		
+		// Prepare server name
+		central.initialize();
 		
 		mockCentralServer.verify();
 		mockCentralEithonLibrary.verify();
@@ -39,7 +43,7 @@ public class BungeeControllerTest {
 		BungeeController central = new BungeeController(mockCentralEithonLibrary.getEithonPlugin());
 		
 		// Mock for bungee
-		mockCentralServer.mockBungee(central);
+		mockCentralServer.mockBungee(central, central);
 		
 		// Prepare server name
 		central.initialize();
@@ -65,11 +69,11 @@ public class BungeeControllerTest {
 		BungeeController central = new BungeeController(mockCentralEithonLibrary.getEithonPlugin());
 		
 		// Create the remote BungeeController
-		BungeeController remote = new BungeeController(mockCentralEithonLibrary.getEithonPlugin());
+		BungeeController remote = new BungeeController(mockRemoteEithonLibrary.getEithonPlugin());
 
 		// Connect them
-		mockCentralServer.mockBungee(remote);
-		mockRemoteServer.mockBungee(central);
+		mockCentralServer.mockBungee(central, remote);
+		mockRemoteServer.mockBungee(remote, central);
 		
 		EithonPlayer eithonPlayer = new EithonPlayer(mockCentralServer.getPlayer());
 		

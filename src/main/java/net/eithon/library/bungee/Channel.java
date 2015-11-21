@@ -47,7 +47,6 @@ class Channel {
 		messageOut.add(subChannel);
 		messageOut.add(arguments);
 		if (message != null) messageOut.add(message.toByteArray());
-		//simulateBungee(player, messageOut);
 		player.sendPluginMessage(this._eithonPlugin, "BungeeCord", messageOut.toByteArray());
 		return true;
 	}

@@ -1,7 +1,6 @@
 package net.eithon.library.test.bungee;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.UUID;
 
 import net.eithon.library.core.IUuidAndName;
@@ -9,10 +8,8 @@ import net.eithon.library.extensions.EithonPlayer;
 import net.eithon.library.json.JsonObjectDelta;
 import net.eithon.library.plugin.Logger;
 import net.eithon.library.plugin.Logger.DebugPrintLevel;
-import net.eithon.library.time.AlarmTrigger;
 import net.eithon.library.time.TimeMisc;
 
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.json.simple.JSONObject;
 
@@ -32,7 +29,6 @@ public class PlayerStatistics extends JsonObjectDelta<PlayerStatistics> implemen
 	// Non-saved, internal variables
 	private LocalDateTime _startTime;
 	private LocalDateTime _lastAliveTime;
-	private UUID _alarmId;
 	private boolean _hasBeenUpdated;
 	private String _afkDescription;
 
