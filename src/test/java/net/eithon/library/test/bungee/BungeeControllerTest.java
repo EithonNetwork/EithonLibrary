@@ -9,6 +9,7 @@ import net.eithon.library.test.mock.MockEithonLibrary;
 import net.eithon.library.test.mock.MockMinecraft;
 
 import org.bukkit.Bukkit;
+import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,8 +20,24 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @PrepareForTest({EithonPlugin.class, Bukkit.class})
 public class BungeeControllerTest {
 	@Test
-	public void testBungeeControllerConstructor() 
+	public void understandEasyMock() 
 	{
+		PlayerStatistics s1 = EasyMock.createMock(PlayerStatistics.class);
+		EasyMock.expect(s1.getTotalTimeInSeconds()).andReturn((long) 1).anyTimes();
+		EasyMock.replay(s1);
+		
+		PlayerStatistics s2 = EasyMock.createMock(PlayerStatistics.class);
+		EasyMock.expect(s2.getTotalTimeInSeconds()).andReturn((long) 2).anyTimes();
+		EasyMock.replay(s2);
+		
+		Assert.assertEquals(1, s1.getTotalTimeInSeconds());
+		Assert.assertEquals(2, s2.getTotalTimeInSeconds());
+		Assert.assertEquals(1, s1.getTotalTimeInSeconds());
+		Assert.assertEquals(2, s2.getTotalTimeInSeconds());		
+	}
+		@Test
+		public void testBungeeControllerConstructor() 
+		{
 		MockMinecraft mockCentralServer = new MockMinecraft("central");
 		MockEithonLibrary mockCentralEithonLibrary = new MockEithonLibrary(mockCentralServer.getServer());
 
@@ -63,8 +80,11 @@ public class BungeeControllerTest {
 	{
 		MockBungee mockBungee = new MockBungee();
 
+		// Verify that the mock works
+		Assert.assertEquals("central", mockBungee.getCentralEithonPlugin().getServer().getServerName());
+		Assert.assertEquals("remote", mockBungee.getRemoteEithonPlugin().getServer().getServerName());
+		
 		// Do the test
-
 		PlayerStatistics playerStatistics = new PlayerStatistics(mockBungee.getCentralPlayer());
 		PlayerStatistics.initialize(mockBungee.getCentralEithonPlugin().getEithonLogger());
 		mockBungee.addBungeeEventListener(new IEithonBungeeEventListener() {
@@ -72,7 +92,7 @@ public class BungeeControllerTest {
 			public void onBungeeEvent(EithonBungeeEvent event) {
 				Assert.assertEquals("Test", event.getName());
 				assertEquals(playerStatistics, PlayerStatistics.getFromJson(event.getData()));
-				Assert.assertEquals(mockBungee.getCentralEithonPlugin().getServer().getName(), event.getSourceServerName());
+				Assert.assertEquals(mockBungee.getCentralEithonPlugin().getServer().getServerName(), event.getSourceServerName());
 			}
 		});
 		mockBungee.getCentralBungeeController()

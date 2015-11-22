@@ -51,13 +51,9 @@ public class MockMinecraft {
 		// Create a mock Server
 		this._server = EasyMock.createNiceMock(Server.class);
 		EasyMock.expect(this._server.getMessenger()).andReturn(this._messenger).anyTimes();
-		EasyMock.expect(this._server.getName()).andReturn(serverName).anyTimes();
+		EasyMock.expect(this._server.getServerName()).andReturn(serverName).anyTimes();
 		EasyMock.expect(this._server.getPluginManager()).andReturn(this._pluginManager).anyTimes();
 		EasyMock.replay(this._server);
-	}
-
-	public void addBungeeEventListener(IEithonBungeeEventListener listener) {
-		this._eithonBungeeEventListeners.add(listener);
 	}
 
 	protected void onEvent(Event event) {
@@ -68,6 +64,10 @@ public class MockMinecraft {
 				listener.onBungeeEvent(ebe);
 			}
 		}
+	}
+
+	public void addBungeeEventListener(IEithonBungeeEventListener listener) {
+		this._eithonBungeeEventListeners.add(listener);
 	}
 
 	public void mockBungee(final BungeeController senderServer, final BungeeController receiverServer) {

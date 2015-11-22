@@ -120,7 +120,7 @@ public class BungeeController {
 		} else if (subchannel.equals("GetServer")) {
 			messageOut = new MessageOut()
 			.add(subchannel)
-			.add(this._eithonPlugin.getServer().getName());
+			.add(this._eithonPlugin.getServer().getServerName());
 		} else {
 			messageOut = new MessageOut()
 			.add(message);
