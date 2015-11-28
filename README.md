@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 3.1 (2015-11-28)
+
+* NEW: Added getEntry() to PlayerCollection.
+
 ### 3.0 (2015-11-13)
 
 * CHANGE: Optimization of PlayerMoveEvent
