@@ -52,28 +52,43 @@ public class BungeeControllerTest {
 		mockCentralEithonLibrary.verify();
 	}
 
-	@Test
-	public void testGetServerName() 
-	{
-		MockMinecraft mockCentralServer = new MockMinecraft("central");
-		MockEithonLibrary mockCentralEithonLibrary = new MockEithonLibrary(mockCentralServer.getServer());
+		@Test
+		public void testSimpleGetServerName() 
+		{
+			MockMinecraft mockCentralServer = new MockMinecraft("central");
+			MockEithonLibrary mockCentralEithonLibrary = new MockEithonLibrary(mockCentralServer.getServer());
 
-		// Create and initialize the BungeeController
-		BungeeController central = new BungeeController(mockCentralEithonLibrary.getEithonPlugin());
+			// Create and initialize the BungeeController
+			BungeeController central = new BungeeController(mockCentralEithonLibrary.getEithonPlugin());
 
-		// Mock for bungee
-		mockCentralServer.mockBungee(central, central);
+			// Mock for bungee
+			mockCentralServer.mockBungee(central, central);
 
-		// Prepare server name
-		central.initialize();
+			// Prepare server name
+			central.initialize();
 
-		// Get server name
-		String serverName = central.getServerName();
-		Assert.assertEquals("central", serverName);
+			// Get server name
+			String serverName = central.getBungeeServerName();
+			Assert.assertEquals("bungee_central", serverName);
 
-		mockCentralServer.verify();
-		mockCentralEithonLibrary.verify();
-	}
+			mockCentralServer.verify();
+			mockCentralEithonLibrary.verify();
+		}
+
+		@Test
+		public void testDoubleGetServerName() 
+		{
+
+			MockBungee mockBungee = new MockBungee();
+
+			// Verify that the mock works
+			Assert.assertEquals("central", mockBungee.getCentralEithonPlugin().getServer().getServerName());
+			Assert.assertEquals("remote", mockBungee.getRemoteEithonPlugin().getServer().getServerName());
+
+			Assert.assertEquals("bungee_remote", mockBungee.getRemoteBungeeController().getBungeeServerName());
+			Assert.assertEquals("bungee_central", mockBungee.getCentralBungeeController().getBungeeServerName());
+			
+			mockBungee.verify();		}
 
 	@Test
 	public void testForward() 
@@ -83,6 +98,9 @@ public class BungeeControllerTest {
 		// Verify that the mock works
 		Assert.assertEquals("central", mockBungee.getCentralEithonPlugin().getServer().getServerName());
 		Assert.assertEquals("remote", mockBungee.getRemoteEithonPlugin().getServer().getServerName());
+		
+		Assert.assertEquals("bungee_central", mockBungee.getCentralBungeeController().getBungeeServerName());
+		Assert.assertEquals("bungee_remote", mockBungee.getRemoteBungeeController().getBungeeServerName());
 		
 		// Do the test
 		PlayerStatistics playerStatistics = new PlayerStatistics(mockBungee.getCentralPlayer());

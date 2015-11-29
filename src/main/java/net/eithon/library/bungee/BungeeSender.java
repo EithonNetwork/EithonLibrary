@@ -24,7 +24,7 @@ class BungeeSender {
 
 	boolean forward(String destinationServer, String command, IJsonObject<?> info, boolean rejectOld) {
 		verbose("forward", "Enter; destinationServer=%s, command = %s", destinationServer, command);
-		String sourceServerName =  this._bungeeController.getServerName();
+		String sourceServerName =  this._bungeeController.getBungeeServerName();
 		ForwardHeader header = new ForwardHeader(command, sourceServerName, rejectOld);
 		verbose("send", "header = %s", header.toJSONString());
 		MessageOut data = new MessageOut()

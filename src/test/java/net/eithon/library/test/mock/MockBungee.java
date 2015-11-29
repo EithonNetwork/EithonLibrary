@@ -1,5 +1,6 @@
 package net.eithon.library.test.mock;
 
+import junit.framework.Assert;
 import net.eithon.library.bungee.BungeeController;
 import net.eithon.library.bungee.EithonBungeeEvent;
 import net.eithon.library.extensions.EithonPlugin;
@@ -19,16 +20,22 @@ public class MockBungee {
 
 	public MockBungee() {
 		this._mockCentralServer = new MockMinecraft(CENTRAL_SERVER_NAME);
+		Assert.assertEquals(CENTRAL_SERVER_NAME, this._mockCentralServer.getServer().getServerName());
 		this._mockCentralEithonLibrary = new MockEithonLibrary(this._mockCentralServer.getServer());
+		Assert.assertEquals(CENTRAL_SERVER_NAME, this._mockCentralEithonLibrary.getEithonPlugin().getServer().getServerName());
 
 		this._mockRemoteServer = new MockMinecraft(REMOTE_SERVER_NAME);
+		Assert.assertEquals(REMOTE_SERVER_NAME, this._mockRemoteServer.getServer().getServerName());
 		this._mockRemoteEithonLibrary = new MockEithonLibrary(this._mockRemoteServer.getServer());
+		Assert.assertEquals(REMOTE_SERVER_NAME, this._mockRemoteEithonLibrary.getEithonPlugin().getServer().getServerName());
 
 		// Create the central BungeeController
 		this._central = new BungeeController(this._mockCentralEithonLibrary.getEithonPlugin());
+		Assert.assertEquals(CENTRAL_SERVER_NAME, this._central.getMinecraftServerName());
 
 		// Create the remote BungeeController
 		this._remote = new BungeeController(this._mockRemoteEithonLibrary.getEithonPlugin());
+		Assert.assertEquals(REMOTE_SERVER_NAME, this._remote.getMinecraftServerName());
 
 		// Connect them
 		this._mockCentralServer.mockBungee(this._central, this._remote);
@@ -36,7 +43,9 @@ public class MockBungee {
 
 		// Initialize them
 		this._central.initialize();
+		Assert.assertEquals("bungee_" + CENTRAL_SERVER_NAME, this._central.getBungeeServerName());
 		this._remote.initialize();
+		Assert.assertEquals("bungee_" + REMOTE_SERVER_NAME, this._remote.getBungeeServerName());
 
 	}
 

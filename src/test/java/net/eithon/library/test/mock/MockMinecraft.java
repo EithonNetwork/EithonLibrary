@@ -72,22 +72,25 @@ public class MockMinecraft {
 
 	public void mockBungee(final BungeeController senderServer, final BungeeController receiverServer) {
 
+		// Debug purpose
+		final String senderServerName = senderServer.getMinecraftServerName();
 		// Create a mock player
 		final Player mockPlayer = EasyMock.createNiceMock(Player.class);
 		this._player = mockPlayer;
 		UUID uuid = UUID.randomUUID();
 		EasyMock.expect(this._player.getUniqueId()).andReturn(uuid).anyTimes();
 		Capture<byte[]> capturedMessage = new Capture<byte[]>();
-		this._player.sendPluginMessage(
+		/* expect */ this._player.sendPluginMessage(
 				EasyMock.anyObject(), 
 				EasyMock.eq("BungeeCord"),
 				EasyMock.capture(capturedMessage));
 		EasyMock.expectLastCall()
 		.andAnswer(new IAnswer<Object>() {
 			public Object answer() {
+				String a = senderServerName;
 				senderServer.simulateSendPluginMessage(receiverServer, mockPlayer, capturedMessage.getValue());
 				//return the value to be returned by the method (null for void)
-				return null;
+				return a;
 			}
 		})
 		.anyTimes();

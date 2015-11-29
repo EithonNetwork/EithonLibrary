@@ -97,7 +97,7 @@ class BungeeListener implements PluginMessageListener {
 		String playerName = info.getPlayerName();
 		player.setNameIfHasNone(playerName);
 		String mainGroup = info.getMainGroup();
-		String thisServerName = this._controller.getServerName();
+		String thisServerName = this._controller.getBungeeServerName();
 		EithonBungeeJoinEvent e = new EithonBungeeJoinEvent(thisServerName, thatServerName, player, mainGroup);
 		Bukkit.getServer().getPluginManager().callEvent(e);
 		verbose("joinEvent", "Leave");
@@ -114,7 +114,7 @@ class BungeeListener implements PluginMessageListener {
 		String playerName = info.getPlayerName();
 		player.setNameIfHasNone(playerName);
 		String mainGroup = info.getMainGroup();
-		String thisServerName = this._controller.getServerName();
+		String thisServerName = this._controller.getBungeeServerName();
 		EithonBungeeQuitEvent e = new EithonBungeeQuitEvent(thisServerName, thatServerName, player, mainGroup);
 		Bukkit.getServer().getPluginManager().callEvent(e);
 		verbose("quitEvent", "Leave");
