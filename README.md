@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 3.2 (2015-12-25)
+
+* NEW: Added TemporaryEffect
+
 ### 3.1 (2015-11-28)
 
 * NEW: Added getEntry() to PlayerCollection.
