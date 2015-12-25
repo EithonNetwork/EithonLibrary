@@ -55,6 +55,17 @@ public class TimeMisc {
 		return 0;
 	}
 	
+	public static long stringToTicks(String time) {
+		if (time == null) return 0;
+		if (time.endsWith("t")) {
+			try {
+				time = time.substring(0, time.length()-1);
+				return Long.parseLong(time);
+			} catch (Exception e) {}
+		} else return 20*stringToSeconds(time);
+		return 0;
+	}
+	
 	public static String secondsToString(long seconds) {
 		return secondsToString(seconds, false);
 	}

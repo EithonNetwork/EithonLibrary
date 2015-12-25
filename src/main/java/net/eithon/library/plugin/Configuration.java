@@ -167,7 +167,7 @@ public class Configuration {
 			this._plugin.getEithonLogger().debug(DebugPrintLevel.MAJOR, "Exception: %s", ex.getMessage());
 			value = defaultValue;
 		}
-		this._plugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = %d" , path, value);
+		this._plugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = %d seconds" , path, value);
 		return value;
 	}
 
@@ -176,7 +176,32 @@ public class Configuration {
 		long value;
 		String valueAsString = this._config.getString(path, defaultValue);
 		value = TimeMisc.stringToSeconds(valueAsString);
-		this._plugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = %d" , path, value);
+		this._plugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = %d seconds" , path, value);
+		return value;
+	}
+
+	public long getTicks(String path, long defaultValue)
+	{
+		long value;
+		try {
+			String valueAsString = this._config.getString(path, String.format("%d", defaultValue));
+			value = TimeMisc.stringToTicks(valueAsString);
+		} catch (Exception ex) {
+			this._plugin.getEithonLogger().warning("Failed to read configuration \"%s\", will use default value (%d).",
+					path, defaultValue);
+			this._plugin.getEithonLogger().debug(DebugPrintLevel.MAJOR, "Exception: %s", ex.getMessage());
+			value = defaultValue;
+		}
+		this._plugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = %d ticks" , path, value);
+		return value;
+	}
+
+	public long getTicks(String path, String defaultValue)
+	{
+		long value;
+		String valueAsString = this._config.getString(path, defaultValue);
+		value = TimeMisc.stringToTicks(valueAsString);
+		this._plugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = %d ticks" , path, value);
 		return value;
 	}
 
