@@ -9,6 +9,8 @@ import org.bukkit.event.player.PlayerMoveEvent;
 public class MoveEventHandler {
 	private static PlayerCollection<BlockMover> _playerSubscriptions = new PlayerCollection<BlockMover>();
 	
+	// Use EithonPlayerMoveOneBlockEvent instead
+	@Deprecated
 	public static void handle(PlayerMoveEvent event) {
 		Block fromBlock = event.getFrom().getBlock();
 		Block toBlock = event.getTo().getBlock();
@@ -24,6 +26,8 @@ public class MoveEventHandler {
 		mover.informFollowers(event);
 	}
 
+	// Use EithonPlayerMoveOneBlockEvent instead
+	@Deprecated
 	public static void addBlockMover(Player player, IBlockMoverFollower follower) {
 		BlockMover mover = _playerSubscriptions.get(player);
 		if (mover == null) {
@@ -33,6 +37,8 @@ public class MoveEventHandler {
 		mover.addFollower(follower);
 	}
 
+	// Use EithonPlayerMoveOneBlockEvent instead
+	@Deprecated
 	public static void removeBlockMover(Player player, IBlockMoverFollower follower) {
 		BlockMover mover = _playerSubscriptions.get(player);
 		if (mover == null) return;
