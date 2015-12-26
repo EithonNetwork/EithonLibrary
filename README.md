@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 3.3 (2015-12-26)
+
+* NEW: Added VaultFacade
+
 ### 3.2 (2015-12-25)
 
 * NEW: Added TemporaryEffect
