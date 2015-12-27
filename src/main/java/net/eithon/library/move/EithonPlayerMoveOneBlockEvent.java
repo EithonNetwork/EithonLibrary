@@ -1,8 +1,9 @@
 package net.eithon.library.move;
 
-import net.eithon.library.extensions.EithonBlock;
+import net.eithon.library.extensions.EithonLocation;
 import net.eithon.library.extensions.EithonPlayer;
 
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -11,13 +12,13 @@ import org.bukkit.event.HandlerList;
 public class EithonPlayerMoveOneBlockEvent extends Event {
 	private static final HandlerList handlers = new HandlerList();
 	private EithonPlayer _player;
-	private EithonBlock _fromBlock;
-	private EithonBlock _toBlock;
+	private EithonLocation _fromLocation;
+	private EithonLocation _toLocation;
 
-	public EithonPlayerMoveOneBlockEvent(Player player, Block fromBlock, Block toBlock) {
+	public EithonPlayerMoveOneBlockEvent(Player player, Location fromLocation, Location toLocation) {
 		this._player = new EithonPlayer(player);
-		this._fromBlock = new EithonBlock(fromBlock);
-		this._toBlock = new EithonBlock(toBlock);
+		this._fromLocation = new EithonLocation(fromLocation);
+		this._toLocation = new EithonLocation(toLocation);
 	}
 
 	public static HandlerList getHandlerList() {
@@ -32,7 +33,11 @@ public class EithonPlayerMoveOneBlockEvent extends Event {
 	
 	public Player getPlayer() { return this._player.getPlayer(); }
 	
-	public Block getFromBlock() { return this._fromBlock.getBlock(); }
+	public Block getFromBlock() { return this._fromLocation.getLocation().getBlock(); }
 	
-	public Block getToBlock() { return this._toBlock.getBlock(); }
+	public Block getToBlock() { return this._toLocation.getLocation().getBlock(); }
+	
+	public Location getFromLocation() { return this._fromLocation.getLocation(); }
+	
+	public Location getToLocation() { return this._toLocation.getLocation(); }
 }

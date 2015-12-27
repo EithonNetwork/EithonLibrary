@@ -2,6 +2,7 @@ package net.eithon.library.move;
 
 import net.eithon.library.core.PlayerCollection;
 
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -10,13 +11,13 @@ public class MoveEventHandler {
 	private static PlayerCollection<BlockMover> _playerSubscriptions = new PlayerCollection<BlockMover>();
 	
 	public static void handle(PlayerMoveEvent event) {
-		Block fromBlock = event.getFrom().getBlock();
-		Block toBlock = event.getTo().getBlock();
-		if (isSameBlock(fromBlock, toBlock)) return;
+		Location fromLocation = event.getFrom();
+		Location toLocation = event.getTo();
+		if (isSameBlock(fromLocation.getBlock(), toLocation.getBlock())) return;
 		
 		Player player = event.getPlayer();
 		EithonPlayerMoveOneBlockEvent e = 
-				new EithonPlayerMoveOneBlockEvent(player, fromBlock, toBlock);
+				new EithonPlayerMoveOneBlockEvent(player, fromLocation, toLocation);
 		player.getServer().getPluginManager().callEvent(e);
 		
 		BlockMover mover = _playerSubscriptions.get(player);
