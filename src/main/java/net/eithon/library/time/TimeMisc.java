@@ -96,16 +96,19 @@ public class TimeMisc {
 	}
 	
 	public static String minutesToString(long minutes, boolean showDays) {
+		if (minutes < 60) return String.format("%d minutes", minutes);
 		long hours = minutes/60;
 		return hoursToString(hours, minutes-hours*60, showDays);
 	}
 
 	private static String minutesToString(long minutes, long seconds, boolean showDays) {
+		if (minutes < 60) return String.format("%d:%02d", minutes, seconds);
 		long hours = minutes/60;
 		return hoursToString(hours, minutes-hours*60, seconds, showDays);
 	}
 
 	private static String minutesToString(long minutes, double seconds, boolean showDays) {
+		if (minutes < 60) return String.format("%d:%02.2f", minutes, seconds);
 		long hours = minutes/60;
 		return hoursToString(hours, minutes % 60, seconds, showDays);
 	}
