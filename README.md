@@ -17,6 +17,7 @@ Eithon java code library for Minecraft.
 
 * CHANGE: TimeMisc.secondsToString now supports non-integer seconds.
 * CHANGE: EithonPlayerMoveOneBlockEvent now stores the from-to as locations instead of blocks.
+* CHANGE: EithonPlayerMoveOneBlockEvent now ignores cancelled move events.
 
 ### 3.3 (2015-12-26)
 
