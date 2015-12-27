@@ -13,6 +13,13 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 3.4 (2015-12-27)
+
+* CHANGE: TimeMisc.secondsToString now supports non-integer seconds.
+* CHANGE: TimeMisc.secondsToString now can print mm:ss.
+* CHANGE: EithonPlayerMoveOneBlockEvent now stores the from-to as locations instead of blocks.
+* CHANGE: EithonPlayerMoveOneBlockEvent now ignores cancelled move events.
+
 ### 3.3 (2015-12-26)
 
 * NEW: Added VaultFacade
