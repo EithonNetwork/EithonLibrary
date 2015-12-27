@@ -9,8 +9,6 @@ import org.bukkit.event.player.PlayerMoveEvent;
 public class MoveEventHandler {
 	private static PlayerCollection<BlockMover> _playerSubscriptions = new PlayerCollection<BlockMover>();
 	
-	// Use EithonPlayerMoveOneBlockEvent instead
-	@Deprecated
 	public static void handle(PlayerMoveEvent event) {
 		Block fromBlock = event.getFrom().getBlock();
 		Block toBlock = event.getTo().getBlock();
