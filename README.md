@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 3.4 (2015-12-27)
+
+* CHANGE: TimeMisc.secondsToString now supports non-integer seconds.
+
 ### 3.3 (2015-12-26)
 
 * NEW: Added VaultFacade

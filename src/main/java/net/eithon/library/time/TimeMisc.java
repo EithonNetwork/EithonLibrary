@@ -75,10 +75,20 @@ public class TimeMisc {
 		return secondsToString(seconds, false);
 	}
 	
+	public static String secondsToString(double seconds) {
+		return secondsToString(seconds, false);
+	}
+	
 	public static String secondsToString(long seconds, boolean showDays) {
 		if (seconds < 60) return String.format("%d s", seconds);
 		long minutes = seconds/60;
 		return minutesToString(minutes, seconds-minutes*60, showDays);
+	}
+	
+	public static String secondsToString(final double seconds, final boolean showDays) {
+		if (seconds < 60) return String.format("%.2f s", seconds);
+		long minutes = (long) seconds/60;
+		return minutesToString(minutes, seconds % 60, showDays);
 	}
 	
 	public static String minutesToString(long minutes) {
@@ -95,6 +105,11 @@ public class TimeMisc {
 		return hoursToString(hours, minutes-hours*60, seconds, showDays);
 	}
 
+	private static String minutesToString(long minutes, double seconds, boolean showDays) {
+		long hours = minutes/60;
+		return hoursToString(hours, minutes % 60, seconds, showDays);
+	}
+
 	private static String hoursToString(long hours, long minutes, boolean showDays) {
 		if (!showDays || (hours < 24)) return String.format("%d:%02d", hours, minutes);
 		long days = hours/24;
@@ -107,11 +122,21 @@ public class TimeMisc {
 		return daysToString(days, hours-days*24, minutes, seconds);
 	}
 
+	private static String hoursToString(long hours, long minutes, double seconds, boolean showDays) {
+		if (!showDays || (hours < 24)) return String.format("%d:%02d:%02.2f", hours, minutes, seconds);
+		long days = hours/24;
+		return daysToString(days, hours-days*24, minutes, seconds);
+	}
+
 	private static String daysToString(long days, long hours, long minutes) {
 		return String.format("%d days, %d:%02d", days, hours, minutes);
 	}
 
 	private static String daysToString(long days, long hours, long minutes, long seconds) {
 		return String.format("%d days, %d:%02d:%02d", days, hours, minutes, seconds);
+	}
+
+	private static String daysToString(long days, long hours, long minutes, double seconds) {
+		return String.format("%d days, %d:%02d:%02.2f", days, hours, minutes, seconds);
 	}
 }
