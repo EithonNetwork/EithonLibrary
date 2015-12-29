@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 3.5 (2015-12-29)
+
+* NEW: Added EithonPlayerMoveHalfBlockEvent
+
 ### 3.4 (2015-12-27)
 
 * CHANGE: TimeMisc.secondsToString now supports non-integer seconds.
