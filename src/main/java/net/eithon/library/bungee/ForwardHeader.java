@@ -32,10 +32,16 @@ public class ForwardHeader extends JsonObject<ForwardHeader>{
 	public LocalDateTime getMessageSendTime() { return this._messageSendTime; }
 	public boolean getRejectOld() { return this._rejectOld; }
 
+	public String investigateTime() {
+		if (!this._rejectOld) return "this._rejectOld == false";
+		if (this._messageSendTime == null) return "this._messageSendTime == null";
+		return String.format("now-3: %s, sent: %s", LocalDateTime.now().minusSeconds(3).toString(), this._messageSendTime.toString());
+	}
+	
 	public boolean isTooOld() {
 		if (!this._rejectOld) return false;
 		if (this._messageSendTime == null) return false;
-		return LocalDateTime.now().minusSeconds(30).isAfter(this._messageSendTime);
+		return LocalDateTime.now().minusSeconds(3).isAfter(this._messageSendTime);
 	}
 	
 	public String toJSONString() {
@@ -65,7 +71,7 @@ public class ForwardHeader extends JsonObject<ForwardHeader>{
 		this._commandName = (String) jsonObject.get("commandName");
 		this._sourceServerName = (String) jsonObject.get("sourceServerName");
 		Boolean rejectOld = (Boolean) jsonObject.get("rejectOld");
-		rejectOld = false;
+		this._rejectOld = false;
 		if (rejectOld != null)  this._rejectOld = rejectOld.booleanValue();
 		this._messageSendTime = null;
 		String sendTime = (String) jsonObject.get("messageSendTime");
