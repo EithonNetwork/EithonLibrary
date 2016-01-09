@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 3.5.1 (2016-01-09)
+
+* BUG: Bungee messages was kept too long.
+
 ### 3.5 (2015-12-29)
 
 * NEW: Added EithonPlayerMoveHalfBlockEvent

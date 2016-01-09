@@ -62,6 +62,7 @@ class BungeeListener implements PluginMessageListener {
 			verbose("eithonLibraryForward", "Message was too old, Leave");
 			return;
 		}
+		verbose("eithonLibraryForward", "%s", forwardHeader.investigateTime());
 		String body = message.readString();
 		verbose("eithonLibraryForward", String.format("jsonObject=%s", body));
 
