@@ -1,7 +1,10 @@
-package net.eithon.library.command;
+package net.eithon.library.command.syntax;
 
 import java.util.ArrayList;
 
+import net.eithon.library.command.CommandArguments;
+
+import org.bukkit.command.CommandSender;
 import org.yaml.snakeyaml.tokens.ValueToken;
 
 public class ArgumentSyntax {
@@ -51,5 +54,12 @@ public class ArgumentSyntax {
 		for (Integer value : args) {
 			this._values.add(value);
 		}
+	}
+
+	public boolean isOk(CommandSender sender, CommandArguments arguments) {
+		String argument = arguments.getString();
+		if ((argument != null) || this._isOptional) return true;
+		sender.sendMessage(String.format("Expected a value for argument %s", this._name));
+		return false;
 	}
 }

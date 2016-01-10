@@ -1,10 +1,16 @@
-package net.eithon.library.command;
+package net.eithon.library.command.syntax;
 
 import java.util.HashMap;
 
-import net.eithon.library.command.ArgumentSyntax.ArgumentType;
+import org.bukkit.command.CommandSender;
+
+import net.eithon.library.command.CommandArguments;
+import net.eithon.library.command.CommandParser;
+import net.eithon.library.command.syntax.ArgumentSyntax.ArgumentType;
+import net.eithon.library.command.syntax.CommandSyntax.CommandExecutor;
 
 public class CommandSyntax {
+	
 	public interface CommandExecutor {
 		public void execute(CommandParser commandParser);
 	}
@@ -17,13 +23,15 @@ public class CommandSyntax {
 	private CommandExecutor _executor;
 	private String _permission;
 	
-	CommandSyntax(String commandName) {
+	public CommandSyntax(String commandName) {
 		this._commandName = commandName;
 		this._argumentsAreOptional = false;
 		this._arguments = new HashMap<String, ArgumentSyntax>();
 		this._subCommands = new HashMap<String, CommandSyntax>();
 		this._permission = null;
 	}
+
+	public String getName() { return this._commandName; }
 
 	public PlayerSyntax addArgumentPlayer(String name) {
 		PlayerSyntax playerSyntax = new PlayerSyntax(name);
@@ -69,6 +77,24 @@ public class CommandSyntax {
 
 	public void setPermission(String permission) {
 		this._permission = permission;
+	}
+
+	public CommandExecutor getExecutor(CommandSender sender, CommandArguments arguments) {
+		if (this._subCommands != null) {
+			String command = arguments.getStringAsLowercase();
+			CommandSyntax commandSyntax = this._subCommands.get(command);
+			if (commandSyntax == null) {
+				sender.sendMessage(String.format("Unexpected sub command: %s", command));
+				return null;
+			}
+			return commandSyntax.getExecutor(sender, arguments);
+		} 
+		if (this._arguments != null) {
+			for (ArgumentSyntax argumentSyntax : this._arguments.values()) {
+				if (!argumentSyntax.isOk(sender, arguments)) return null;
+			}
+		}
+		return this._executor;
 	}
 
 }

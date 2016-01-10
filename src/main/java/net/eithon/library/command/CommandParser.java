@@ -2,7 +2,8 @@ package net.eithon.library.command;
 
 import java.util.HashMap;
 
-import net.eithon.library.command.CommandSyntax.CommandExecutor;
+import net.eithon.library.command.syntax.CommandSyntax;
+import net.eithon.library.command.syntax.CommandSyntax.CommandExecutor;
 import net.eithon.library.extensions.EithonPlayer;
 import net.eithon.library.plugin.GeneralMessage;
 
@@ -15,21 +16,29 @@ public class CommandParser {
 	private CommandSender _sender;
 	private CommandArguments _arguments;
 	private ICommandHandler _commandHandler;
-	private String _currentCommand;
-	private CommandSyntax _rootCommand;
+	private CommandSyntax _commandSyntax;
 
 	public CommandParser(ICommandHandler commandHandler, CommandSender sender, Command cmd, String label, String[] args) {
 		this._sender = sender;
 		this._arguments = new CommandArguments(sender, args);
 		this._commandHandler = commandHandler;
-		this._currentCommand.execute(this._arguments);
+		this._commandSyntax = commandHandler.getCommandSyntax();
 	}
 	
+	public void execute() {
+		String command = this._arguments.getStringAsLowercase();
+		if (!command.equalsIgnoreCase(this._commandSyntax.getName())) {
+			this._sender.sendMessage(String.format("Expected command \"%s\", got \"%s\"", this._commandSyntax.getName(), command));
+			return;
+		}
+		CommandExecutor executor = this._commandSyntax.getExecutor(this._sender, this._arguments);
+		if (executor == null) return;
+		executor.execute(this);
+	}
+
 	public CommandArguments getArguments() { return this._arguments; }
 
 	public CommandSender getSender() { return this._sender; }
-
-	public String getCurrentCommand() { return this._currentCommand; }
 
 	public Player getPlayer() {
 		if (this._sender == null) return null;
@@ -68,24 +77,5 @@ public class CommandParser {
 		EithonPlayer eithonPlayer = getEithonPlayer();
 		if (eithonPlayer == null) return true;
 		return eithonPlayer.hasPermissionOrInformPlayer(permission);
-	}
-
-	public void showCommandSyntax() {
-		if (this._currentCommand == null) {
-			this._sender.sendMessage("Unknown command.");
-			return;
-		}
-	}
-
-	public CommandSyntax setRootCommand(String commandName) {
-		CommandSyntax commandSyntax = new CommandSyntax(commandName);
-		this._rootCommand = commandSyntax;
-		return commandSyntax;
-	}
-
-	public CommandSyntax setRootCommand(String commandName, CommandExecutor commandExecutor) {
-		CommandSyntax commandSyntax = setRootCommand(commandName);
-		commandSyntax.setExecutor(commandExecutor);
-		return commandSyntax;
 	}
 }

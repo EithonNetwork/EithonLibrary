@@ -1,6 +1,8 @@
 package net.eithon.library.command;
 
+import net.eithon.library.command.syntax.CommandSyntax;
+
 
 public interface ICommandHandler {
-	void setup(CommandParser commandParser);
+	CommandSyntax getCommandSyntax();
 }
