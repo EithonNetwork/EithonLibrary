@@ -14,30 +14,30 @@ import org.bukkit.entity.Player;
 public class CommandParser {
 
 	private CommandSender _sender;
-	private CommandArguments _arguments;
+	private CommandArguments _commandArguments;
 	private ICommandHandler _commandHandler;
 	private CommandSyntax _commandSyntax;
 
 	public CommandParser(ICommandHandler commandHandler, CommandSender sender, Command cmd, String label, String[] args) {
 		this._sender = sender;
-		this._arguments = new CommandArguments(sender, args);
+		this._commandArguments = new CommandArguments(sender, args);
 		this._commandHandler = commandHandler;
 		this._commandSyntax = commandHandler.getCommandSyntax();
 	}
 	
 	public boolean execute() {
-		String command = this._arguments.getStringAsLowercase();
+		String command = this._commandArguments.getStringAsLowercase();
 		if (!command.equalsIgnoreCase(this._commandSyntax.getName())) {
 			this._sender.sendMessage(String.format("Expected command \"%s\", got \"%s\"", this._commandSyntax.getName(), command));
 			return false;
 		}
-		CommandExecutor executor = this._commandSyntax.verifyAndGetExecutor(this._sender, this._arguments);
+		CommandExecutor executor = this._commandSyntax.verifyAndGetExecutor(this._commandArguments);
 		if (executor == null) return false;
 		executor.execute(this);
 		return true;
 	}
 
-	public CommandArguments getArguments() { return this._arguments; }
+	public CommandArguments getArguments() { return this._commandArguments; }
 
 	public CommandSender getSender() { return this._sender; }
 
@@ -50,7 +50,7 @@ public class CommandParser {
 	public Player getPlayerOrInformSender() {
 		Player player = getPlayer();
 		if (player != null) return player;
-		GeneralMessage.expectedToBePlayer.sendMessage(this._sender, this._sender.getName());
+		//GeneralMessage.expectedToBePlayer.sendMessage(this._sender, this._sender.getName());
 		return null;
 	}
 

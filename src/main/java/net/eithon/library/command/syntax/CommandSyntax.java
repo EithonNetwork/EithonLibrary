@@ -1,7 +1,9 @@
 package net.eithon.library.command.syntax;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 
 import org.bukkit.command.CommandSender;
 
@@ -79,22 +81,63 @@ public class CommandSyntax {
 		this._permission = permission;
 	}
 
-	public CommandExecutor verifyAndGetExecutor(CommandSender sender, CommandArguments arguments) {
+	public CommandExecutor verifyAndGetExecutor(CommandArguments arguments) {
 		if (this._subCommands.size() > 0) {
 			String command = arguments.getStringAsLowercase();
 			CommandSyntax commandSyntax = this._subCommands.get(command);
 			if (commandSyntax == null) {
-				sender.sendMessage(String.format("Unexpected sub command: %s", command));
+				arguments.getSender().sendMessage(String.format("Unexpected sub command: %s", command));
 				return null;
 			}
-			return commandSyntax.verifyAndGetExecutor(sender, arguments);
+			return commandSyntax.verifyAndGetExecutor(arguments);
 		}
 		
 		CommandArguments argumentsClone = arguments.clone();
 		for (ArgumentSyntax argumentSyntax : this._arguments) {
-			if (!argumentSyntax.isOk(sender, argumentsClone)) return null;
+			if (!argumentSyntax.isOk(argumentsClone)) return null;
 		}
 		return this._executor;
+	}
+	
+	private List<String> getSubCommands() {
+		ArrayList<String> subCommands = new ArrayList<String>();
+		for (String name : this._subCommands.keySet()) {
+			subCommands.add(name);
+		}
+		subCommands.sort(new Comparator<String>() {
+			@Override
+			public int compare(String o1, String o2) {
+				return o1.compareTo(o2);
+			}
+		});
+		return subCommands;
+	}
+
+	public List<String> tabComplete(CommandArguments arguments) {
+		if (this._subCommands.size() > 0) {
+			String command = arguments.getStringAsLowercase();
+			if (command == null) return getSubCommands();
+			CommandSyntax commandSyntax = this._subCommands.get(command);
+			if (commandSyntax == null) {
+				/*
+				if (arguments.hasReachedEnd()) {
+					List<String> list = getSubCommands();
+				}
+				*/
+				arguments.getSender().sendMessage(String.format("Unexpected sub command: %s", command));
+				return null;
+			}
+			return commandSyntax.tabComplete(arguments);
+		}
+		
+		CommandArguments argumentsClone = arguments.clone();
+		for (ArgumentSyntax argumentSyntax : this._arguments) {
+			String argument = argumentsClone.getString();
+			if (argument == null) return argumentSyntax.getValidValues();
+			argumentsClone.goOneArgumentBack();
+			if (!argumentSyntax.isOk(argumentsClone)) return null;
+		}
+		return null;
 	}
 
 }

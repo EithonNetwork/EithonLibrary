@@ -2,6 +2,7 @@ package net.eithon.library.extensions;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 
 import net.eithon.library.facades.EithonLibraryFacade;
 import net.eithon.library.facades.ZPermissionsFacade;
@@ -15,6 +16,7 @@ import net.eithon.plugin.eithonlibrary.EithonLibraryApi;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 

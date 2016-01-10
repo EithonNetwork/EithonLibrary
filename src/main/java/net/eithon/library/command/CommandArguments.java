@@ -17,14 +17,8 @@ public class CommandArguments {
 		this._nextArgument = 0;
 		this._sender = sender;
 	}
-	
-	@Override
-	public CommandArguments clone() {
-		CommandArguments clone = new CommandArguments(this._sender, this._args);
-		clone._nextArgument = this._nextArgument;
-		return clone;
-	}
 
+	public CommandSender getSender() { return this._sender; }
 	public void setNextArgument(int nextArgument) { this._nextArgument = nextArgument; }
 
 	private Argument getNextArgument() {
@@ -166,5 +160,19 @@ public class CommandArguments {
 		EithonPlayer eithonPlayer = getEithonPlayerOrInformSender(defaultEithonPlayer);
 		if (eithonPlayer == null) return defaultValue;
 		return eithonPlayer.getPlayer();
+	}
+	
+	@Override
+	public CommandArguments clone() {
+		CommandArguments clone = new CommandArguments(this._sender, this._args);
+		clone._nextArgument = this._nextArgument;
+		return clone;
+	}
+
+	public void goOneArgumentBack() {
+		this._nextArgument--;
+		if (this._nextArgument < 0) {
+			throw new IllegalArgumentException("You can't go back from argument 0");
+		}
 	}
 }

@@ -1,11 +1,12 @@
 package net.eithon.library.command.syntax;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 import net.eithon.library.command.CommandArguments;
 
 import org.bukkit.command.CommandSender;
-import org.yaml.snakeyaml.tokens.ValueToken;
 
 public class ArgumentSyntax {
 	private ArgumentType _type;
@@ -19,7 +20,7 @@ public class ArgumentSyntax {
 	public enum ArgumentType { STRING, REAL, INTEGER, Player, REST, BOOLEAN };
 
 	public interface ValueGetter {
-		String[] getValues();
+		List<String> getValues();
 	}
 
 	public ArgumentSyntax(ArgumentType type, String name) {
@@ -58,29 +59,62 @@ public class ArgumentSyntax {
 		}
 	}
 
-	public boolean isOk(CommandSender sender, CommandArguments arguments) {
+	public boolean isOk(CommandArguments arguments) {
 		String argument = arguments.getString();
 		if (argument == null) {
 			if (this._isOptional) return true;
-			sender.sendMessage(String.format("Expected a value for argument %s", this._name));
+			arguments.getSender().sendMessage(String.format("Expected a value for argument %s", this._name));
 			return false;
 		}
-		if (!typeIsOk(sender, argument)) return false;
+		if (!typeIsOk(arguments.getSender(), argument)) return false;
 		if (!this._valuesAreMandatory) return true;
 		if (this._valueGetter != null) {
 			this._validValues = new ArrayList<String>();
-			for (String value : this._valueGetter.getValues()) {
-				this._validValues.add(value);
-			}
+			this._validValues.addAll(this._valueGetter.getValues());
 		}
 		if (this._validValues != null) {
 			for (String validValue : this._validValues) {
 				if (argument.equals(validValue)) return true;
 			}
 		}
-		sender.sendMessage(String.format("The value \"%s\" was not an accepted value for argument %s.",
+		arguments.getSender().sendMessage(String.format("The value \"%s\" was not an accepted value for argument %s.",
 				argument, this._name));
 		return false;
+	}
+
+	public List<String> tabComplete(CommandArguments arguments) {
+		String argument = arguments.getString();
+		List<String> validValues = getValidValues();
+		if (argument == null)  {
+			if (this._isOptional && (validValues != null)) return validValues;
+			arguments.getSender().sendMessage(String.format("Expected a value for argument %s", this._name));
+			return null;
+		}
+		if (!typeIsOk(arguments.getSender(), argument)) return null;
+		if (!this._valuesAreMandatory) return null;
+		if (validValues != null) {
+			for (String validValue : this._validValues) {
+				if (argument.equals(validValue)) return null;
+			}
+		}
+		arguments.getSender().sendMessage(String.format("The value \"%s\" was not an accepted value for argument %s.",
+				argument, this._name));
+		return null;
+	}
+
+
+	public List<String> getValidValues() {
+		if (this._valueGetter != null) {
+			this._validValues = new ArrayList<String>();
+			this._validValues.addAll(this._valueGetter.getValues());
+			this._validValues.sort(new Comparator<String>() {
+				@Override
+				public int compare(String o1, String o2) {
+					return o1.compareTo(o2);
+				}
+			});
+		}
+		return this._validValues;
 	}
 
 	private boolean typeIsOk(CommandSender sender, String argument) {
