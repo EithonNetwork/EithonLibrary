@@ -20,7 +20,7 @@ public final class EithonLibraryPlugin extends EithonPlugin implements Listener 
 		this._bungeeController = new BungeeController(this);
 		EventListener eventListener = new EventListener(this);
 		this._api = new EithonLibraryApi(this._bungeeController);
-		super.activate(null, eventListener);
+		super.activate(eventListener);
 	}
 
 	@Override

@@ -60,6 +60,14 @@ public class EithonPlugin extends JavaPlugin implements Listener {
 			.execute();
 	}
 
+	public void activate(Listener eventListener) {
+		this._commandHandlerNew = null;
+		this._commandHandlerOld = null;
+		this._eventListener = eventListener;
+		if (this._eventListener == null) this._eventListener = this;
+		getServer().getPluginManager().registerEvents(this._eventListener, this);
+	}
+
 	@Deprecated
 	public void activate(net.eithon.library.plugin.ICommandHandler commandHandler, Listener eventListener) {
 		this._commandHandlerOld = commandHandler;

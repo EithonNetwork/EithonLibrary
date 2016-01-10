@@ -25,15 +25,16 @@ public class CommandParser {
 		this._commandSyntax = commandHandler.getCommandSyntax();
 	}
 	
-	public void execute() {
+	public boolean execute() {
 		String command = this._arguments.getStringAsLowercase();
 		if (!command.equalsIgnoreCase(this._commandSyntax.getName())) {
 			this._sender.sendMessage(String.format("Expected command \"%s\", got \"%s\"", this._commandSyntax.getName(), command));
-			return;
+			return false;
 		}
-		CommandExecutor executor = this._commandSyntax.getExecutor(this._sender, this._arguments);
-		if (executor == null) return;
+		CommandExecutor executor = this._commandSyntax.verifyAndGetExecutor(this._sender, this._arguments);
+		if (executor == null) return false;
 		executor.execute(this);
+		return true;
 	}
 
 	public CommandArguments getArguments() { return this._arguments; }

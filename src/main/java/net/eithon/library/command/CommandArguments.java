@@ -17,6 +17,13 @@ public class CommandArguments {
 		this._nextArgument = 0;
 		this._sender = sender;
 	}
+	
+	@Override
+	public CommandArguments clone() {
+		CommandArguments clone = new CommandArguments(this._sender, this._args);
+		clone._nextArgument = this._nextArgument;
+		return clone;
+	}
 
 	public void setNextArgument(int nextArgument) { this._nextArgument = nextArgument; }
 
