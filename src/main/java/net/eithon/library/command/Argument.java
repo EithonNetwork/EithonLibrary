@@ -5,7 +5,7 @@ import net.eithon.library.time.TimeMisc;
 
 import org.bukkit.entity.Player;
 
-public class Argument {
+class Argument {
 	private String _argument;
 	private int _position;
 

@@ -7,12 +7,12 @@ import net.eithon.library.time.TimeMisc;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class Arguments {
+public class CommandArguments {
 	private String[] _args;
 	private int _nextArgument;
 	private CommandSender _sender;
 
-	public Arguments(CommandSender sender, String[] args) {
+	public CommandArguments(CommandSender sender, String[] args) {
 		this._args = args;
 		this._nextArgument = 0;
 		this._sender = sender;
@@ -26,11 +26,11 @@ public class Arguments {
 		return new Argument(argument, position);
 	}
 
-	public boolean hasCorrectNumberOfArgumentsOrShowSyntax(int min) {
+	boolean hasCorrectNumberOfArgumentsOrShowSyntax(int min) {
 		return hasCorrectNumberOfArgumentsOrShowSyntax(min, Integer.MAX_VALUE);
 	}
 
-	public boolean hasCorrectNumberOfArgumentsOrShowSyntax(int min, int max) {
+	boolean hasCorrectNumberOfArgumentsOrShowSyntax(int min, int max) {
 		if (hasCorrectNumberOfArguments(min, max)) return true;
 		Logger.libraryInfo("Expected %d to %d arguments, had %d arguments", min, max, this._args.length);
 		return false;
