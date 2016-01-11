@@ -31,7 +31,7 @@ public class CommandParser {
 			this._sender.sendMessage(String.format("Expected command \"%s\", got \"%s\"", this._commandSyntax.getName(), command));
 			return false;
 		}
-		CommandExecutor executor = this._commandSyntax.verifyAndGetExecutor(this._commandArguments);
+		CommandExecutor executor = this._commandSyntax.verifyAndGetCommandExecutor(this._commandArguments);
 		if (executor == null) return false;
 		executor.execute(this);
 		return true;

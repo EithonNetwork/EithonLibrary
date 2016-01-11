@@ -9,7 +9,7 @@ import org.bukkit.command.CommandSender;
 
 import net.eithon.library.command.CommandArguments;
 import net.eithon.library.command.CommandParser;
-import net.eithon.library.command.syntax.ArgumentSyntax.ArgumentType;
+import net.eithon.library.command.syntax.ParameterSyntax.ParameterType;
 import net.eithon.library.command.syntax.CommandSyntax.CommandExecutor;
 
 public class CommandSyntax {
@@ -20,45 +20,45 @@ public class CommandSyntax {
 
 	private String _documentation;
 	private String _commandName;
-	private ArrayList<ArgumentSyntax> _arguments;
+	private ArrayList<ParameterSyntax> _parameterSyntaxList;
 	private HashMap<String, CommandSyntax> _subCommands;
-	private boolean _argumentsAreOptional;
-	private CommandExecutor _executor;
+	private boolean _parametersAreOptionalFromThisPoint;
+	private CommandExecutor _commandExecutor;
 	private String _permission;
 
 	public CommandSyntax(String commandName) {
 		this._commandName = commandName;
-		this._argumentsAreOptional = false;
-		this._arguments = new ArrayList<ArgumentSyntax>();
+		this._parametersAreOptionalFromThisPoint = false;
+		this._parameterSyntaxList = new ArrayList<ParameterSyntax>();
 		this._subCommands = new HashMap<String, CommandSyntax>();
 		this._permission = null;
 	}
 
 	public String getName() { return this._commandName; }
 
-	public PlayerSyntax addArgumentPlayer(String name) {
-		PlayerSyntax playerSyntax = new PlayerSyntax(name);
-		return (PlayerSyntax) addArgument(playerSyntax);
+	public PlayerParameterSyntax addParameterPlayer(String name) {
+		PlayerParameterSyntax playerParameterSyntax = new PlayerParameterSyntax(name);
+		return (PlayerParameterSyntax) addParameter(playerParameterSyntax);
 	}
 
-	public ArgumentSyntax addArgument(ArgumentType type, String name) {
-		ArgumentSyntax argumentSyntax = new ArgumentSyntax(type, name);
-		return addArgument(argumentSyntax);
+	public ParameterSyntax addParameter(ParameterType type, String name) {
+		ParameterSyntax parameterSyntax = new ParameterSyntax(type, name);
+		return addParameter(parameterSyntax);
 	}
 
-	public ArgumentSyntax addNamedArgument(ArgumentType type, String name) {
-		ArgumentSyntax argumentSyntax = new ArgumentSyntax(type, name, true);
-		return addArgument(argumentSyntax);
+	public ParameterSyntax addNamedParameter(ParameterType type, String name) {
+		ParameterSyntax parameterSyntax = new ParameterSyntax(type, name, true);
+		return addParameter(parameterSyntax);
 	}
 
-	public ArgumentSyntax addArgument(ArgumentSyntax argumentSyntax) {
-		if (this._argumentsAreOptional) argumentSyntax.setOptional();
-		this._arguments.add(argumentSyntax);
-		return argumentSyntax;
+	public ParameterSyntax addParameter(ParameterSyntax parameterSyntax) {
+		if (this._parametersAreOptionalFromThisPoint) parameterSyntax.setOptional();
+		this._parameterSyntaxList.add(parameterSyntax);
+		return parameterSyntax;
 	}
 
-	public void setRestOfArgumentsOptional() {
-		this._argumentsAreOptional = true;
+	public void setRestOfParametersAsOptional() {
+		this._parametersAreOptionalFromThisPoint = true;
 	}
 
 	public CommandSyntax addCommand(String name) {
@@ -69,19 +69,19 @@ public class CommandSyntax {
 
 	public CommandSyntax addCommand(String commandName, CommandExecutor commandExecutor) {
 		CommandSyntax commandSyntax = addCommand(commandName);
-		commandSyntax.setExecutor(commandExecutor);
+		commandSyntax.setCommandExecutor(commandExecutor);
 		return commandSyntax;
 	}
 
-	public void setExecutor(CommandExecutor commandExecutor) {
-		this._executor = commandExecutor;		
+	public void setCommandExecutor(CommandExecutor commandExecutor) {
+		this._commandExecutor = commandExecutor;		
 	}
 
 	public void setPermission(String permission) {
 		this._permission = permission;
 	}
 
-	public CommandExecutor verifyAndGetExecutor(CommandArguments arguments) {
+	public CommandExecutor verifyAndGetCommandExecutor(CommandArguments arguments) {
 		if (this._subCommands.size() > 0) {
 			String command = arguments.getStringAsLowercase();
 			CommandSyntax commandSyntax = this._subCommands.get(command);
@@ -89,14 +89,14 @@ public class CommandSyntax {
 				arguments.getSender().sendMessage(String.format("Unexpected sub command: %s", command));
 				return null;
 			}
-			return commandSyntax.verifyAndGetExecutor(arguments);
+			return commandSyntax.verifyAndGetCommandExecutor(arguments);
 		}
 		
 		CommandArguments argumentsClone = arguments.clone();
-		for (ArgumentSyntax argumentSyntax : this._arguments) {
-			if (!argumentSyntax.isOk(argumentsClone)) return null;
+		for (ParameterSyntax parameterSyntax : this._parameterSyntaxList) {
+			if (!parameterSyntax.isOk(argumentsClone)) return null;
 		}
-		return this._executor;
+		return this._commandExecutor;
 	}
 	
 	private List<String> getSubCommands() {
@@ -133,18 +133,18 @@ public class CommandSyntax {
 		}
 		
 		CommandArguments argumentsClone = arguments.clone();
-		for (ArgumentSyntax argumentSyntax : this._arguments) {
+		for (ParameterSyntax parameterSyntax : this._parameterSyntaxList) {
 			String argument = argumentsClone.getString();
-			if ((argument == null) || argument.isEmpty()) return argumentSyntax.getValidValues();
+			if ((argument == null) || argument.isEmpty()) return parameterSyntax.getValidValues();
 			if (argumentsClone.hasReachedEnd()) {
 				List<String> found = new ArrayList<String>();
-				for (String string :argumentSyntax.getValidValues()) {
+				for (String string :parameterSyntax.getValidValues()) {
 					if (string.startsWith(argument)) found.add(string);
 				}
 				if (found.size() > 0) return found;			
 			}
 			argumentsClone.goOneArgumentBack();
-			if (!argumentSyntax.isOk(argumentsClone)) return null;
+			if (!parameterSyntax.isOk(argumentsClone)) return null;
 			if (argumentsClone.hasReachedEnd()) return null;
 		}
 		return null;

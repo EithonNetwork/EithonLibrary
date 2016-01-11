@@ -7,9 +7,9 @@ import net.eithon.library.command.CommandArguments;
 
 import org.bukkit.command.CommandSender;
 
-class PlayerSyntax extends ArgumentSyntax {
-	public PlayerSyntax(String name) {
-		super(ArgumentType.Player, name);
+class PlayerParameterSyntax extends ParameterSyntax {
+	public PlayerParameterSyntax(String name) {
+		super(ParameterType.Player, name);
 	}
 
 	@Override

@@ -8,8 +8,8 @@ import net.eithon.library.command.CommandArguments;
 
 import org.bukkit.command.CommandSender;
 
-public class ArgumentSyntax {
-	private ArgumentType _type;
+public class ParameterSyntax {
+	private ParameterType _type;
 	private String _name;
 	private boolean _isNamed;
 	private ArrayList<String> _validValues;
@@ -17,17 +17,25 @@ public class ArgumentSyntax {
 	private boolean _valuesAreMandatory;
 	private boolean _isOptional;
 
-	public enum ArgumentType { STRING, REAL, INTEGER, Player, REST, BOOLEAN };
+	public enum ParameterType { STRING, REAL, INTEGER, Player, REST, BOOLEAN };
 
 	public interface ValueGetter {
 		List<String> getValues();
 	}
 
-	public ArgumentSyntax(ArgumentType type, String name) {
+	public ParameterSyntax(ParameterType type, String name) {
 		this(type, name, false);
 	}
+	
+	public static List<String> fromArray(String[] array) {
+		ArrayList<String> list = new ArrayList<String>();
+		for (String string : array) {
+			list.add(string);
+		}
+		return list;
+	}
 
-	ArgumentSyntax(ArgumentType type, String name, boolean isNamed) {
+	ParameterSyntax(ParameterType type, String name, boolean isNamed) {
 		this._type = type;
 		this._name = name;
 		this._isNamed = isNamed;
@@ -50,7 +58,7 @@ public class ArgumentSyntax {
 	}
 
 	public void setValues(Integer... args) {
-		if (this._type != ArgumentType.INTEGER) {
+		if (this._type != ParameterType.INTEGER) {
 			throw new IllegalArgumentException(String.format("Expected values of type %s", this._type.toString()));
 		}
 		this._validValues = new ArrayList<String>();
