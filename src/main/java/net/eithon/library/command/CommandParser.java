@@ -17,6 +17,7 @@ public class CommandParser {
 	private CommandArguments _commandArguments;
 	private ICommandHandler _commandHandler;
 	private CommandSyntax _commandSyntax;
+	private HashMap<String, ParameterValue> _parameterValues;
 
 	public CommandParser(ICommandHandler commandHandler, CommandSender sender, Command cmd, String label, String[] args) {
 		this._sender = sender;
@@ -31,7 +32,8 @@ public class CommandParser {
 			this._sender.sendMessage(String.format("Expected command \"%s\", got \"%s\"", this._commandSyntax.getName(), command));
 			return false;
 		}
-		CommandExecutor executor = this._commandSyntax.verifyAndGetCommandExecutor(this._commandArguments);
+		this._parameterValues = new HashMap<String, ParameterValue>();
+		CommandExecutor executor = this._commandSyntax.parse(this._commandArguments, this._parameterValues);
 		if (executor == null) return false;
 		executor.execute(this);
 		return true;
@@ -78,5 +80,9 @@ public class CommandParser {
 		EithonPlayer eithonPlayer = getEithonPlayer();
 		if (eithonPlayer == null) return true;
 		return eithonPlayer.hasPermissionOrInformPlayer(permission);
+	}
+
+	public ParameterValue getArgument(String name) {
+		return this._parameterValues.get(name);
 	}
 }

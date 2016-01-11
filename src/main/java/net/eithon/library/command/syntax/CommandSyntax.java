@@ -9,6 +9,7 @@ import org.bukkit.command.CommandSender;
 
 import net.eithon.library.command.CommandArguments;
 import net.eithon.library.command.CommandParser;
+import net.eithon.library.command.ParameterValue;
 import net.eithon.library.command.syntax.ParameterSyntax.ParameterType;
 import net.eithon.library.command.syntax.CommandSyntax.CommandExecutor;
 
@@ -81,7 +82,7 @@ public class CommandSyntax {
 		this._permission = permission;
 	}
 
-	public CommandExecutor verifyAndGetCommandExecutor(CommandArguments arguments) {
+	public CommandExecutor parse(CommandArguments arguments, HashMap<String, ParameterValue> parameterValues) {
 		if (this._subCommands.size() > 0) {
 			String command = arguments.getStringAsLowercase();
 			CommandSyntax commandSyntax = this._subCommands.get(command);
@@ -89,12 +90,13 @@ public class CommandSyntax {
 				arguments.getSender().sendMessage(String.format("Unexpected sub command: %s", command));
 				return null;
 			}
-			return commandSyntax.verifyAndGetCommandExecutor(arguments);
+			parameterValues.put(this._commandName, new ParameterValue(this, command));
+			return commandSyntax.parse(arguments, parameterValues);
 		}
 		
 		CommandArguments argumentsClone = arguments.clone();
 		for (ParameterSyntax parameterSyntax : this._parameterSyntaxList) {
-			if (!parameterSyntax.isOk(argumentsClone)) return null;
+			if (!parameterSyntax.parse(argumentsClone, parameterValues)) return null;
 		}
 		return this._commandExecutor;
 	}
@@ -144,7 +146,7 @@ public class CommandSyntax {
 				if (found.size() > 0) return found;			
 			}
 			argumentsClone.goOneArgumentBack();
-			if (!parameterSyntax.isOk(argumentsClone)) return null;
+			if (!parameterSyntax.parse(argumentsClone, null)) return null;
 			if (argumentsClone.hasReachedEnd()) return null;
 		}
 		return null;

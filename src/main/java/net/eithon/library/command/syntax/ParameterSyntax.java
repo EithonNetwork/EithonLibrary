@@ -2,9 +2,11 @@ package net.eithon.library.command.syntax;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 import net.eithon.library.command.CommandArguments;
+import net.eithon.library.command.ParameterValue;
 
 import org.bukkit.command.CommandSender;
 
@@ -67,22 +69,32 @@ public class ParameterSyntax {
 		}
 	}
 
-	public boolean isOk(CommandArguments arguments) {
+	public boolean parse(CommandArguments arguments, HashMap<String, ParameterValue> parameterValues) {
 		String argument = arguments.getString();
+		ParameterValue parameterValue = new ParameterValue(this, argument);
 		if (argument == null) {
-			if (this._isOptional) return true;
+			if (this._isOptional) {
+				if (parameterValues != null) parameterValues.put(this._name, parameterValue);
+				return true;
+			}
 			arguments.getSender().sendMessage(String.format("Expected a value for argument %s", this._name));
 			return false;
 		}
 		if (!typeIsOk(arguments.getSender(), argument)) return false;
-		if (!this._valuesAreMandatory) return true;
+		if (!this._valuesAreMandatory) {
+			if (parameterValues != null) parameterValues.put(this._name, parameterValue);
+			return true;
+		}
 		if (this._valueGetter != null) {
 			this._validValues = new ArrayList<String>();
 			this._validValues.addAll(this._valueGetter.getValues());
 		}
 		if (this._validValues != null) {
 			for (String validValue : this._validValues) {
-				if (argument.equals(validValue)) return true;
+				if (argument.equals(validValue)) {
+					if (parameterValues != null) parameterValues.put(this._name, parameterValue);
+					return true;
+				}
 			}
 		}
 		arguments.getSender().sendMessage(String.format("The value \"%s\" was not an accepted value for argument %s.",

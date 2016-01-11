@@ -1,9 +1,11 @@
 package net.eithon.library.command.syntax;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import net.eithon.library.command.CommandArguments;
+import net.eithon.library.command.ParameterValue;
 
 import org.bukkit.command.CommandSender;
 
@@ -13,9 +15,12 @@ class PlayerParameterSyntax extends ParameterSyntax {
 	}
 
 	@Override
-	public boolean isOk(CommandArguments arguments) {
+	public boolean parse(CommandArguments arguments, HashMap<String, ParameterValue> parameterValues) {
 		String argument = arguments.getString();
-		if ((argument != null) || getIsOptional()) return true;
+		if ((argument != null) || getIsOptional()) {
+			if (parameterValues != null) parameterValues.put(getName(), new ParameterValue(this, argument));
+			return true;
+		}
 		arguments.getSender().sendMessage(String.format("Expected a value for argument %s", getName()));
 		return false;
 	}
