@@ -20,7 +20,7 @@ public class CommandArguments {
 
 	public CommandSender getSender() { return this._sender; }
 	public void setNextArgument(int nextArgument) { this._nextArgument = nextArgument; }
-
+	public boolean hasReachedEnd() { return this._nextArgument >= this._args.length; }
 	private Argument getNextArgument() {
 		int position = this._nextArgument++;
 		String argument = this._args.length > position ? this._args[position] : null;

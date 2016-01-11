@@ -116,14 +116,16 @@ public class CommandSyntax {
 	public List<String> tabComplete(CommandArguments arguments) {
 		if (this._subCommands.size() > 0) {
 			String command = arguments.getStringAsLowercase();
-			if (command == null) return getSubCommands();
+			if ((command == null) || command.isEmpty()) return getSubCommands();
 			CommandSyntax commandSyntax = this._subCommands.get(command);
 			if (commandSyntax == null) {
-				/*
 				if (arguments.hasReachedEnd()) {
-					List<String> list = getSubCommands();
+					List<String> found = new ArrayList<String>();
+					for (String string : getSubCommands()) {
+						if (string.startsWith(command)) found.add(string);
+					}
+					if (found.size() > 0) return found;
 				}
-				*/
 				arguments.getSender().sendMessage(String.format("Unexpected sub command: %s", command));
 				return null;
 			}
@@ -133,9 +135,17 @@ public class CommandSyntax {
 		CommandArguments argumentsClone = arguments.clone();
 		for (ArgumentSyntax argumentSyntax : this._arguments) {
 			String argument = argumentsClone.getString();
-			if (argument == null) return argumentSyntax.getValidValues();
+			if ((argument == null) || argument.isEmpty()) return argumentSyntax.getValidValues();
+			if (argumentsClone.hasReachedEnd()) {
+				List<String> found = new ArrayList<String>();
+				for (String string :argumentSyntax.getValidValues()) {
+					if (string.startsWith(argument)) found.add(string);
+				}
+				if (found.size() > 0) return found;			
+			}
 			argumentsClone.goOneArgumentBack();
 			if (!argumentSyntax.isOk(argumentsClone)) return null;
+			if (argumentsClone.hasReachedEnd()) return null;
 		}
 		return null;
 	}
