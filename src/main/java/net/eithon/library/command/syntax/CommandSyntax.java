@@ -5,37 +5,30 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
-import org.bukkit.command.CommandSender;
-
 import net.eithon.library.command.CommandArguments;
 import net.eithon.library.command.CommandParser;
 import net.eithon.library.command.ParameterValue;
 import net.eithon.library.command.syntax.ParameterSyntax.ParameterType;
-import net.eithon.library.command.syntax.CommandSyntax.CommandExecutor;
 
-public class CommandSyntax {
+public class CommandSyntax extends Syntax {
 
 	public interface CommandExecutor {
 		public void execute(CommandParser commandParser);
 	}
 
-	private String _documentation;
-	private String _commandName;
 	private ArrayList<ParameterSyntax> _parameterSyntaxList;
 	private HashMap<String, CommandSyntax> _subCommands;
 	private boolean _parametersAreOptionalFromThisPoint;
 	private CommandExecutor _commandExecutor;
 	private String _permission;
 
-	public CommandSyntax(String commandName) {
-		this._commandName = commandName;
+	public CommandSyntax(String name) {
+		super(name);
 		this._parametersAreOptionalFromThisPoint = false;
 		this._parameterSyntaxList = new ArrayList<ParameterSyntax>();
 		this._subCommands = new HashMap<String, CommandSyntax>();
 		this._permission = null;
 	}
-
-	public String getName() { return this._commandName; }
 
 	public PlayerParameterSyntax addParameterPlayer(String name) {
 		PlayerParameterSyntax playerParameterSyntax = new PlayerParameterSyntax(name);
@@ -90,7 +83,7 @@ public class CommandSyntax {
 				arguments.getSender().sendMessage(String.format("Unexpected sub command: %s", command));
 				return null;
 			}
-			parameterValues.put(this._commandName, new ParameterValue(this, command));
+			parameterValues.put(getName(), new ParameterValue(this, command));
 			return commandSyntax.parse(arguments, parameterValues);
 		}
 		

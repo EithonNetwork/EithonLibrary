@@ -39,8 +39,6 @@ public class CommandParser {
 		return true;
 	}
 
-	public CommandArguments getArguments() { return this._commandArguments; }
-
 	public CommandSender getSender() { return this._sender; }
 
 	public Player getPlayer() {

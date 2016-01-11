@@ -1,6 +1,7 @@
 package net.eithon.library.command.syntax;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -10,14 +11,14 @@ import net.eithon.library.command.ParameterValue;
 
 import org.bukkit.command.CommandSender;
 
-public class ParameterSyntax {
+public class ParameterSyntax extends Syntax {
 	private ParameterType _type;
-	private String _name;
 	private boolean _isNamed;
 	private ArrayList<String> _validValues;
 	private ValueGetter _valueGetter;
 	private boolean _valuesAreMandatory;
 	private boolean _isOptional;
+	private String _defaultValue;
 
 	public enum ParameterType { STRING, REAL, INTEGER, Player, REST, BOOLEAN };
 
@@ -38,35 +39,34 @@ public class ParameterSyntax {
 	}
 
 	ParameterSyntax(ParameterType type, String name, boolean isNamed) {
+		super(name);
 		this._type = type;
-		this._name = name;
 		this._isNamed = isNamed;
 		this._isOptional = false;
 		this._valueGetter = null;
-		this._validValues = null;
+		this._validValues = new ArrayList<String>();
 	}
 
-	public String getName() {return this._name; }
-
 	public boolean getIsOptional() { return this._isOptional; }
+	public String getDefault() { return this._defaultValue; }
+
+	void setOptional() {
+		this._isOptional = true;
+	}
+	
+	public void setDefault(String defaultValue) {
+		this._isOptional = true;
+		this._defaultValue = defaultValue;
+	}
 
 	public void SetValueGetter(ValueGetter valueGetter, boolean mandatory) {
 		this._valueGetter = valueGetter;
 		this._valuesAreMandatory = mandatory;
 	}
 
-	void setOptional() {
-		this._isOptional = true;
-	}
-
-	public void setValues(Integer... args) {
-		if (this._type != ParameterType.INTEGER) {
-			throw new IllegalArgumentException(String.format("Expected values of type %s", this._type.toString()));
-		}
+	public void setValues(String... args) {
 		this._validValues = new ArrayList<String>();
-		for (Integer value : args) {
-			this._validValues.add(value.toString());
-		}
+		this._validValues.addAll(Arrays.asList(args));
 	}
 
 	public boolean parse(CommandArguments arguments, HashMap<String, ParameterValue> parameterValues) {
@@ -74,15 +74,15 @@ public class ParameterSyntax {
 		ParameterValue parameterValue = new ParameterValue(this, argument);
 		if (argument == null) {
 			if (this._isOptional) {
-				if (parameterValues != null) parameterValues.put(this._name, parameterValue);
+				if (parameterValues != null) parameterValues.put(getName(), parameterValue);
 				return true;
 			}
-			arguments.getSender().sendMessage(String.format("Expected a value for argument %s", this._name));
+			arguments.getSender().sendMessage(String.format("Expected a value for argument %s", getName()));
 			return false;
 		}
 		if (!typeIsOk(arguments.getSender(), argument)) return false;
 		if (!this._valuesAreMandatory) {
-			if (parameterValues != null) parameterValues.put(this._name, parameterValue);
+			if (parameterValues != null) parameterValues.put(getName(), parameterValue);
 			return true;
 		}
 		if (this._valueGetter != null) {
@@ -92,13 +92,13 @@ public class ParameterSyntax {
 		if (this._validValues != null) {
 			for (String validValue : this._validValues) {
 				if (argument.equals(validValue)) {
-					if (parameterValues != null) parameterValues.put(this._name, parameterValue);
+					if (parameterValues != null) parameterValues.put(getName(), parameterValue);
 					return true;
 				}
 			}
 		}
 		arguments.getSender().sendMessage(String.format("The value \"%s\" was not an accepted value for argument %s.",
-				argument, this._name));
+				argument, getName()));
 		return false;
 	}
 
@@ -107,7 +107,7 @@ public class ParameterSyntax {
 		List<String> validValues = getValidValues();
 		if (argument == null)  {
 			if (this._isOptional && (validValues != null)) return validValues;
-			arguments.getSender().sendMessage(String.format("Expected a value for argument %s", this._name));
+			arguments.getSender().sendMessage(String.format("Expected a value for argument %s", getName()));
 			return null;
 		}
 		if (!typeIsOk(arguments.getSender(), argument)) return null;
@@ -118,7 +118,7 @@ public class ParameterSyntax {
 			}
 		}
 		arguments.getSender().sendMessage(String.format("The value \"%s\" was not an accepted value for argument %s.",
-				argument, this._name));
+				argument, getName()));
 		return null;
 	}
 
@@ -133,6 +133,9 @@ public class ParameterSyntax {
 					return o1.compareTo(o2);
 				}
 			});
+		}
+		if ((this._defaultValue != null) && !this._validValues.contains(this._defaultValue)) {
+			this._validValues.add(0, this._defaultValue);
 		}
 		return this._validValues;
 	}
