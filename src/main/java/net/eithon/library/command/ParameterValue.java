@@ -1,60 +1,48 @@
 package net.eithon.library.command;
 
-import org.bukkit.entity.Player;
-
-import net.eithon.library.command.syntax.CommandSyntax;
 import net.eithon.library.command.syntax.ParameterSyntax;
-import net.eithon.library.command.syntax.Syntax;
+import net.eithon.library.time.TimeMisc;
+
+import org.bukkit.entity.Player;
 
 public class ParameterValue {
 
 	private ParameterSyntax _parameterSyntax;
-	private CommandSyntax _commandSyntax;
 	private String _value;
-
-	public ParameterValue(CommandSyntax commandSyntax, String command) {
-		this._commandSyntax = commandSyntax;
-		this._value = command;
-	}
 
 	public ParameterValue(ParameterSyntax parameterSyntax, String argument) {
 		this._parameterSyntax = parameterSyntax;
 		this._value = argument;
 	}
 
-	public Player asPlayer() {
-		// TODO Auto-generated method stub
-		return null;
+	public float asFloat() {
+		return Float.parseFloat(asString());
 	}
 
-	public float getFloat() {
-		return Float.parseFloat(getString());
+	public double asDouble() {
+		return Double.parseDouble(asString());
 	}
 
-	public double getDouble() {
-		return Double.parseDouble(getString());
+	public int asInteger() {
+		return Integer.parseInt(asString());
 	}
 
-	public int getInteger() {
-		return Integer.parseInt(getString());
+	public long asLong() {
+		return Long.parseLong(asString());
 	}
 
-	public long getLong() {
-		return Long.parseLong(getString());
+	public boolean asBoolean() {
+		return Boolean.parseBoolean(asString());
 	}
 
-	public boolean getBoolean() {
-		return Boolean.parseBoolean(getString());
-	}
-
-	public String getString() {
+	public String asString() {
 		if (this._value != null) return this._value;
 		if (this._parameterSyntax == null) return null;
 		return this._parameterSyntax.getDefault();
 	}
 
-	public String getStringAsLowerCase() {
-		String value = getString();
+	public String asLowerCase() {
+		String value = asString();
 		if (value == null) return null;
 		return value.toLowerCase();
 	}
@@ -67,4 +55,16 @@ public class ParameterValue {
 		return this._value != null;
 	}
 
+	public long asSeconds() {
+		return TimeMisc.stringToSeconds(asString());
+	}
+
+	public long asTicks() {
+		return TimeMisc.stringToTicks(asString());
+	}
+
+	public Player asPlayer() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

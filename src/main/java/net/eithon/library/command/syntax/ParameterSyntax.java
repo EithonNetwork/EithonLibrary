@@ -8,6 +8,7 @@ import java.util.List;
 
 import net.eithon.library.command.CommandArguments;
 import net.eithon.library.command.ParameterValue;
+import net.eithon.library.time.TimeMisc;
 
 import org.bukkit.command.CommandSender;
 
@@ -20,7 +21,7 @@ public class ParameterSyntax extends Syntax {
 	private boolean _isOptional;
 	private String _defaultValue;
 
-	public enum ParameterType { STRING, REAL, INTEGER, Player, REST, BOOLEAN };
+	public enum ParameterType { STRING, REAL, INTEGER, Player, REST, BOOLEAN, TIME_SPAN };
 
 	public interface ValueGetter {
 		List<String> getValues();
@@ -151,6 +152,9 @@ public class ParameterSyntax extends Syntax {
 				break;
 			case REAL:
 				Float.parseFloat(argument);
+				break;
+			case TIME_SPAN:
+				TimeMisc.stringToSeconds(argument);
 				break;
 			default:
 				break;

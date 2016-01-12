@@ -22,12 +22,16 @@ public class CommandSyntax extends Syntax {
 	private CommandExecutor _commandExecutor;
 	private String _permission;
 
-	public CommandSyntax(String name) {
+	public CommandSyntax(String name, String permission) {
 		super(name);
+		this._permission = permission;
 		this._parametersAreOptionalFromThisPoint = false;
 		this._parameterSyntaxList = new ArrayList<ParameterSyntax>();
 		this._subCommands = new HashMap<String, CommandSyntax>();
-		this._permission = null;
+	}
+	
+	public CommandSyntax(String name) {
+		this(name, null);
 	}
 
 	public PlayerParameterSyntax addParameterPlayer(String name) {
@@ -56,13 +60,16 @@ public class CommandSyntax extends Syntax {
 	}
 
 	public CommandSyntax addCommand(String name) {
-		CommandSyntax commandSyntax = new CommandSyntax(name);
-		this._subCommands.put(name, commandSyntax);
-		return commandSyntax;
+		return addCommand(name, null, null);
 	}
 
-	public CommandSyntax addCommand(String commandName, CommandExecutor commandExecutor) {
-		CommandSyntax commandSyntax = addCommand(commandName);
+	public CommandSyntax addCommand(String name, CommandExecutor commandExecutor) {
+		return addCommand(name, null, commandExecutor);
+	}
+
+	public CommandSyntax addCommand(String name, String permission, CommandExecutor commandExecutor) {
+		CommandSyntax commandSyntax = addCommand(name);
+		commandSyntax.setPermission(permission);
 		commandSyntax.setCommandExecutor(commandExecutor);
 		return commandSyntax;
 	}
@@ -83,7 +90,6 @@ public class CommandSyntax extends Syntax {
 				arguments.getSender().sendMessage(String.format("Unexpected sub command: %s", command));
 				return null;
 			}
-			parameterValues.put(getName(), new ParameterValue(this, command));
 			return commandSyntax.parse(arguments, parameterValues);
 		}
 		
