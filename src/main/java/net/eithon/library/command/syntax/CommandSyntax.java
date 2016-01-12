@@ -34,14 +34,24 @@ public class CommandSyntax extends Syntax {
 		this(name, null);
 	}
 
+	public boolean hasParameters() { return this._parameterSyntaxList.size() > 0; }
+
 	public PlayerParameterSyntax addParameterPlayer(String name) {
 		PlayerParameterSyntax playerParameterSyntax = new PlayerParameterSyntax(name);
 		return (PlayerParameterSyntax) addParameter(playerParameterSyntax);
 	}
 
+	public ParameterSyntax addParameter(String name) {
+		return addParameter(ParameterType.STRING, name);
+	}
+
 	public ParameterSyntax addParameter(ParameterType type, String name) {
 		ParameterSyntax parameterSyntax = new ParameterSyntax(type, name);
 		return addParameter(parameterSyntax);
+	}
+
+	public ParameterSyntax addNamedParameter(String name) {
+		return addNamedParameter(ParameterType.STRING, name);
 	}
 
 	public ParameterSyntax addNamedParameter(ParameterType type, String name) {
@@ -68,7 +78,8 @@ public class CommandSyntax extends Syntax {
 	}
 
 	public CommandSyntax addCommand(String name, String permission, CommandExecutor commandExecutor) {
-		CommandSyntax commandSyntax = addCommand(name);
+		CommandSyntax commandSyntax = new CommandSyntax(name);
+		this._subCommands.put(name, commandSyntax);
 		commandSyntax.setPermission(permission);
 		commandSyntax.setCommandExecutor(commandExecutor);
 		return commandSyntax;
@@ -149,6 +160,21 @@ public class CommandSyntax extends Syntax {
 			if (argumentsClone.hasReachedEnd()) return null;
 		}
 		return null;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder(this.getName());
+		sb.append(" ");
+		for (CommandSyntax commandSyntax : this._subCommands.values()) {
+			sb.append(commandSyntax.toString());
+			sb.append(" ");
+		}
+		for (ParameterSyntax parameterSyntax : this._parameterSyntaxList) {
+			sb.append(parameterSyntax.toString());
+			sb.append(" ");			
+		}
+		return sb.toString().trim();
 	}
 
 }

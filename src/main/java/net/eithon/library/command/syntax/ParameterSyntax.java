@@ -30,7 +30,7 @@ public class ParameterSyntax extends Syntax {
 	public ParameterSyntax(ParameterType type, String name) {
 		this(type, name, false);
 	}
-	
+
 	public static List<String> fromArray(String[] array) {
 		ArrayList<String> list = new ArrayList<String>();
 		for (String string : array) {
@@ -54,7 +54,7 @@ public class ParameterSyntax extends Syntax {
 	void setOptional() {
 		this._isOptional = true;
 	}
-	
+
 	public void setDefault(String defaultValue) {
 		this._isOptional = true;
 		this._defaultValue = defaultValue;
@@ -164,5 +164,15 @@ public class ParameterSyntax extends Syntax {
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder("");
+		if (this._isOptional) sb.append("[");
+		if (!this._isNamed) sb.append(String.format("<%s>", this.getName()));
+		else sb.append(String.format("<%s>=<%s>", this.getName(), this.getName()));
+		if (this._isOptional) sb.append("]");
+		return sb.toString();
 	}
 }

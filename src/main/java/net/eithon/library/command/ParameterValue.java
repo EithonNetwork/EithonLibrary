@@ -67,4 +67,9 @@ public class ParameterValue {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	public Player asPlayer(Player defaultPlayer) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
