@@ -89,7 +89,10 @@ public class SimpleMarkUp {
 			token = handleBackslash(st, token);
 			if (token.equalsIgnoreCase("[")) {
 				if (isInsideBrackets) {
+					if (firstToken) parsedLine += activeCodes();
 					parsedLine += "[";
+					firstToken = false;
+					hasContent = true;
 					continue;
 				}
 				isInsideBrackets = true;

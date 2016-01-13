@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 3.5.3 (2016-01-13)
+
+* BUG: Leading literal bracket did not get color.
+
 ### 3.5.2 (2016-01-12)
 
 * BUG: SimpleMarkUp could not handle nested brackets properly.
