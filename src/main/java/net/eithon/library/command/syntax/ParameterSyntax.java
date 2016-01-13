@@ -15,6 +15,7 @@ import org.bukkit.command.CommandSender;
 public class ParameterSyntax extends Syntax {
 	private ParameterType _type;
 	private boolean _isNamed;
+	private String _leftHandName;
 	private ArrayList<String> _validValues;
 	private ValueGetter _valueGetter;
 	private boolean _valuesAreMandatory;
@@ -28,7 +29,7 @@ public class ParameterSyntax extends Syntax {
 	}
 
 	public ParameterSyntax(ParameterType type, String name) {
-		this(type, name, false);
+		this(type, name, null);
 	}
 
 	public static List<String> fromArray(String[] array) {
@@ -39,11 +40,12 @@ public class ParameterSyntax extends Syntax {
 		return list;
 	}
 
-	ParameterSyntax(ParameterType type, String name, boolean isNamed) {
-		super(name);
+	ParameterSyntax(ParameterType type, String parameterName, String leftHandName) {
+		super(parameterName);
+		this._leftHandName = leftHandName;
 		this._type = type;
-		this._isNamed = isNamed;
-		this._isOptional = false;
+		this._isNamed = leftHandName != null;
+		this._isOptional = this._isNamed;
 		this._valueGetter = null;
 		this._validValues = new ArrayList<String>();
 	}
@@ -66,8 +68,12 @@ public class ParameterSyntax extends Syntax {
 	}
 
 	public void setValues(String... args) {
+		setValues(Arrays.asList(args));
+	}
+
+	public void setValues(List<String> values) {
 		this._validValues = new ArrayList<String>();
-		this._validValues.addAll(Arrays.asList(args));
+		this._validValues.addAll(values);
 	}
 
 	public boolean parse(CommandArguments arguments, HashMap<String, ParameterValue> parameterValues) {
@@ -169,10 +175,12 @@ public class ParameterSyntax extends Syntax {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder("");
-		if (this._isOptional) sb.append("[");
-		if (!this._isNamed) sb.append(String.format("<%s>", this.getName()));
-		else sb.append(String.format("<%s>=<%s>", this.getName(), this.getName()));
-		if (this._isOptional) sb.append("]");
+		if (!this._isNamed) sb.append(String.format("<%s", this.getName()));
+		else sb.append(String.format("%s=<%s", this._leftHandName, this.getName()));
+		if (this._type != ParameterType.STRING) sb.append(String.format(":%s", this._type.toString()));
+		if (this._defaultValue != null) sb.append(String.format("(%s)", this._defaultValue));
+		if (this._validValues.size()>0) sb.append(String.format("{%s}", String.join(",", this._validValues)));
+		sb.append(">");
 		return sb.toString();
 	}
 }

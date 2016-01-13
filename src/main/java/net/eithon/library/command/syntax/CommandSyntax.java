@@ -50,12 +50,12 @@ public class CommandSyntax extends Syntax {
 		return addParameter(parameterSyntax);
 	}
 
-	public ParameterSyntax addNamedParameter(String name) {
-		return addNamedParameter(ParameterType.STRING, name);
+	public ParameterSyntax addNamedParameter(String name, String parameterName) {
+		return addNamedParameter(ParameterType.STRING, name, parameterName);
 	}
 
-	public ParameterSyntax addNamedParameter(ParameterType type, String name) {
-		ParameterSyntax parameterSyntax = new ParameterSyntax(type, name, true);
+	public ParameterSyntax addNamedParameter(ParameterType type, String name, String parameterName) {
+		ParameterSyntax parameterSyntax = new ParameterSyntax(type, name, parameterName);
 		return addParameter(parameterSyntax);
 	}
 
