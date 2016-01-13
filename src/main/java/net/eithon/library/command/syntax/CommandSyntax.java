@@ -177,4 +177,8 @@ public class CommandSyntax extends Syntax {
 		return sb.toString().trim();
 	}
 
+	public void parse(String commandSentence) {
+		CommandSyntaxParser.parseCommand(this, commandSentence); 
+	}
+
 }

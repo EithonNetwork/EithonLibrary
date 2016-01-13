@@ -16,11 +16,11 @@ import org.apache.commons.lang.NotImplementedException;
 // eithonfixes rc set [<variable>=<value> ...]
 // eithonfixes rc add <name> <command>
 
-public class CommandSyntaxParser {
+class CommandSyntaxParser {
 
-	public static CommandSyntax parseCommand(String command) {
-		CommandSyntaxParser parser = new CommandSyntaxParser(command);
-		return parser.getCommandSyntax();
+	public static void parseCommand(CommandSyntax rootCommand, String command) {
+		CommandSyntaxParser parser = new CommandSyntaxParser(rootCommand, command);
+		parser.parse();
 	}
 
 	private CommandSyntax getCommandSyntax() { return this._rootCommand; }
@@ -35,12 +35,13 @@ public class CommandSyntaxParser {
 	private List<String> _parameterValues;
 	private ParameterType _type;
 
-	private CommandSyntaxParser(String command) {
+	private CommandSyntaxParser(CommandSyntax rootCommand, String command) {
+		this._rootCommand = rootCommand;
 		this._stringTokenizer = new StringTokenizer(command, " <:>{,}=()", true);
-		parse();
 	}
 
 	private void parse() {
+		this._currentCommand = this._rootCommand;
 		this._lastItem = null;
 		this._lastItemWasParameter = false;
 		this._leftHandName = null;
@@ -102,12 +103,7 @@ public class CommandSyntaxParser {
 		if ((this._currentCommand != null) && (this._currentCommand.hasParameters())) {
 			throw new NotImplementedException("Sub commands after parameters is not yet supported.");
 		}
-		if (this._rootCommand == null) {
-			this._rootCommand = new CommandSyntax(lastItem);
-			this._currentCommand = this._rootCommand;
-		} else {
-			this._currentCommand = this._currentCommand.addCommand(lastItem);
-		}
+		this._currentCommand = this._currentCommand.addCommand(lastItem);
 	}
 
 	private void addParameter() {
@@ -142,7 +138,7 @@ public class CommandSyntaxParser {
 				if (typeFound) {
 					String type = sb.toString();
 					try {
-					this._type = ParameterType.valueOf(type);
+						this._type = ParameterType.valueOf(type);
 					} catch (Exception e) {
 						throw new IllegalArgumentException(String.format("Parameter %s has unknown type; %s", parameter, type));
 					}
