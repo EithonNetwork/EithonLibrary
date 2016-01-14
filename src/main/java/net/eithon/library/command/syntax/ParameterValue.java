@@ -2,15 +2,14 @@ package net.eithon.library.command.syntax;
 
 import net.eithon.library.command.syntax.ParameterSyntax;
 
-public class Argument {
+public class ParameterValue {
+
 	private ParameterSyntax _parameterSyntax;
 	private String _value;
 
-
-	public Argument(ParameterSyntax parameterSyntax, String argument) {
+	public ParameterValue(ParameterSyntax parameterSyntax, String argument) {
 		this._parameterSyntax = parameterSyntax;
 		this._value = argument;
-		// TODO Auto-generated constructor stub
 	}
 
 	public float asFloat() {
