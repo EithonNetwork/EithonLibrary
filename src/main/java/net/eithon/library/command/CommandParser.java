@@ -1,7 +1,11 @@
 package net.eithon.library.command;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
 
+import net.eithon.library.command.syntax.CommandArgumentException;
 import net.eithon.library.command.syntax.CommandSyntax;
 import net.eithon.library.command.syntax.CommandSyntax.CommandExecutor;
 import net.eithon.library.extensions.EithonPlayer;
@@ -13,26 +17,32 @@ import org.bukkit.entity.Player;
 public class CommandParser {
 
 	private CommandSender _sender;
-	private CommandArguments _commandArguments;
+	private Queue<String> _commandQueue;
 	private CommandSyntax _commandSyntax;
-	private HashMap<String, ParameterValue> _parameterValues;
+	private HashMap<String, Argument> _arguments;
 
 	public CommandParser(CommandSyntax commandSyntax, CommandSender sender, Command cmd, String label, String[] args) {
 		this._sender = sender;
-		this._commandArguments = new CommandArguments(sender, args);
+		this._commandQueue = new LinkedList<String>();
+		this._commandQueue.addAll(Arrays.asList(args));
 		this._commandSyntax = commandSyntax;
 	}
-	
+
 	public boolean execute() {
-		String command = this._commandArguments.getStringAsLowercase();
+		String command = this._commandQueue.poll().toLowerCase();
 		if (!command.equalsIgnoreCase(this._commandSyntax.getName())) {
 			this._sender.sendMessage(String.format("Expected command \"%s\", got \"%s\"", this._commandSyntax.getName(), command));
 			return false;
 		}
-		this._parameterValues = new HashMap<String, ParameterValue>();
-		CommandExecutor executor = this._commandSyntax.parse(this._commandArguments, this._parameterValues);
-		if (executor == null) return false;
-		executor.execute(this);
+		this._arguments = new HashMap<String, Argument>();
+		try {
+			CommandExecutor executor = this._commandSyntax.parse(this._commandQueue, this._arguments);
+			if (executor == null) return false;
+			executor.execute(this);
+		} catch (CommandArgumentException e) {
+			this._sender.sendMessage(e.getMessage());
+			return false;
+		}
 		return true;
 	}
 
@@ -63,7 +73,7 @@ public class CommandParser {
 		return new EithonPlayer(player);
 	}
 
-	public ParameterValue getArgument(String name) {
-		return this._parameterValues.get(name);
+	public Argument getArgument(String name) {
+		return this._arguments.get(name);
 	}
 }

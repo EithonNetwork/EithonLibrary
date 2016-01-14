@@ -8,11 +8,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.eithon.library.command.CommandArguments;
-import net.eithon.library.command.ParameterValue;
+import net.eithon.library.command.Argument;
 import net.eithon.library.time.TimeMisc;
-
-import org.bukkit.command.CommandSender;
 
 public class ParameterSyntax extends Syntax {
 	private static String parameterName = "([^:{]+)";
@@ -81,21 +78,19 @@ public class ParameterSyntax extends Syntax {
 		this._validValues.addAll(values);
 	}
 
-	public boolean parse(CommandArguments arguments, HashMap<String, ParameterValue> parameterValues) {
-		String argument = arguments.getString();
-		ParameterValue parameterValue = new ParameterValue(this, argument);
+	public void parse(String argument, HashMap<String, Argument> collectedArguments) throws CommandArgumentException {
+		Argument parameterValue = new Argument(this, argument);
 		if (argument == null) {
 			if (this._isOptional) {
-				if (parameterValues != null) parameterValues.put(getName(), parameterValue);
-				return true;
-			}
-			arguments.getSender().sendMessage(String.format("Expected a value for argument %s", getName()));
-			return false;
+				if (collectedArguments != null) collectedArguments.put(getName(), parameterValue);
+				return;
+			}	
+			throw new CommandArgumentException(String.format("Expected a value for argument %s", getName()));
 		}
-		if (!verifyValueIsOkAccordingToType(arguments.getSender(), argument)) return false;
+		verifyValueIsOkAccordingToType(argument);
 		if (this._acceptsAnyValue) {
-			if (parameterValues != null) parameterValues.put(getName(), parameterValue);
-			return true;
+			if (collectedArguments != null) collectedArguments.put(getName(), parameterValue);
+			return;
 		}
 		if (this._valueGetter != null) {
 			this._validValues = new ArrayList<String>();
@@ -104,14 +99,13 @@ public class ParameterSyntax extends Syntax {
 		if (this._validValues != null) {
 			for (String validValue : this._validValues) {
 				if (argument.equals(validValue)) {
-					if (parameterValues != null) parameterValues.put(getName(), parameterValue);
-					return true;
+					if (collectedArguments != null) collectedArguments.put(getName(), parameterValue);
+					return;
 				}
 			}
 		}
-		arguments.getSender().sendMessage(String.format("The value \"%s\" was not an accepted value for argument %s.",
+		throw new CommandArgumentException(String.format("The value \"%s\" was not an accepted value for argument %s.",
 				argument, getName()));
-		return false;
 	}
 
 	public List<String> getValidValues() {
@@ -131,7 +125,7 @@ public class ParameterSyntax extends Syntax {
 		return this._validValues;
 	}
 
-	private boolean verifyValueIsOkAccordingToType(CommandSender sender, String argument) {
+	private boolean verifyValueIsOkAccordingToType(String argument) throws CommandArgumentException {
 		try {
 			switch (this._type) {
 			case BOOLEAN:
@@ -150,8 +144,7 @@ public class ParameterSyntax extends Syntax {
 				break;
 			}
 		} catch (final Exception e) {
-			sender.sendMessage(String.format("\"%s\" is not of type %s", argument, this._type.toString()));
-			return false;
+			throw new CommandArgumentException(String.format("\"%s\" is not of type %s", argument, this._type.toString()));
 		}
 		return true;
 	}

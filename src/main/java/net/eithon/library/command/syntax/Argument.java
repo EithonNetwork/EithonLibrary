@@ -1,16 +1,13 @@
-package net.eithon.library.command;
+package net.eithon.library.command.syntax;
 
 import net.eithon.library.command.syntax.ParameterSyntax;
-import net.eithon.library.time.TimeMisc;
 
-import org.bukkit.entity.Player;
-
-public class ParameterValue {
+public class Argument {
 
 	private ParameterSyntax _parameterSyntax;
 	private String _value;
 
-	public ParameterValue(ParameterSyntax parameterSyntax, String argument) {
+	public Argument(ParameterSyntax parameterSyntax, String argument) {
 		this._parameterSyntax = parameterSyntax;
 		this._value = argument;
 	}
@@ -53,23 +50,5 @@ public class ParameterValue {
 
 	public boolean hasValue() {
 		return this._value != null;
-	}
-
-	public long asSeconds() {
-		return TimeMisc.stringToSeconds(asString());
-	}
-
-	public long asTicks() {
-		return TimeMisc.stringToTicks(asString());
-	}
-
-	public Player asPlayer() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Player asPlayer(Player defaultPlayer) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }

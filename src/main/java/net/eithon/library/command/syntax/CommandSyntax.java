@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.NotImplementedException;
-
-import net.eithon.library.command.CommandArguments;
 import net.eithon.library.command.CommandParser;
-import net.eithon.library.command.ParameterValue;
+import net.eithon.library.command.Argument;
 import net.eithon.library.command.syntax.ParameterSyntax.ParameterType;
+
+import org.apache.commons.lang.NotImplementedException;
 
 public class CommandSyntax extends Syntax {	
 	private static String leftHand = "([^<= ]+) *= *";
@@ -43,7 +43,7 @@ public class CommandSyntax extends Syntax {
 	}
 
 	public List<ParameterSyntax> getParameterSyntaxList() { return this._parameterSyntaxList; }
-	public CommandSyntax getSubCommand(String command) { return this._subCommands.get(command); }
+	public CommandSyntax getSubCommand(String command) { return this._subCommands.get(command.toLowerCase()); }
 	public boolean hasSubCommands() { return this._subCommands.size() > 0; }
 	public boolean hasParameters() { return this._parameterSyntaxList.size() > 0; }
 
@@ -84,20 +84,18 @@ public class CommandSyntax extends Syntax {
 		this._permission = permission;
 	}
 
-	public CommandExecutor parse(CommandArguments arguments, HashMap<String, ParameterValue> parameterValues) {
+	public CommandExecutor parse(Queue<String> argumentQueue, HashMap<String, Argument> collectedArguments) throws CommandArgumentException {
 		if (this._subCommands.size() > 0) {
-			String command = arguments.getStringAsLowercase();
+			String command = argumentQueue.poll();
 			CommandSyntax commandSyntax = this._subCommands.get(command);
 			if (commandSyntax == null) {
-				arguments.getSender().sendMessage(String.format("Unexpected sub command: %s", command));
-				return null;
+				throw new CommandArgumentException(String.format("Unexpected sub command: %s", command));
 			}
-			return commandSyntax.parse(arguments, parameterValues);
+			return commandSyntax.parse(argumentQueue, collectedArguments);
 		}
 
-		CommandArguments argumentsClone = arguments.clone();
 		for (ParameterSyntax parameterSyntax : this._parameterSyntaxList) {
-			if (!parameterSyntax.parse(argumentsClone, parameterValues)) return null;
+			parameterSyntax.parse(argumentQueue.poll(), collectedArguments);
 		}
 		return this._commandExecutor;
 	}
