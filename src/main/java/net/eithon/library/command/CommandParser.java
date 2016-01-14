@@ -63,20 +63,6 @@ public class CommandParser {
 		return new EithonPlayer(player);
 	}
 
-	public boolean hasPermission(String permission)
-	{
-		EithonPlayer eithonPlayer = getEithonPlayer();
-		if (eithonPlayer == null) return true;
-		return eithonPlayer.hasPermission(permission);
-	}
-
-	public boolean hasPermissionOrInformSender(String permission)
-	{
-		EithonPlayer eithonPlayer = getEithonPlayer();
-		if (eithonPlayer == null) return true;
-		return eithonPlayer.hasPermissionOrInformPlayer(permission);
-	}
-
 	public ParameterValue getArgument(String name) {
 		return this._parameterValues.get(name);
 	}
