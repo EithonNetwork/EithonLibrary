@@ -1,8 +1,12 @@
 package net.eithon.library.command;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
+import net.eithon.library.command.syntax.CommandArgumentException;
 import net.eithon.library.command.syntax.CommandSyntax;
 import net.eithon.library.command.syntax.ParameterSyntax;
 
@@ -20,36 +24,40 @@ public class TabComplete implements TabCompleter{
 
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-		CommandArguments arguments = new CommandArguments(sender, args);
-		arguments.getStringAsLowercase();
-		return tabComplete(this._commandSyntax, arguments);
+		Queue<String> argumentQueue = new LinkedList<String>();
+		argumentQueue.addAll(Arrays.asList(args));
+		argumentQueue.poll();
+		return tabComplete(sender, this._commandSyntax, argumentQueue);
 	}
 
-	private static List<String> tabComplete(CommandSyntax commandSyntax, CommandArguments arguments) {
+	private static List<String> tabComplete(CommandSender sender, CommandSyntax commandSyntax, Queue<String> argumentQueue) {
 		if (commandSyntax.hasSubCommands()) {
-			String command = arguments.getStringAsLowercase();
+			String command = argumentQueue.poll();
 			if ((command == null) || command.isEmpty()) return commandSyntax.getSubCommands();
 			CommandSyntax subCommandSyntax = commandSyntax.getSubCommand(command);
-			if (subCommandSyntax != null) return tabComplete(subCommandSyntax, arguments);
-			if (arguments.hasReachedEnd()) {
+			if (subCommandSyntax != null) return tabComplete(sender, subCommandSyntax, argumentQueue);
+			if (argumentQueue.isEmpty()) {
 				List<String> found = findPartialMatches(command, commandSyntax.getSubCommands());
 				if (!found.isEmpty()) return found;
 			}
-			arguments.getSender().sendMessage(String.format("Unexpected sub command: %s", command));
+			sender.sendMessage(String.format("Unexpected sub command: %s", command));
 			return null;
 		}
 
-		CommandArguments argumentsClone = arguments.clone();
 		for (ParameterSyntax parameterSyntax : commandSyntax.getParameterSyntaxList()) {
-			String argument = argumentsClone.getString();
+			String argument = argumentQueue.poll();
 			if ((argument == null) || argument.isEmpty()) return parameterSyntax.getValidValues();
-			if (argumentsClone.hasReachedEnd()) {
+			if (argumentQueue.isEmpty()) {
 				List<String> found = findPartialMatches(argument, parameterSyntax.getValidValues());
 				if (!found.isEmpty()) return found;			
 			}
-			argumentsClone.goOneArgumentBack();
-			if (!parameterSyntax.parse(argumentsClone, null)) return null;
-			if (argumentsClone.hasReachedEnd()) return null;
+			try {
+				parameterSyntax.parse(argument, null);
+			} catch (CommandArgumentException e) {
+				sender.sendMessage(e.getMessage());
+				return null;
+			}
+			if (argumentQueue.isEmpty()) return null;
 		}
 		return null;
 	}
