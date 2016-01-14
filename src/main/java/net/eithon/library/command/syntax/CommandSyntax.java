@@ -152,8 +152,8 @@ public class CommandSyntax extends Syntax {
 		if (matcher.matches()) {
 			String leftSide = matcher.group(2);
 			String parameter = matcher.group(3);
-			ParameterSyntaxParser parameterParser = new ParameterSyntaxParser(leftSide, parameter);
-			parameterParser.addParameterToCommand(currentCommand);
+			ParameterSyntax parameterSyntax = ParameterSyntax.parseSyntax(leftSide, parameter);
+			currentCommand.addParameter(parameterSyntax);
 			parseSyntax(currentCommand, matcher.group(4));
 		} else {
 			matcher = commandPattern.matcher(remainingPart);

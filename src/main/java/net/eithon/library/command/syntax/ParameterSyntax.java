@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.eithon.library.command.CommandArguments;
 import net.eithon.library.command.ParameterValue;
@@ -13,6 +15,11 @@ import net.eithon.library.time.TimeMisc;
 import org.bukkit.command.CommandSender;
 
 public class ParameterSyntax extends Syntax {
+	private static String parameterName = "([^:{]+)";
+	private static String type = "([^{]+)";
+	private static String valueList = "([^}]+)";
+	private static Pattern insideParameterPattern= Pattern.compile(parameterName + "( *: *" + type + ")?" + "( *\\{" + valueList + "\\})?");
+
 	private ParameterType _type;
 	private boolean _isNamed;
 	private String _leftHandName;
@@ -21,15 +28,12 @@ public class ParameterSyntax extends Syntax {
 	private boolean _isOptional;
 	private String _defaultValue;
 	private boolean _acceptsAnyValue;
+	private ValueListParser _valueListParser;
 
 	public enum ParameterType { STRING, REAL, INTEGER, Player, REST, BOOLEAN, TIME_SPAN };
 
 	public interface ValueGetter {
 		List<String> getValues();
-	}
-
-	public ParameterSyntax(ParameterType type, String name) {
-		this(type, name, null);
 	}
 
 	public static List<String> fromArray(String[] array) {
@@ -40,6 +44,10 @@ public class ParameterSyntax extends Syntax {
 		return list;
 	}
 
+	public ParameterSyntax(ParameterType type, String name) {
+		this(type, name, null);
+	}
+
 	ParameterSyntax(ParameterType type, String parameterName, String leftHandName) {
 		super(parameterName);
 		this._leftHandName = leftHandName;
@@ -47,6 +55,7 @@ public class ParameterSyntax extends Syntax {
 		this._isNamed = leftHandName != null;
 		this._isOptional = this._isNamed;
 		this._valueGetter = null;
+		this._acceptsAnyValue = true;
 		this._validValues = new ArrayList<String>();
 	}
 
@@ -174,4 +183,43 @@ public class ParameterSyntax extends Syntax {
 	}
 
 	public void setAcceptsAnyValue(boolean acceptsAnyValue) { this._acceptsAnyValue = acceptsAnyValue; }
+
+	public static ParameterSyntax parseSyntax(String leftSide, String parameter) {
+		Matcher matcher = insideParameterPattern.matcher(parameter);
+		if (!matcher.matches()) {
+			throw new IllegalArgumentException(String.format("Could not parse \"<%s>\". Format accepted: \"<name : TYPE {valuelist}>\", where \": TYPE\" and \"{valuelist}\" are optional.", parameter));
+		}
+		String parameterName = matcher.group(1).trim();
+		ParameterType type = ParameterType.STRING;
+		if (matcher.group(3) != null) {
+			String typeAsString = matcher.group(3).trim();
+			try {
+				type = ParameterType.valueOf(typeAsString);
+			} catch (Exception e) {
+				String typesAsString = getParameterTypesAsString();
+				throw new IllegalArgumentException(String.format("\"<%s>\" is not one of the know types (%s).",
+						type, typesAsString));
+			}
+		}
+		ParameterSyntax parameterSyntax;
+		if ((leftSide == null) || leftSide.isEmpty()) parameterSyntax= new ParameterSyntax(type, parameterName);
+		else parameterSyntax= new ParameterSyntax(type, parameterName, leftSide);
+		if (matcher.group(5) == null) return parameterSyntax;
+		String valueList = matcher.group(5).trim();
+		if ((valueList != null) && !valueList.isEmpty()) {
+			ValueListParser valueListParser = new ValueListParser(parameterName, valueList);
+			parameterSyntax.setValues(valueListParser.getValues());
+			parameterSyntax.setDefault(valueListParser.getDefault());
+			parameterSyntax.setAcceptsAnyValue(valueListParser.acceptsAnyValue());
+		}
+		return parameterSyntax;
+	}
+
+	private static String getParameterTypesAsString() {
+		List<String> typesAsList = new ArrayList<String>();
+		for (ParameterType t : ParameterType.values()) {
+			typesAsList.add(t.toString());
+		}
+		return String.join(", ", typesAsList);
+	}
 }
