@@ -18,9 +18,9 @@ public class ParameterSyntax extends Syntax {
 	private String _leftHandName;
 	private ArrayList<String> _validValues;
 	private ValueGetter _valueGetter;
-	private boolean _valuesAreMandatory;
 	private boolean _isOptional;
 	private String _defaultValue;
+	private boolean _acceptsAnyValue;
 
 	public enum ParameterType { STRING, REAL, INTEGER, Player, REST, BOOLEAN, TIME_SPAN };
 
@@ -53,18 +53,14 @@ public class ParameterSyntax extends Syntax {
 	public boolean getIsOptional() { return this._isOptional; }
 	public String getDefault() { return this._defaultValue; }
 
-	void setOptional() {
-		this._isOptional = true;
-	}
-
 	public void setDefault(String defaultValue) {
 		this._isOptional = true;
 		this._defaultValue = defaultValue;
 	}
 
-	public void SetValueGetter(ValueGetter valueGetter, boolean mandatory) {
+	public void SetValueGetter(ValueGetter valueGetter, boolean acceptsAnyValue) {
 		this._valueGetter = valueGetter;
-		this._valuesAreMandatory = mandatory;
+		this._acceptsAnyValue = acceptsAnyValue;
 	}
 
 	public void setValues(String... args) {
@@ -87,8 +83,8 @@ public class ParameterSyntax extends Syntax {
 			arguments.getSender().sendMessage(String.format("Expected a value for argument %s", getName()));
 			return false;
 		}
-		if (!typeIsOk(arguments.getSender(), argument)) return false;
-		if (!this._valuesAreMandatory) {
+		if (!verifyValueIsOkAccordingToType(arguments.getSender(), argument)) return false;
+		if (this._acceptsAnyValue) {
 			if (parameterValues != null) parameterValues.put(getName(), parameterValue);
 			return true;
 		}
@@ -109,27 +105,6 @@ public class ParameterSyntax extends Syntax {
 		return false;
 	}
 
-	public List<String> tabComplete(CommandArguments arguments) {
-		String argument = arguments.getString();
-		List<String> validValues = getValidValues();
-		if (argument == null)  {
-			if (this._isOptional && (validValues != null)) return validValues;
-			arguments.getSender().sendMessage(String.format("Expected a value for argument %s", getName()));
-			return null;
-		}
-		if (!typeIsOk(arguments.getSender(), argument)) return null;
-		if (!this._valuesAreMandatory) return null;
-		if (validValues != null) {
-			for (String validValue : this._validValues) {
-				if (argument.equals(validValue)) return null;
-			}
-		}
-		arguments.getSender().sendMessage(String.format("The value \"%s\" was not an accepted value for argument %s.",
-				argument, getName()));
-		return null;
-	}
-
-
 	public List<String> getValidValues() {
 		if (this._valueGetter != null) {
 			this._validValues = new ArrayList<String>();
@@ -147,7 +122,7 @@ public class ParameterSyntax extends Syntax {
 		return this._validValues;
 	}
 
-	private boolean typeIsOk(CommandSender sender, String argument) {
+	private boolean verifyValueIsOkAccordingToType(CommandSender sender, String argument) {
 		try {
 			switch (this._type) {
 			case BOOLEAN:
@@ -177,10 +152,26 @@ public class ParameterSyntax extends Syntax {
 		StringBuilder sb = new StringBuilder("");
 		if (!this._isNamed) sb.append(String.format("<%s", this.getName()));
 		else sb.append(String.format("%s=<%s", this._leftHandName, this.getName()));
-		if (this._type != ParameterType.STRING) sb.append(String.format(":%s", this._type.toString()));
-		if (this._defaultValue != null) sb.append(String.format("(%s)", this._defaultValue));
-		if (this._validValues.size()>0) sb.append(String.format("{%s}", String.join(",", this._validValues)));
+		if (this._type != ParameterType.STRING) sb.append(String.format(" : %s", this._type.toString()));
+		if (this._validValues.size()>0) sb.append(String.format(" {%s}", validValuesAsString(true)));
 		sb.append(">");
 		return sb.toString();
 	}
+
+	private String validValuesAsString(boolean markDefault) {
+		String validValues;
+		if (this._defaultValue == null) validValues = String.join(", ", this._validValues);
+		else {
+			List<String> values = new ArrayList<String>();
+			for (String value : this._validValues) {
+				if (value.equals(this._defaultValue)) value = String.format("_%s_", value);
+				values.add(value);
+			}
+			validValues = String.join(", ", values);
+		}
+		if (this._acceptsAnyValue) validValues = validValues + ", ...";
+		return validValues;
+	}
+
+	public void setAcceptsAnyValue(boolean acceptsAnyValue) { this._acceptsAnyValue = acceptsAnyValue; }
 }

@@ -5,7 +5,6 @@ import java.util.HashMap;
 import net.eithon.library.command.syntax.CommandSyntax;
 import net.eithon.library.command.syntax.CommandSyntax.CommandExecutor;
 import net.eithon.library.extensions.EithonPlayer;
-import net.eithon.library.plugin.GeneralMessage;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -15,15 +14,13 @@ public class CommandParser {
 
 	private CommandSender _sender;
 	private CommandArguments _commandArguments;
-	private ICommandHandler _commandHandler;
 	private CommandSyntax _commandSyntax;
 	private HashMap<String, ParameterValue> _parameterValues;
 
-	public CommandParser(ICommandHandler commandHandler, CommandSender sender, Command cmd, String label, String[] args) {
+	public CommandParser(CommandSyntax commandSyntax, CommandSender sender, Command cmd, String label, String[] args) {
 		this._sender = sender;
 		this._commandArguments = new CommandArguments(sender, args);
-		this._commandHandler = commandHandler;
-		this._commandSyntax = commandHandler.getCommandSyntax();
+		this._commandSyntax = commandSyntax;
 	}
 	
 	public boolean execute() {

@@ -3,11 +3,13 @@ package net.eithon.library.extensions;
 import java.io.File;
 import java.util.HashMap;
 
+import net.eithon.library.command.syntax.CommandSyntax;
 import net.eithon.library.facades.EithonLibraryFacade;
 import net.eithon.library.facades.ZPermissionsFacade;
 import net.eithon.library.file.FileMisc;
 import net.eithon.library.plugin.Configuration;
 import net.eithon.library.plugin.GeneralMessage;
+import net.eithon.library.plugin.ICommandHandler;
 import net.eithon.library.plugin.Logger;
 import net.eithon.library.plugin.PermissionBasedMultiplier;
 import net.eithon.library.time.AlarmTrigger;
@@ -22,8 +24,8 @@ public class EithonPlugin extends JavaPlugin implements Listener {
 	private static HashMap<String, EithonPlugin> instances = new HashMap<String, EithonPlugin>();
 	private Logger _logger;
 	private Configuration _config;
-	private net.eithon.library.plugin.ICommandHandler _commandHandlerOld;
-	private net.eithon.library.command.ICommandHandler _commandHandlerNew;
+	private ICommandHandler _commandHandlerOld;
+	private CommandSyntax _commandSyntax;
 	private Listener _eventListener;
 	private EithonLibraryApi _eithonLibraryApi;
 
@@ -48,7 +50,7 @@ public class EithonPlugin extends JavaPlugin implements Listener {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if ((this._commandHandlerOld == null) && (this._commandHandlerNew == null)) {
+		if ((this._commandHandlerOld == null) && (this._commandSyntax == null)) {
 			this._logger.error("EithonPlugin has not been activated, can't execute command \"%s\".", label);
 			return false;
 		}
@@ -56,12 +58,12 @@ public class EithonPlugin extends JavaPlugin implements Listener {
 			return new net.eithon.library.plugin.CommandParser(this._commandHandlerOld, sender, cmd, label, args)
 			.execute();
 		}
-		return new net.eithon.library.command.CommandParser(this._commandHandlerNew, sender, cmd, label, args)
+		return new net.eithon.library.command.CommandParser(this._commandSyntax, sender, cmd, label, args)
 			.execute();
 	}
 
 	public void activate(Listener eventListener) {
-		this._commandHandlerNew = null;
+		this._commandSyntax = null;
 		this._commandHandlerOld = null;
 		this._eventListener = eventListener;
 		if (this._eventListener == null) this._eventListener = this;
@@ -69,15 +71,15 @@ public class EithonPlugin extends JavaPlugin implements Listener {
 	}
 
 	@Deprecated
-	public void activate(net.eithon.library.plugin.ICommandHandler commandHandler, Listener eventListener) {
+	public void activate(ICommandHandler commandHandler, Listener eventListener) {
 		this._commandHandlerOld = commandHandler;
 		this._eventListener = eventListener;
 		if (this._eventListener == null) this._eventListener = this;
 		getServer().getPluginManager().registerEvents(this._eventListener, this);
 	}
 
-	public void activate(net.eithon.library.command.ICommandHandler commandHandler, Listener eventListener) {
-		this._commandHandlerNew = commandHandler;
+	public void activate(CommandSyntax commandSyntax, Listener eventListener) {
+		this._commandSyntax = commandSyntax;
 		this._eventListener = eventListener;
 		if (this._eventListener == null) this._eventListener = this;
 		getServer().getPluginManager().registerEvents(this._eventListener, this);
@@ -86,7 +88,7 @@ public class EithonPlugin extends JavaPlugin implements Listener {
 	@Override
 	public void onDisable() {
 		this._commandHandlerOld = null;
-		this._commandHandlerNew = null;
+		this._commandSyntax = null;
 		this._eventListener = null;
 		instances.remove(getName());
 	}

@@ -4,13 +4,23 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang.NotImplementedException;
 
 import net.eithon.library.command.CommandArguments;
 import net.eithon.library.command.CommandParser;
 import net.eithon.library.command.ParameterValue;
 import net.eithon.library.command.syntax.ParameterSyntax.ParameterType;
 
-public class CommandSyntax extends Syntax {
+public class CommandSyntax extends Syntax {	
+	private static String leftHand = "([^<= ]+) *= *";
+	private static String parameter = "([^>]+)";
+	private static String rest = "(.*)";
+	private static Pattern namedParameterPattern= Pattern.compile("^(" + leftHand + ")?<" + parameter + ">" + rest);
+	private static String command = "([^ ]+)";
+	private static Pattern commandPattern = Pattern.compile("^" + command + rest);
 
 	public interface CommandExecutor {
 		public void execute(CommandParser commandParser);
@@ -18,28 +28,24 @@ public class CommandSyntax extends Syntax {
 
 	private ArrayList<ParameterSyntax> _parameterSyntaxList;
 	private HashMap<String, CommandSyntax> _subCommands;
-	private boolean _parametersAreOptionalFromThisPoint;
 	private CommandExecutor _commandExecutor;
 	private String _permission;
 
 	public CommandSyntax(String name, String permission) {
 		super(name);
 		this._permission = permission;
-		this._parametersAreOptionalFromThisPoint = false;
 		this._parameterSyntaxList = new ArrayList<ParameterSyntax>();
 		this._subCommands = new HashMap<String, CommandSyntax>();
 	}
-	
+
 	public CommandSyntax(String name) {
 		this(name, null);
 	}
 
+	public List<ParameterSyntax> getParameterSyntaxList() { return this._parameterSyntaxList; }
+	public CommandSyntax getSubCommand(String command) { return this._subCommands.get(command); }
+	public boolean hasSubCommands() { return this._subCommands.size() > 0; }
 	public boolean hasParameters() { return this._parameterSyntaxList.size() > 0; }
-
-	public PlayerParameterSyntax addParameterPlayer(String name) {
-		PlayerParameterSyntax playerParameterSyntax = new PlayerParameterSyntax(name);
-		return (PlayerParameterSyntax) addParameter(playerParameterSyntax);
-	}
 
 	public ParameterSyntax addParameter(String name) {
 		return addParameter(ParameterType.STRING, name);
@@ -50,38 +56,23 @@ public class CommandSyntax extends Syntax {
 		return addParameter(parameterSyntax);
 	}
 
-	public ParameterSyntax addNamedParameter(String name, String parameterName) {
-		return addNamedParameter(ParameterType.STRING, name, parameterName);
+	public ParameterSyntax addNamedParameter(String leftSide, String parameterName) {
+		return addNamedParameter(ParameterType.STRING, leftSide, parameterName);
 	}
 
-	public ParameterSyntax addNamedParameter(ParameterType type, String name, String parameterName) {
-		ParameterSyntax parameterSyntax = new ParameterSyntax(type, name, parameterName);
+	public ParameterSyntax addNamedParameter(ParameterType type, String leftSide, String parameterName) {
+		ParameterSyntax parameterSyntax = new ParameterSyntax(type, leftSide, parameterName);
 		return addParameter(parameterSyntax);
 	}
 
 	public ParameterSyntax addParameter(ParameterSyntax parameterSyntax) {
-		if (this._parametersAreOptionalFromThisPoint) parameterSyntax.setOptional();
 		this._parameterSyntaxList.add(parameterSyntax);
 		return parameterSyntax;
 	}
 
-	public void setRestOfParametersAsOptional() {
-		this._parametersAreOptionalFromThisPoint = true;
-	}
-
 	public CommandSyntax addCommand(String name) {
-		return addCommand(name, null, null);
-	}
-
-	public CommandSyntax addCommand(String name, CommandExecutor commandExecutor) {
-		return addCommand(name, null, commandExecutor);
-	}
-
-	public CommandSyntax addCommand(String name, String permission, CommandExecutor commandExecutor) {
 		CommandSyntax commandSyntax = new CommandSyntax(name);
 		this._subCommands.put(name, commandSyntax);
-		commandSyntax.setPermission(permission);
-		commandSyntax.setCommandExecutor(commandExecutor);
 		return commandSyntax;
 	}
 
@@ -103,15 +94,15 @@ public class CommandSyntax extends Syntax {
 			}
 			return commandSyntax.parse(arguments, parameterValues);
 		}
-		
+
 		CommandArguments argumentsClone = arguments.clone();
 		for (ParameterSyntax parameterSyntax : this._parameterSyntaxList) {
 			if (!parameterSyntax.parse(argumentsClone, parameterValues)) return null;
 		}
 		return this._commandExecutor;
 	}
-	
-	private List<String> getSubCommands() {
+
+	public List<String> getSubCommands() {
 		ArrayList<String> subCommands = new ArrayList<String>();
 		for (String name : this._subCommands.keySet()) {
 			subCommands.add(name);
@@ -125,60 +116,57 @@ public class CommandSyntax extends Syntax {
 		return subCommands;
 	}
 
-	public List<String> tabComplete(CommandArguments arguments) {
-		if (this._subCommands.size() > 0) {
-			String command = arguments.getStringAsLowercase();
-			if ((command == null) || command.isEmpty()) return getSubCommands();
-			CommandSyntax commandSyntax = this._subCommands.get(command);
-			if (commandSyntax == null) {
-				if (arguments.hasReachedEnd()) {
-					List<String> found = new ArrayList<String>();
-					for (String string : getSubCommands()) {
-						if (string.startsWith(command)) found.add(string);
-					}
-					if (found.size() > 0) return found;
-				}
-				arguments.getSender().sendMessage(String.format("Unexpected sub command: %s", command));
-				return null;
-			}
-			return commandSyntax.tabComplete(arguments);
-		}
-		
-		CommandArguments argumentsClone = arguments.clone();
-		for (ParameterSyntax parameterSyntax : this._parameterSyntaxList) {
-			String argument = argumentsClone.getString();
-			if ((argument == null) || argument.isEmpty()) return parameterSyntax.getValidValues();
-			if (argumentsClone.hasReachedEnd()) {
-				List<String> found = new ArrayList<String>();
-				for (String string :parameterSyntax.getValidValues()) {
-					if (string.startsWith(argument)) found.add(string);
-				}
-				if (found.size() > 0) return found;			
-			}
-			argumentsClone.goOneArgumentBack();
-			if (!parameterSyntax.parse(argumentsClone, null)) return null;
-			if (argumentsClone.hasReachedEnd()) return null;
-		}
-		return null;
-	}
-	
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder(this.getName());
-		sb.append(" ");
-		for (CommandSyntax commandSyntax : this._subCommands.values()) {
-			sb.append(commandSyntax.toString());
-			sb.append(" ");
-		}
-		for (ParameterSyntax parameterSyntax : this._parameterSyntaxList) {
-			sb.append(parameterSyntax.toString());
-			sb.append(" ");			
-		}
-		return sb.toString().trim();
+		ArrayList<String> commandLineList = new ArrayList<String>();
+		toString(commandLineList, "");
+		return String.join("\n", commandLineList);
 	}
 
-	public void parse(String commandSentence) {
-		CommandSyntaxParser.parseCommand(this, commandSentence); 
+	private void toString(List<String> commandLineList, String beginning) {
+		StringBuilder soFar = new StringBuilder(beginning);
+		soFar.append(" ");
+		soFar.append(this.getName());
+		if (!this._subCommands.isEmpty()) {
+			for (CommandSyntax commandSyntax : this._subCommands.values()) {
+				commandSyntax.toString(commandLineList, soFar.toString());
+			}
+		} else {
+			for (ParameterSyntax parameterSyntax : this._parameterSyntaxList) {
+				soFar.append(" ");			
+				soFar.append(parameterSyntax.toString());
+			}
+			commandLineList.add(soFar.toString().trim());
+		}
+	}
+
+	public void parseSyntax(String commandLine) {
+		parseSyntax(this, commandLine);
+	}
+
+	private static void parseSyntax(CommandSyntax currentCommand, String commandLine) {
+		String remainingPart = commandLine.trim();
+		if (remainingPart.isEmpty()) return;
+
+		Matcher matcher = namedParameterPattern.matcher(remainingPart);
+		if (matcher.matches()) {
+			String leftSide = matcher.group(2);
+			String parameter = matcher.group(3);
+			ParameterSyntaxParser parameterParser = new ParameterSyntaxParser(leftSide, parameter);
+			parameterParser.addParameterToCommand(currentCommand);
+			parseSyntax(currentCommand, matcher.group(4));
+		} else {
+			matcher = commandPattern.matcher(remainingPart);
+			if (!matcher.matches()) {
+				throw new IllegalArgumentException(String.format("Expected to find a command token here: \"%s\"", remainingPart));
+			}
+			if (currentCommand.hasParameters()) {
+				throw new NotImplementedException("Sub commands after parameters is not yet supported.");
+			}
+			String name = matcher.group(1);
+			currentCommand = currentCommand.addCommand(name);
+			parseSyntax(currentCommand, matcher.group(2));
+		}
 	}
 
 }
