@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import org.bukkit.command.CommandSender;
 
 import net.eithon.library.command.Argument;
+import net.eithon.library.command.EithonCommand;
 import net.eithon.library.time.TimeMisc;
 
 public class ParameterSyntax extends Syntax {
@@ -32,11 +33,11 @@ public class ParameterSyntax extends Syntax {
 	public enum ParameterType { STRING, REAL, INTEGER, Player, REST, BOOLEAN, TIME_SPAN };
 
 	public interface ValueGetter {
-		List<String> getValues(CommandSender sender);
+		List<String> getValues(EithonCommand command);
 	}
 	
 	public interface DefaultGetter {
-		String getDefault(CommandSender sender);
+		String getDefault(EithonCommand command);
 	}
 
 	public static List<String> fromArray(String[] array) {

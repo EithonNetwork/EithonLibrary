@@ -24,7 +24,7 @@ public class CommandSyntax extends Syntax {
 	private static Pattern commandPattern = Pattern.compile("^" + command + rest);
 
 	public interface CommandExecutor {
-		public void execute(EithonCommand commandParser);
+		public void execute(EithonCommand command);
 	}
 
 	private HashMap<String, ParameterSyntax> _parameterSyntaxMap;
