@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.bukkit.command.CommandSender;
+
 import net.eithon.library.command.Argument;
 import net.eithon.library.time.TimeMisc;
 
@@ -26,11 +28,16 @@ public class ParameterSyntax extends Syntax {
 	private String _defaultValue;
 	private boolean _acceptsAnyValue;
 	private ValueListParser _valueListParser;
+	private DefaultGetter _defaultGetter;
 
 	public enum ParameterType { STRING, REAL, INTEGER, Player, REST, BOOLEAN, TIME_SPAN };
 
 	public interface ValueGetter {
-		List<String> getValues();
+		List<String> getValues(CommandSender sender);
+	}
+	
+	public interface DefaultGetter {
+		String getDefault(CommandSender sender);
 	}
 
 	public static List<String> fromArray(String[] array) {
@@ -64,9 +71,15 @@ public class ParameterSyntax extends Syntax {
 		this._defaultValue = defaultValue;
 	}
 
-	public void SetValueGetter(ValueGetter valueGetter, boolean acceptsAnyValue) {
+	public ParameterSyntax setMandatoryValues(ValueGetter valueGetter) {
 		this._valueGetter = valueGetter;
-		this._acceptsAnyValue = acceptsAnyValue;
+		this._acceptsAnyValue = false;
+		return this;	}
+
+	public ParameterSyntax setExampleValues(ValueGetter valueGetter) {
+		this._valueGetter = valueGetter;
+		this._acceptsAnyValue = true;
+		return this;
 	}
 
 	public void setValues(String... args) {
@@ -94,7 +107,8 @@ public class ParameterSyntax extends Syntax {
 		}
 		if (this._valueGetter != null) {
 			this._validValues = new ArrayList<String>();
-			this._validValues.addAll(this._valueGetter.getValues());
+			// TODO: How to handle sender parameter?
+			this._validValues.addAll(this._valueGetter.getValues(null));
 		}
 		if (this._validValues != null) {
 			for (String validValue : this._validValues) {
@@ -111,7 +125,8 @@ public class ParameterSyntax extends Syntax {
 	public List<String> getValidValues() {
 		if (this._valueGetter != null) {
 			this._validValues = new ArrayList<String>();
-			this._validValues.addAll(this._valueGetter.getValues());
+			// TODO: How to handle sender parameter?
+			this._validValues.addAll(this._valueGetter.getValues(null));
 			this._validValues.sort(new Comparator<String>() {
 				@Override
 				public int compare(String o1, String o2) {
@@ -214,5 +229,9 @@ public class ParameterSyntax extends Syntax {
 			typesAsList.add(t.toString());
 		}
 		return String.join(", ", typesAsList);
+	}
+
+	public void setDefaultValue(DefaultGetter defaultGetter) {
+		this._defaultGetter = defaultGetter;
 	}
 }

@@ -58,7 +58,7 @@ public class EithonPlugin extends JavaPlugin implements Listener {
 			return new net.eithon.library.plugin.CommandParser(this._commandHandlerOld, sender, cmd, label, args)
 			.execute();
 		}
-		return new net.eithon.library.command.CommandParser(this._commandSyntax, sender, cmd, label, args)
+		return new net.eithon.library.command.EithonCommand(this._commandSyntax, sender, cmd, label, args)
 			.execute();
 	}
 

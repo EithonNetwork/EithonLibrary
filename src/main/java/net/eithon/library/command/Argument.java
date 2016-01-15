@@ -5,7 +5,7 @@ import net.eithon.library.time.TimeMisc;
 
 import org.bukkit.entity.Player;
 
-public class Argument extends net.eithon.library.command.syntax.Argument{
+public class Argument extends net.eithon.library.command.syntax.ArgumentBase{
 
 	public Argument(ParameterSyntax parameterSyntax, String argument) {
 		super(parameterSyntax, argument);

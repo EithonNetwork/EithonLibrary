@@ -14,14 +14,14 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class CommandParser {
+public class EithonCommand {
 
 	private CommandSender _sender;
 	private Queue<String> _commandQueue;
 	private CommandSyntax _commandSyntax;
 	private HashMap<String, Argument> _arguments;
 
-	public CommandParser(CommandSyntax commandSyntax, CommandSender sender, Command cmd, String label, String[] args) {
+	public EithonCommand(CommandSyntax commandSyntax, CommandSender sender, Command cmd, String label, String[] args) {
 		this._sender = sender;
 		this._commandQueue = new LinkedList<String>();
 		this._commandQueue.addAll(Arrays.asList(args));

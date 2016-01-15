@@ -8,7 +8,7 @@ import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.eithon.library.command.CommandParser;
+import net.eithon.library.command.EithonCommand;
 import net.eithon.library.command.Argument;
 import net.eithon.library.command.syntax.ParameterSyntax.ParameterType;
 
@@ -23,10 +23,10 @@ public class CommandSyntax extends Syntax {
 	private static Pattern commandPattern = Pattern.compile("^" + command + rest);
 
 	public interface CommandExecutor {
-		public void execute(CommandParser commandParser);
+		public void execute(EithonCommand commandParser);
 	}
 
-	private ArrayList<ParameterSyntax> _parameterSyntaxList;
+	private HashMap<String, ParameterSyntax> _parameterSyntaxList;
 	private HashMap<String, CommandSyntax> _subCommands;
 	private CommandExecutor _commandExecutor;
 	private String _permission;
@@ -34,7 +34,7 @@ public class CommandSyntax extends Syntax {
 	public CommandSyntax(String name, String permission) {
 		super(name);
 		this._permission = permission;
-		this._parameterSyntaxList = new ArrayList<ParameterSyntax>();
+		this._parameterSyntaxList =new HashMap<String, ParameterSyntax>();
 		this._subCommands = new HashMap<String, CommandSyntax>();
 	}
 
@@ -42,8 +42,8 @@ public class CommandSyntax extends Syntax {
 		this(name, null);
 	}
 
-	public List<ParameterSyntax> getParameterSyntaxList() { return this._parameterSyntaxList; }
 	public CommandSyntax getSubCommand(String command) { return this._subCommands.get(command.toLowerCase()); }
+	public ParameterSyntax getParameterSyntax(String parameterName) { return this._parameterSyntaxList.get(parameterName); }
 	public boolean hasSubCommands() { return this._subCommands.size() > 0; }
 	public boolean hasParameters() { return this._parameterSyntaxList.size() > 0; }
 
@@ -66,7 +66,7 @@ public class CommandSyntax extends Syntax {
 	}
 
 	public ParameterSyntax addParameter(ParameterSyntax parameterSyntax) {
-		this._parameterSyntaxList.add(parameterSyntax);
+		this._parameterSyntaxList.put(parameterSyntax.getName(), parameterSyntax);
 		return parameterSyntax;
 	}
 
@@ -76,8 +76,9 @@ public class CommandSyntax extends Syntax {
 		return commandSyntax;
 	}
 
-	public void setCommandExecutor(CommandExecutor commandExecutor) {
-		this._commandExecutor = commandExecutor;		
+	public CommandSyntax setCommandExecutor(CommandExecutor commandExecutor) {
+		this._commandExecutor = commandExecutor;
+		return this;
 	}
 
 	public void setPermission(String permission) {
@@ -94,7 +95,7 @@ public class CommandSyntax extends Syntax {
 			return commandSyntax.parse(argumentQueue, collectedArguments);
 		}
 
-		for (ParameterSyntax parameterSyntax : this._parameterSyntaxList) {
+		for (ParameterSyntax parameterSyntax : this._parameterSyntaxList.values()) {
 			parameterSyntax.parse(argumentQueue.poll(), collectedArguments);
 		}
 		return this._commandExecutor;
@@ -130,7 +131,7 @@ public class CommandSyntax extends Syntax {
 				commandSyntax.toString(commandLineList, soFar.toString());
 			}
 		} else {
-			for (ParameterSyntax parameterSyntax : this._parameterSyntaxList) {
+			for (ParameterSyntax parameterSyntax : this._parameterSyntaxList.values()) {
 				soFar.append(" ");			
 				soFar.append(parameterSyntax.toString());
 			}
@@ -165,6 +166,10 @@ public class CommandSyntax extends Syntax {
 			currentCommand = currentCommand.addCommand(name);
 			parseSyntax(currentCommand, matcher.group(2));
 		}
+	}
+
+	public void setAutomaticPermissions() {
+		throw new NotImplementedException();
 	}
 
 }
