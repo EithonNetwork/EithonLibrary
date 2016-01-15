@@ -168,7 +168,7 @@ public class CommandSyntax extends Syntax {
 		}
 	}
 
-	public void setAutomaticPermissions() {
+	public void setPermissionsAutomatically() {
 		throw new NotImplementedException();
 	}
 
