@@ -13,25 +13,14 @@ public class ArgumentBase {
 		// TODO Auto-generated constructor stub
 	}
 
-	public float asFloat() {
-		return Float.parseFloat(asString());
-	}
-
-	public double asDouble() {
-		return Double.parseDouble(asString());
-	}
-
-	public int asInteger() {
-		return Integer.parseInt(asString());
-	}
-
-	public long asLong() {
-		return Long.parseLong(asString());
-	}
-
-	public boolean asBoolean() {
-		return Boolean.parseBoolean(asString());
-	}
+	public boolean hasValue() { return this._value != null;	}
+	public String getRaw() { return this._value; }
+	
+	public float asFloat() { return Float.parseFloat(asString()); }
+	public double asDouble() { return Double.parseDouble(asString()); }
+	public int asInteger() { return Integer.parseInt(asString()); }
+	public long asLong() { return Long.parseLong(asString()); }
+	public boolean asBoolean() { return Boolean.parseBoolean(asString()); }
 
 	public String asString() {
 		if (this._value != null) return this._value;
@@ -43,13 +32,5 @@ public class ArgumentBase {
 		String value = asString();
 		if (value == null) return null;
 		return value.toLowerCase();
-	}
-
-	public String getRaw() {
-		return this._value;
-	}
-
-	public boolean hasValue() {
-		return this._value != null;
 	}
 }
