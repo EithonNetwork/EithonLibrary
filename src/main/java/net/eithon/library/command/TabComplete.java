@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import net.eithon.library.command.syntax.CommandArgumentException;
+import net.eithon.library.command.syntax.CommandSyntaxException;
 import net.eithon.library.command.syntax.CommandSyntax;
 import net.eithon.library.command.syntax.ParameterSyntax;
 
@@ -52,8 +52,8 @@ public class TabComplete implements TabCompleter{
 				if (!found.isEmpty()) return found;			
 			}
 			try {
-				parameterSyntax.parse(argument, null);
-			} catch (CommandArgumentException e) {
+				parameterSyntax.parseArguments(argument, null);
+			} catch (CommandSyntaxException e) {
 				sender.sendMessage(e.getMessage());
 				return null;
 			}

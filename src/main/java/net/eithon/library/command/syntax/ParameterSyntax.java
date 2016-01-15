@@ -27,7 +27,6 @@ public class ParameterSyntax extends Syntax {
 	private boolean _isOptional;
 	private String _defaultValue;
 	private boolean _acceptsAnyValue;
-	private ValueListParser _valueListParser;
 	private DefaultGetter _defaultGetter;
 
 	public enum ParameterType { STRING, REAL, INTEGER, Player, REST, BOOLEAN, TIME_SPAN };
@@ -48,11 +47,11 @@ public class ParameterSyntax extends Syntax {
 		return list;
 	}
 
-	public ParameterSyntax(ParameterType type, String name) {
-		this(type, name, null);
+	public ParameterSyntax(String name, ParameterType type) {
+		this(name, type, null);
 	}
 
-	ParameterSyntax(ParameterType type, String parameterName, String leftHandName) {
+	ParameterSyntax(String parameterName, ParameterType type, String leftHandName) {
 		super(parameterName);
 		this._leftHandName = leftHandName;
 		this._type = type;
@@ -91,14 +90,14 @@ public class ParameterSyntax extends Syntax {
 		this._validValues.addAll(values);
 	}
 
-	public void parse(String argument, HashMap<String, Argument> collectedArguments) throws CommandArgumentException {
+	public void parseArguments(String argument, HashMap<String, Argument> collectedArguments) throws CommandSyntaxException {
 		Argument parameterValue = new Argument(this, argument);
 		if (argument == null) {
 			if (this._isOptional) {
 				if (collectedArguments != null) collectedArguments.put(getName(), parameterValue);
 				return;
 			}	
-			throw new CommandArgumentException(String.format("Expected a value for argument %s", getName()));
+			throw new CommandSyntaxException(String.format("Expected a value for argument %s", getName()));
 		}
 		verifyValueIsOkAccordingToType(argument);
 		if (this._acceptsAnyValue) {
@@ -118,7 +117,7 @@ public class ParameterSyntax extends Syntax {
 				}
 			}
 		}
-		throw new CommandArgumentException(String.format("The value \"%s\" was not an accepted value for argument %s.",
+		throw new CommandSyntaxException(String.format("The value \"%s\" was not an accepted value for argument %s.",
 				argument, getName()));
 	}
 
@@ -140,7 +139,7 @@ public class ParameterSyntax extends Syntax {
 		return this._validValues;
 	}
 
-	private boolean verifyValueIsOkAccordingToType(String argument) throws CommandArgumentException {
+	private boolean verifyValueIsOkAccordingToType(String argument) throws CommandSyntaxException {
 		try {
 			switch (this._type) {
 			case BOOLEAN:
@@ -159,7 +158,7 @@ public class ParameterSyntax extends Syntax {
 				break;
 			}
 		} catch (final Exception e) {
-			throw new CommandArgumentException(String.format("\"%s\" is not of type %s", argument, this._type.toString()));
+			throw new CommandSyntaxException(String.format("\"%s\" is not of type %s", argument, this._type.toString()));
 		}
 		return true;
 	}
@@ -192,10 +191,10 @@ public class ParameterSyntax extends Syntax {
 
 	public void setAcceptsAnyValue(boolean acceptsAnyValue) { this._acceptsAnyValue = acceptsAnyValue; }
 
-	public static ParameterSyntax parseSyntax(String leftSide, String parameter) {
+	public static ParameterSyntax parseSyntax(String leftSide, String parameter) throws CommandSyntaxException {
 		Matcher matcher = insideParameterPattern.matcher(parameter);
 		if (!matcher.matches()) {
-			throw new IllegalArgumentException(String.format("Could not parse \"<%s>\". Format accepted: \"<name : TYPE {valuelist}>\", where \": TYPE\" and \"{valuelist}\" are optional.", parameter));
+			throw new CommandSyntaxException(String.format("Could not parse \"<%s>\". Format accepted: \"<name : TYPE {valuelist}>\", where \": TYPE\" and \"{valuelist}\" are optional.", parameter));
 		}
 		String parameterName = matcher.group(1).trim();
 		ParameterType type = ParameterType.STRING;
@@ -205,17 +204,17 @@ public class ParameterSyntax extends Syntax {
 				type = ParameterType.valueOf(typeAsString);
 			} catch (Exception e) {
 				String typesAsString = getParameterTypesAsString();
-				throw new IllegalArgumentException(String.format("\"<%s>\" is not one of the know types (%s).",
+				throw new CommandSyntaxException(String.format("\"<%s>\" is not one of the know types (%s).",
 						type, typesAsString));
 			}
 		}
 		ParameterSyntax parameterSyntax;
-		if ((leftSide == null) || leftSide.isEmpty()) parameterSyntax= new ParameterSyntax(type, parameterName);
-		else parameterSyntax= new ParameterSyntax(type, parameterName, leftSide);
+		if ((leftSide == null) || leftSide.isEmpty()) parameterSyntax= new ParameterSyntax(parameterName, type);
+		else parameterSyntax= new ParameterSyntax(parameterName, type, leftSide);
 		if (matcher.group(5) == null) return parameterSyntax;
 		String valueList = matcher.group(5).trim();
 		if ((valueList != null) && !valueList.isEmpty()) {
-			ValueListParser valueListParser = new ValueListParser(parameterName, valueList);
+			ValueListSyntax valueListParser = new ValueListSyntax(parameterName, valueList);
 			parameterSyntax.setValues(valueListParser.getValues());
 			parameterSyntax.setDefault(valueListParser.getDefault());
 			parameterSyntax.setAcceptsAnyValue(valueListParser.acceptsAnyValue());

@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class ValueListParser {
+class ValueListSyntax {
 	private static Pattern defaultValuePattern = Pattern.compile("_(.*)_");
 	private String _defaultValue;
 	private List<String> _valueList;
 	private boolean _acceptsAnyValue;
 
-	public ValueListParser(String parameterName, String valueList) {
+	public ValueListSyntax(String parameterName, String valueList) {
 		this._valueList = new ArrayList<String>();
 		parse(parameterName, valueList);
 	}

@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import net.eithon.library.command.syntax.CommandArgumentException;
 import net.eithon.library.command.syntax.CommandSyntax;
 import net.eithon.library.command.syntax.CommandSyntax.CommandExecutor;
+import net.eithon.library.command.syntax.CommandSyntaxException;
 import net.eithon.library.extensions.EithonPlayer;
 
 import org.bukkit.command.Command;
@@ -36,10 +36,10 @@ public class EithonCommand {
 		}
 		this._arguments = new HashMap<String, Argument>();
 		try {
-			CommandExecutor executor = this._commandSyntax.parse(this._commandQueue, this._arguments);
+			CommandExecutor executor = this._commandSyntax.parseArguments(this._commandQueue, this._arguments);
 			if (executor == null) return false;
 			executor.execute(this);
-		} catch (CommandArgumentException e) {
+		} catch (CommandSyntaxException e) {
 			this._sender.sendMessage(e.getMessage());
 			return false;
 		}
