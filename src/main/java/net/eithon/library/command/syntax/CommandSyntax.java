@@ -109,7 +109,11 @@ public class CommandSyntax extends Syntax {
 		}
 
 		for (ParameterSyntax parameterSyntax : this._parameterSyntaxMap.values()) {
-			parameterSyntax.parseArguments(argumentQueue.poll(), collectedArguments);
+			String argument = null;
+			if (!argumentQueue.isEmpty()) {
+				argument = argumentQueue.poll();
+			}
+			parameterSyntax.parseArguments(argument, collectedArguments);
 		}
 		return this._commandExecutor;
 	}

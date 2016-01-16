@@ -21,7 +21,7 @@ public class EithonCommand {
 	private CommandSyntax _commandSyntax;
 	private HashMap<String, Argument> _arguments;
 
-	public EithonCommand(CommandSyntax commandSyntax, CommandSender sender, Command cmd, String label, String[] args) {
+	public EithonCommand(CommandSyntax commandSyntax, CommandSender sender, Command cmd, String alias, String[] args) {
 		this._sender = sender;
 		this._commandQueue = new LinkedList<String>();
 		this._commandQueue.addAll(Arrays.asList(args));
@@ -29,18 +29,39 @@ public class EithonCommand {
 	}
 
 	public boolean execute() {
-		String command = this._commandQueue.poll().toLowerCase();
-		if (!command.equalsIgnoreCase(this._commandSyntax.getName())) {
-			this._sender.sendMessage(String.format("Expected command \"%s\", got \"%s\"", this._commandSyntax.getName(), command));
+		if (this._commandQueue.size() < 1) {
+			sendMessage(String.format("Empty command. Expected it to start with \"%s\"", this._commandSyntax.getName()));
 			return false;
+		}
+		String command = this._commandQueue.poll();
+		if (!command.equals(this._commandSyntax.getName())) {
+			sendMessage(String.format("Expected command \"%s\", got \"%s\"", this._commandSyntax.getName(), command));
+			return false;
+		}
+		return execute(this._commandSyntax);
+	}
+
+	public boolean execute(CommandSyntax commandSyntax) {
+		if (commandSyntax.hasSubCommands()) {
+			if (this._commandQueue.size() < 1) {
+				sendMessage(String.format("Too short command. Expected one of the following: %s", String.join(", ", this._commandSyntax.getSubCommands())));
+				return false;
+			}
+			String command = this._commandQueue.poll();
+			CommandSyntax subCommand = commandSyntax.getSubCommand(command);
+			if (subCommand == null) {
+				this._sender.sendMessage(String.format("Expected command \"%s\", got \"%s\"", this._commandSyntax.getName(), command));
+				return false;
+			}
+			return execute(subCommand);
 		}
 		this._arguments = new HashMap<String, Argument>();
 		try {
-			CommandExecutor executor = this._commandSyntax.parseArguments(this._commandQueue, this._arguments);
+			CommandExecutor executor = commandSyntax.parseArguments(this._commandQueue, this._arguments);
 			if (executor == null) return false;
 			executor.execute(this);
 		} catch (CommandSyntaxException e) {
-			this._sender.sendMessage(e.getMessage());
+			sendMessage(e.getMessage());
 			return false;
 		}
 		return true;
@@ -75,5 +96,10 @@ public class EithonCommand {
 
 	public Argument getArgument(String name) {
 		return this._arguments.get(name);
+	}
+
+	private void sendMessage(String message) {
+		if (this._sender != null) this._sender.sendMessage(message);
+		else System.out.println(message);
 	}
 }
