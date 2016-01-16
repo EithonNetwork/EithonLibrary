@@ -1,6 +1,7 @@
 package net.eithon.library.test.command;
 
 import net.eithon.library.command.syntax.CommandSyntax;
+import net.eithon.library.command.syntax.CommandSyntaxException;
 import net.eithon.library.command.syntax.ParameterSyntax;
 
 import org.junit.Assert;
@@ -41,7 +42,7 @@ public class CommandSyntaxTest {
 		
 		// Verify
 		final CommandSyntax sub = root.getSubCommand(subName);
-		final ParameterSyntax parameterSyntax = root.getParameterSyntax(parameterName);
+		final ParameterSyntax parameterSyntax = sub.getParameterSyntax(parameterName);
 		Assert.assertNotNull(parameterSyntax);
 		Assert.assertEquals(parameterName, parameterSyntax.getName());
 	}
@@ -59,7 +60,11 @@ public class CommandSyntaxTest {
 		final String completeCommand = String.format("%s %s", root.toString(), command);
 		
 		// Do
-		root.addCommand(command);	
+		try {
+			root.parseSyntax(command);
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}	
 		
 		// Verify
 		final CommandSyntax sub = root.getSubCommand(name);
