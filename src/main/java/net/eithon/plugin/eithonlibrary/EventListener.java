@@ -22,7 +22,7 @@ public class EventListener implements Listener {
 	}
 	
 	// Handle move by block
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void onPlayerMoveEvent(PlayerMoveEvent event) {
 		if (event.isCancelled()) return;
 		MoveEventHandler.handle(event);

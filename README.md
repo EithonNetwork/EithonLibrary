@@ -13,6 +13,37 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 3.5.3 (2016-01-13)
+
+* BUG: Leading literal bracket did not get color.
+
+### 3.5.2 (2016-01-12)
+
+* BUG: SimpleMarkUp could not handle nested brackets properly.
+
+### 3.5.1 (2016-01-09)
+
+* BUG: Bungee messages was kept too long.
+
+### 3.5 (2015-12-29)
+
+* NEW: Added EithonPlayerMoveHalfBlockEvent
+
+### 3.4 (2015-12-27)
+
+* CHANGE: TimeMisc.secondsToString now supports non-integer seconds.
+* CHANGE: TimeMisc.secondsToString now can print mm:ss.
+* CHANGE: EithonPlayerMoveOneBlockEvent now stores the from-to as locations instead of blocks.
+* CHANGE: EithonPlayerMoveOneBlockEvent now ignores cancelled move events.
+
+### 3.3 (2015-12-26)
+
+* NEW: Added VaultFacade
+
+### 3.2 (2015-12-25)
+
+* NEW: Added TemporaryEffect
+
 ### 3.1 (2015-11-28)
 
 * NEW: Added getEntry() to PlayerCollection.

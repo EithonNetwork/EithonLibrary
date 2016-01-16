@@ -88,6 +88,13 @@ public class SimpleMarkUp {
 			String token = st.nextToken();
 			token = handleBackslash(st, token);
 			if (token.equalsIgnoreCase("[")) {
+				if (isInsideBrackets) {
+					if (firstToken) parsedLine += activeCodes();
+					parsedLine += "[";
+					firstToken = false;
+					hasContent = true;
+					continue;
+				}
 				isInsideBrackets = true;
 				continue;
 			} else if (token.equalsIgnoreCase("]")) {
