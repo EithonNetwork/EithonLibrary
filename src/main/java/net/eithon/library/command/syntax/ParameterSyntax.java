@@ -64,10 +64,13 @@ public class ParameterSyntax extends Syntax {
 	}
 
 	public boolean getIsOptional() { return this._isOptional; }
+	public boolean getAcceptsAnyValue() { return this._acceptsAnyValue; }
 	public String getDefault() { return this._defaultValue; }
+	public ParameterType getType() { return this._type; }
+	
 
 	public void setDefault(String defaultValue) {
-		this._isOptional = true;
+		this._isOptional = defaultValue != null;
 		this._defaultValue = defaultValue;
 	}
 
