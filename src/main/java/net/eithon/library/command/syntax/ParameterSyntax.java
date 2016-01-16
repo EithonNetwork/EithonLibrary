@@ -209,7 +209,7 @@ public class ParameterSyntax extends Syntax {
 			} catch (Exception e) {
 				String typesAsString = getParameterTypesAsString();
 				throw new CommandSyntaxException(String.format("\"<%s>\" is not one of the know types (%s).",
-						type, typesAsString));
+						typeAsString, typesAsString));
 			}
 		}
 		ParameterSyntax parameterSyntax;

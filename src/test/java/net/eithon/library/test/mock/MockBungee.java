@@ -1,6 +1,6 @@
 package net.eithon.library.test.mock;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import net.eithon.library.bungee.BungeeController;
 import net.eithon.library.bungee.EithonBungeeEvent;
 import net.eithon.library.extensions.EithonPlugin;

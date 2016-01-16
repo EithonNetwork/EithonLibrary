@@ -61,12 +61,14 @@ class Support {
 		ParameterSyntax parameterSyntax = null;
 		try {
 			parameterSyntax = ParameterSyntax.parseSyntax(null, parameter);
+			command.addParameter(parameterSyntax);
 		} catch (CommandSyntaxException e) {
 			Assert.fail();
 		}
 
 		// Verify
 		Assert.assertNotNull(parameterSyntax);
+		Assert.assertNotNull(command.getParameterSyntax(name));
 		Assert.assertEquals(defaultValue != null, parameterSyntax.getIsOptional());
 		Assert.assertEquals(defaultValue, parameterSyntax.getDefault());
 		final List<String> valueList = parameterSyntax.getValidValues();

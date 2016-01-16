@@ -20,7 +20,7 @@ public class CommandSyntax extends Syntax {
 	private static String parameter = "([^>]+)";
 	private static String rest = "(.*)";
 	private static Pattern namedParameterPattern= Pattern.compile("^(" + leftHand + ")?<" + parameter + ">" + rest);
-	private static String command = "([^ ]+)";
+	private static String command = "([^ <>{}:]+)";
 	private static Pattern commandPattern = Pattern.compile("^" + command + rest);
 
 	public interface CommandExecutor {
@@ -31,6 +31,7 @@ public class CommandSyntax extends Syntax {
 	private HashMap<String, CommandSyntax> _subCommands;
 	private CommandExecutor _commandExecutor;
 	private String _permission;
+	private boolean _automaticPermissions;
 
 	public CommandSyntax(String name) {
 		super(name);
@@ -44,6 +45,8 @@ public class CommandSyntax extends Syntax {
 	public boolean hasSubCommands() { return this._subCommands.size() > 0; }
 	public boolean hasParameters() { return this._parameterSyntaxMap.size() > 0; }
 	public List<ParameterSyntax> getParameterSyntaxList() { return this._parameterSyntaxMap.values().stream().collect(Collectors.toList());	}
+	public void setPermissionsAutomatically() { this._automaticPermissions = true;}
+	public String getRequiredPermission() { return this._permission; }
 
 	public List<String> getSubCommands() {
 		ArrayList<String> subCommands = new ArrayList<String>();
@@ -58,7 +61,7 @@ public class CommandSyntax extends Syntax {
 		});
 		return subCommands;
 	}
-	
+
 	public CommandSyntax addCommand(String name) {
 		CommandSyntax commandSyntax = new CommandSyntax(name);
 		this._subCommands.put(name, commandSyntax);
@@ -118,18 +121,25 @@ public class CommandSyntax extends Syntax {
 		return this._commandExecutor;
 	}
 
-	public void parseSyntax(String commandLine) throws CommandSyntaxException {
+	public CommandSyntax parseSyntax(String commandLine) throws CommandSyntaxException {
+		if ((this._permission == null) && (this._automaticPermissions)) this._permission = getName();
+		return parseSyntax(commandLine, this._permission);
+	}
+	
+	private CommandSyntax parseSyntax(String commandLine, String permission) throws CommandSyntaxException {
 		String remainingPart = commandLine.trim();
-		if (remainingPart.isEmpty()) return;
+		if (remainingPart.isEmpty()) return this;
 
 		Matcher matcher = namedParameterPattern.matcher(remainingPart);
 		if (matcher.matches()) {
+			// Parameter
 			String leftSide = matcher.group(2);
 			String parameter = matcher.group(3);
 			ParameterSyntax parameterSyntax = ParameterSyntax.parseSyntax(leftSide, parameter);
 			addParameter(parameterSyntax);
-			parseSyntax(matcher.group(4));
+			parseSyntax(matcher.group(4), permission);
 		} else {
+			// Command
 			matcher = commandPattern.matcher(remainingPart);
 			if (!matcher.matches()) {
 				throw new CommandSyntaxException(String.format("Expected to find a command token here: \"%s\"", remainingPart));
@@ -138,14 +148,14 @@ public class CommandSyntax extends Syntax {
 				throw new NotImplementedException("Sub commands after parameters is not yet supported.");
 			}
 			String name = matcher.group(1);
-			addCommand(name).parseSyntax(matcher.group(2));
+			String commandPermssion = permission + "." + name;
+			CommandSyntax subCommand = addCommand(name)
+					.parseSyntax(matcher.group(2), commandPermssion);
+			if (!subCommand.hasSubCommands() && (permission != null)) subCommand.setPermission(commandPermssion);
 		}
+		return this;
 	}
 
-	public void setPermissionsAutomatically() {
-		throw new NotImplementedException();
-	}
-	
 	@Override
 	public String toString() {
 		ArrayList<String> commandLineList = new ArrayList<String>();
