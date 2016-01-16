@@ -1,5 +1,6 @@
 package net.eithon.library.test.command;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.eithon.library.command.syntax.CommandSyntax;
@@ -17,7 +18,7 @@ public class CommandSyntaxTest {
 		// Do and verify
 		createRoot("root");
 	}
-	
+
 	@Test
 	public void subCommand() 
 	{
@@ -25,11 +26,12 @@ public class CommandSyntaxTest {
 		final String subName = "sub";
 		final String subCommand = String.format("%s", subName);
 		CommandSyntax root = createRoot("root");
-		
+
 		// Do and verify
 		createSubCommand(root, subName, subCommand);		
+		final CommandSyntax sub = root.getSubCommand(subName);
 	}
-	
+
 	@Test
 	public void parameter() 
 	{
@@ -39,10 +41,10 @@ public class CommandSyntaxTest {
 		final String parameterName = "parameter";
 		final String subCommand = String.format("%s <%s>", subName, parameterName);
 		final CommandSyntax root = createRoot("root");
-		
+
 		// Do
 		createSubCommand(root, subName, subCommand);		
-		
+
 		// Verify
 		final CommandSyntax sub = root.getSubCommand(subName);
 		final ParameterSyntax parameterSyntax = sub.getParameterSyntax(parameterName);
@@ -56,7 +58,7 @@ public class CommandSyntaxTest {
 		Assert.assertFalse(parameterSyntax.getIsOptional());
 		Assert.assertTrue(parameterSyntax.getAcceptsAnyValue());
 	}
-	
+
 	@Test
 	public void parameterInteger() 
 	{
@@ -66,13 +68,13 @@ public class CommandSyntaxTest {
 		final String parameterName = "parameter";
 		final String subCommand = String.format("%s <%s : INTEGER>", subName, parameterName);
 		final CommandSyntax root = createRoot("root");
-		
-		// Do
-		createSubCommand(root, subName, subCommand);		
-		
+		final CommandSyntax sub = createSubCommand(root, subName, subCommand);
+
+		// Do and verify
+		final ParameterSyntax parameterSyntax = createParameter(sub, null, parameterName, ParameterType.INTEGER, null, null, false);
+
+
 		// Verify
-		final CommandSyntax sub = root.getSubCommand(subName);
-		final ParameterSyntax parameterSyntax = sub.getParameterSyntax(parameterName);
 		Assert.assertNotNull(parameterSyntax);
 		Assert.assertEquals(parameterName, parameterSyntax.getName());
 		Assert.assertEquals(ParameterType.INTEGER, parameterSyntax.getType());
@@ -83,7 +85,7 @@ public class CommandSyntaxTest {
 		Assert.assertFalse(parameterSyntax.getIsOptional());
 		Assert.assertTrue(parameterSyntax.getAcceptsAnyValue());
 	}
-	
+
 	@Test
 	public void parameterDefault() 
 	{
@@ -94,13 +96,11 @@ public class CommandSyntaxTest {
 		final String defaultValue = "42";
 		final String subCommand = String.format("%s <%s {_%s_, ...}>", subName, parameterName, defaultValue);
 		final CommandSyntax root = createRoot("root");
-		
-		// Do
-		createSubCommand(root, subName, subCommand);		
-		
-		// Verify
-		final CommandSyntax sub = root.getSubCommand(subName);
-		final ParameterSyntax parameterSyntax = sub.getParameterSyntax(parameterName);
+		final CommandSyntax sub = createSubCommand(root, subName, subCommand);
+
+		// Do and verify
+		final ParameterSyntax parameterSyntax = createParameter(sub, null, parameterName, defaultValue, null, false);
+
 		Assert.assertNotNull(parameterSyntax);
 		Assert.assertEquals(defaultValue, parameterSyntax.getDefault());
 		final List<String> validValues = parameterSyntax.getValidValues();
@@ -110,7 +110,7 @@ public class CommandSyntaxTest {
 		Assert.assertTrue(parameterSyntax.getIsOptional());
 		Assert.assertTrue(parameterSyntax.getAcceptsAnyValue());
 	}
-	
+
 	@Test
 	public void parameterOneHelp() 
 	{
@@ -119,15 +119,15 @@ public class CommandSyntaxTest {
 		final String subName = "sub";
 		final String parameterName = "parameter";
 		final String helpValue1 = "113";
-		final String subCommand = String.format("%s <%s {%s, ...}>", subName, parameterName, helpValue1);
+		final String[] helpValues = new String[] { "113" };
+		final String subCommand = String.format("%s <%s {%s, ...}>", subName, parameterName, helpValues[0]);
 		final CommandSyntax root = createRoot("root");
-		
-		// Do
-		createSubCommand(root, subName, subCommand);		
-		
+		final CommandSyntax sub = createSubCommand(root, subName, subCommand);
+
+		// Do and verify
+		final ParameterSyntax parameterSyntax = createParameter(sub, null, parameterName, null, helpValues, true);
+
 		// Verify
-		final CommandSyntax sub = root.getSubCommand(subName);
-		final ParameterSyntax parameterSyntax = sub.getParameterSyntax(parameterName);
 		Assert.assertNotNull(parameterSyntax);
 		Assert.assertNull(parameterSyntax.getDefault());
 		final List<String> validValues = parameterSyntax.getValidValues();
@@ -137,25 +137,25 @@ public class CommandSyntaxTest {
 		Assert.assertFalse(parameterSyntax.getIsOptional());
 		Assert.assertTrue(parameterSyntax.getAcceptsAnyValue());
 	}
-	
+
 	@Test
 	public void parameterTwoHelp() 
 	{
 
 		// Prepare
 		final String subName = "sub";
-		final String parameterName = "parameter";
+		final String parameterName = "parameter";	
+		final String[] helpValues = new String[] { "113", "1477" };
 		final String helpValue1 = "113";
 		final String helpValue2 = "1447";
 		final String subCommand = String.format("%s <%s {%s, %s, ...}>", subName, parameterName, helpValue1, helpValue2);
 		final CommandSyntax root = createRoot("root");
-		
-		// Do
-		createSubCommand(root, subName, subCommand);		
+		final CommandSyntax sub = createSubCommand(root, subName, subCommand);
+
+		// Do and verify
+		final ParameterSyntax parameterSyntax = createParameter(sub, null, parameterName, null, helpValues, true);
 		
 		// Verify
-		final CommandSyntax sub = root.getSubCommand(subName);
-		final ParameterSyntax parameterSyntax = sub.getParameterSyntax(parameterName);
 		Assert.assertNotNull(parameterSyntax);
 		Assert.assertNull(parameterSyntax.getDefault());
 		final List<String> validValues = parameterSyntax.getValidValues();
@@ -166,7 +166,7 @@ public class CommandSyntaxTest {
 		Assert.assertFalse(parameterSyntax.getIsOptional());
 		Assert.assertTrue(parameterSyntax.getAcceptsAnyValue());
 	}
-	
+
 	@Test
 	public void parameterTwoMandatory() 
 	{
@@ -174,17 +174,17 @@ public class CommandSyntaxTest {
 		// Prepare
 		final String subName = "sub";
 		final String parameterName = "parameter";
+		final String[] helpValues = new String[] { "113", "1477" };
 		final String helpValue1 = "113";
 		final String helpValue2 = "1447";
 		final String subCommand = String.format("%s <%s {%s, %s}>", subName, parameterName, helpValue1, helpValue2);
 		final CommandSyntax root = createRoot("root");
-		
-		// Do
-		createSubCommand(root, subName, subCommand);		
-		
+		final CommandSyntax sub = createSubCommand(root, subName, subCommand);
+
+		// Do and verify
+		final ParameterSyntax parameterSyntax = createParameter(sub, null, parameterName, null, helpValues, false);	
+
 		// Verify
-		final CommandSyntax sub = root.getSubCommand(subName);
-		final ParameterSyntax parameterSyntax = sub.getParameterSyntax(parameterName);
 		Assert.assertNotNull(parameterSyntax);
 		Assert.assertNull(parameterSyntax.getDefault());
 		final List<String> validValues = parameterSyntax.getValidValues();
@@ -193,6 +193,35 @@ public class CommandSyntaxTest {
 		Assert.assertEquals(helpValue1, validValues.get(0));
 		Assert.assertEquals(helpValue2, validValues.get(1));
 		Assert.assertFalse(parameterSyntax.getIsOptional());
+		Assert.assertFalse(parameterSyntax.getAcceptsAnyValue());
+	}
+
+	@Test
+	public void parameterTwoMandatoryWithDefault() 
+	{
+		// Prepare
+		final String subName = "sub";
+		final String parameterName = "parameter";
+		final String[] helpValues = new String[] { "113", "1477" };
+		final String helpValue1 = "113";
+		final String helpValue2 = "1447";
+		final String subCommand = String.format("%s <%s {%s, _%s_}>", subName, parameterName, helpValue1, helpValue2);
+		final CommandSyntax root = createRoot("root");
+		final CommandSyntax sub = createSubCommand(root, subName, subCommand);
+
+		// Do and verify
+		final ParameterSyntax parameterSyntax = createParameter(sub, null, parameterName, helpValues[1], helpValues, false);	
+
+		// Verify
+		Assert.assertNotNull(parameterSyntax);
+		Assert.assertNotNull(parameterSyntax.getDefault());
+		Assert.assertEquals(helpValue2, parameterSyntax.getDefault());
+		final List<String> validValues = parameterSyntax.getValidValues();
+		Assert.assertNotNull(validValues);
+		Assert.assertEquals(2, validValues.size());
+		Assert.assertEquals(helpValue1, validValues.get(0));
+		Assert.assertEquals(helpValue2, validValues.get(1));
+		Assert.assertTrue(parameterSyntax.getIsOptional());
 		Assert.assertFalse(parameterSyntax.getAcceptsAnyValue());
 	}
 
@@ -207,21 +236,83 @@ public class CommandSyntaxTest {
 	private CommandSyntax createSubCommand(CommandSyntax root, String name, String command) {
 		// Prepare
 		final String completeCommand = String.format("%s %s", root.toString(), command);
-		
+
 		// Do
 		try {
 			root.parseSyntax(command);
 		} catch (CommandSyntaxException e) {
 			Assert.fail();
 		}	
-		
+
 		// Verify
 		final CommandSyntax sub = root.getSubCommand(name);
 		Assert.assertNotNull(sub);	
 		Assert.assertEquals(name,sub.getName());		
 		Assert.assertEquals(command,sub.toString());
 		Assert.assertEquals(completeCommand,root.toString());
-		
-		return root;
+
+		return sub;
+	}
+
+	private ParameterSyntax createParameter(CommandSyntax command, String leftSide, String name, String defaultValue, String[] validValues, boolean acceptsAnyValue) { 
+		return createParameter(command, leftSide, name, ParameterType.STRING, defaultValue, validValues, acceptsAnyValue);
+	}
+
+	private ParameterSyntax createParameter(CommandSyntax command, String leftSide, String name, ParameterType type, String defaultValue, String[] validValues, boolean acceptsAnyValue) {
+		// Prepare
+		String parameter = "";
+		if (leftSide != null) parameter += leftSide+"=";
+		parameter+="<" + name;
+		if (type != ParameterType.STRING) {
+			parameter += " " + type.toString();
+		}
+		String[] values = createValues(defaultValue, validValues, acceptsAnyValue);
+		if (values.length > 0) {
+			parameter += " {" + String.join(", ", values) + "}";
+		}
+		parameter += ">";
+
+		// Do
+		ParameterSyntax parameterSyntax = null;
+		try {
+			parameterSyntax = ParameterSyntax.parseSyntax(null, parameter);
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+
+		// Verify
+		Assert.assertNotNull(parameterSyntax);
+		Assert.assertEquals(defaultValue != null, parameterSyntax.getIsOptional());
+		Assert.assertEquals(defaultValue, parameterSyntax.getDefault());
+		final List<String> valueList = parameterSyntax.getValidValues();
+		Assert.assertNotNull(valueList);
+		Assert.assertEquals(validValues == null ? 0 : validValues.length, valueList.size());
+		if (valueList.size() > 0) {
+			int i = 0;
+			for (String value : valueList) {
+				Assert.assertEquals(validValues[i], value);
+			}
+		}
+		Assert.assertEquals(acceptsAnyValue, parameterSyntax.getAcceptsAnyValue());
+
+		return parameterSyntax;
+	}
+
+	private String[] createValues(String defaultValue, String[] validValues,
+			boolean acceptsAnyValue) {
+		boolean found = false;
+		List<String> list = new ArrayList<String>();
+		if (validValues != null) {
+			for (String value : validValues) {
+				if (!value.equals(defaultValue)) {
+					list.add("_" + value + "_");
+					found = true;
+				}
+				else list.add(value); 
+			}
+		}
+		if (!found && (defaultValue != null)) list.add(0, defaultValue);
+		if (acceptsAnyValue) list.add("...");
+		return list.toArray(new String[0]);
 	}
 }
