@@ -13,7 +13,7 @@ public class EithonLibraryApi {
 	}
 	
 	public String getBungeeServerName() {
-		return this._controller.getServerName();
+		return this._controller.getBungeeServerName();
 	}
 	
 	public String getPrimaryBungeeServerName() {

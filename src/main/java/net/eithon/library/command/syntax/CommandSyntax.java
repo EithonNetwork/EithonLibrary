@@ -115,10 +115,6 @@ public class CommandSyntax extends Syntax {
 	}
 
 	public void parseSyntax(String commandLine) throws CommandSyntaxException {
-		parseSyntax(this, commandLine);
-	}
-
-	private static void parseSyntax(CommandSyntax currentCommand, String commandLine) throws CommandSyntaxException {
 		String remainingPart = commandLine.trim();
 		if (remainingPart.isEmpty()) return;
 
@@ -127,19 +123,18 @@ public class CommandSyntax extends Syntax {
 			String leftSide = matcher.group(2);
 			String parameter = matcher.group(3);
 			ParameterSyntax parameterSyntax = ParameterSyntax.parseSyntax(leftSide, parameter);
-			currentCommand.addParameter(parameterSyntax);
-			parseSyntax(currentCommand, matcher.group(4));
+			addParameter(parameterSyntax);
+			parseSyntax(matcher.group(4));
 		} else {
 			matcher = commandPattern.matcher(remainingPart);
 			if (!matcher.matches()) {
 				throw new CommandSyntaxException(String.format("Expected to find a command token here: \"%s\"", remainingPart));
 			}
-			if (currentCommand.hasParameters()) {
+			if (hasParameters()) {
 				throw new NotImplementedException("Sub commands after parameters is not yet supported.");
 			}
 			String name = matcher.group(1);
-			currentCommand = currentCommand.addCommand(name);
-			parseSyntax(currentCommand, matcher.group(2));
+			addCommand(name).parseSyntax(matcher.group(2));
 		}
 	}
 
