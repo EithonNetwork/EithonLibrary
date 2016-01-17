@@ -1,7 +1,11 @@
 package net.eithon.library.extensions;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 import net.eithon.library.command.CommandSyntax;
 import net.eithon.library.facades.EithonLibraryFacade;
@@ -18,10 +22,11 @@ import net.eithon.plugin.eithonlibrary.EithonLibraryApi;
 import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class EithonPlugin extends JavaPlugin implements Listener {
+public class EithonPlugin extends JavaPlugin implements Listener, TabCompleter {
 	private static HashMap<String, EithonPlugin> instances = new HashMap<String, EithonPlugin>();
 	private Logger _logger;
 	private Configuration _config;
@@ -63,6 +68,15 @@ public class EithonPlugin extends JavaPlugin implements Listener {
 			.execute();
 	}
 
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {
+		Queue<String> argumentQueue = new LinkedList<String>();
+		argumentQueue.addAll(Arrays.asList(args));
+		argumentQueue.poll();
+		return new net.eithon.library.command.EithonCommand(this._commandSyntax, sender, cmd, alias, args)
+		.tabComplete();
+	}
+
 	public void activate(Listener eventListener) {
 		this._commandSyntax = null;
 		this._commandHandlerOld = null;
@@ -84,6 +98,7 @@ public class EithonPlugin extends JavaPlugin implements Listener {
 		this._eventListener = eventListener;
 		if (this._eventListener == null) this._eventListener = this;
 		getServer().getPluginManager().registerEvents(this._eventListener, this);
+		getCommand(commandSyntax.getName()).setTabCompleter(this);
 	}
 
 	@Override

@@ -1,8 +1,10 @@
 package net.eithon.library.command;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 import net.eithon.library.command.CommandSyntax.CommandExecutor;
@@ -101,5 +103,50 @@ public class EithonCommand {
 	private void sendMessage(String message) {
 		if (this._sender != null) this._sender.sendMessage(message);
 		else System.out.println(message);
+	}
+
+	public List<String> tabComplete() {
+		Queue<String> argumentQueue = this._commandQueue;
+		return tabComplete(this._commandSyntax, argumentQueue);
+	}
+
+	public List<String> tabComplete(CommandSyntax commandSyntax, Queue<String> argumentQueue) {
+		if (commandSyntax.hasSubCommands()) {
+			String command = argumentQueue.poll();
+			if ((command == null) || command.isEmpty()) return commandSyntax.getSubCommands();
+			CommandSyntax subCommandSyntax = commandSyntax.getSubCommand(command);
+			if (subCommandSyntax != null) return tabComplete(subCommandSyntax, argumentQueue);
+			if (argumentQueue.isEmpty()) {
+				List<String> found = findPartialMatches(command, commandSyntax.getSubCommands());
+				if (!found.isEmpty()) return found;
+			}
+			sendMessage(String.format("Unexpected sub command: %s", command));
+			return null;
+		}
+
+		for (ParameterSyntax parameterSyntax : commandSyntax.getParameterSyntaxList()) {
+			String argument = argumentQueue.poll();
+			if ((argument == null) || argument.isEmpty()) return parameterSyntax.getValidValues(this);
+			if (argumentQueue.isEmpty()) {
+				List<String> found = findPartialMatches(argument, parameterSyntax.getValidValues(this));
+				if (!found.isEmpty()) return found;			
+			}
+			try {
+				parameterSyntax.parseArguments(this, argument, null);
+			} catch (CommandSyntaxException e) {
+				sendMessage(e.getMessage());
+				return null;
+			}
+			if (argumentQueue.isEmpty()) return null;
+		}
+		return null;
+	}
+
+	private static List<String> findPartialMatches(String partial, List<String> valueList) {
+		List<String> found = new ArrayList<String>();
+		for (String value : valueList) {
+			if (value.startsWith(partial)) found.add(value);
+		}
+		return found;
 	}
 }

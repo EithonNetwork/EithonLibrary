@@ -120,11 +120,10 @@ public class ParameterSyntax extends Syntax {
 				argument, getName()));
 	}
 
-	public List<String> getValidValues() {
+	public List<String> getValidValues(EithonCommand command) {
 		if (this._valueGetter != null) {
 			this._validValues = new ArrayList<String>();
-			// TODO: How to handle sender parameter?
-			this._validValues.addAll(this._valueGetter.getValues(null));
+			this._validValues.addAll(this._valueGetter.getValues(command));
 			this._validValues.sort(new Comparator<String>() {
 				@Override
 				public int compare(String o1, String o2) {
