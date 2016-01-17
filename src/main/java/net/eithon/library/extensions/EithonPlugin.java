@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Queue;
 
 import net.eithon.library.command.CommandSyntax;
+import net.eithon.library.command.ICommandSyntax;
 import net.eithon.library.facades.EithonLibraryFacade;
 import net.eithon.library.facades.ZPermissionsFacade;
 import net.eithon.library.file.FileMisc;
@@ -31,7 +32,7 @@ public class EithonPlugin extends JavaPlugin implements Listener, TabCompleter {
 	private Logger _logger;
 	private Configuration _config;
 	private ICommandHandler _commandHandlerOld;
-	private CommandSyntax _commandSyntax;
+	private ICommandSyntax _commandSyntax;
 	private Listener _eventListener;
 	private EithonLibraryApi _eithonLibraryApi;
 
@@ -93,7 +94,7 @@ public class EithonPlugin extends JavaPlugin implements Listener, TabCompleter {
 		getServer().getPluginManager().registerEvents(this._eventListener, this);
 	}
 
-	public void activate(CommandSyntax commandSyntax, Listener eventListener) {
+	public void activate(ICommandSyntax commandSyntax, Listener eventListener) {
 		this._commandSyntax = commandSyntax;
 		this._eventListener = eventListener;
 		if (this._eventListener == null) this._eventListener = this;

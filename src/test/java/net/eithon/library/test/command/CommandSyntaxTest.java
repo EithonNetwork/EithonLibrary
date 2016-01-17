@@ -1,7 +1,7 @@
 package net.eithon.library.test.command;
 
-import net.eithon.library.command.CommandSyntax;
 import net.eithon.library.command.CommandSyntaxException;
+import net.eithon.library.command.ICommandSyntax;
 import net.eithon.library.command.ParameterSyntax.ParameterType;
 
 import org.junit.Assert;
@@ -21,7 +21,7 @@ public class CommandSyntaxTest {
 		// Prepare
 		final String subName = "sub";
 		final String subCommand = String.format("%s", subName);
-		CommandSyntax root = Support.createRoot("root");
+		ICommandSyntax root = Support.createRoot("root");
 
 		// Do and verify
 		Support.createSubCommand(root, subName, subCommand);		
@@ -35,8 +35,8 @@ public class CommandSyntaxTest {
 		// Prepare
 		final String subName = "sub";
 		final String parameterName = "parameter";
-		final CommandSyntax root = Support.createRoot("root");
-		final CommandSyntax sub = Support.createSubCommand(root, subName, subName);
+		final ICommandSyntax root = Support.createRoot("root");
+		final ICommandSyntax sub = Support.createSubCommand(root, subName, subName);
 
 		// Do and verify
 		Support.createParameter(sub, null, parameterName, null, null, true);
@@ -49,8 +49,8 @@ public class CommandSyntaxTest {
 		// Prepare
 		final String subName = "sub";
 		final String parameterName = "parameter";
-		final CommandSyntax root = Support.createRoot("root");
-		final CommandSyntax sub = Support.createSubCommand(root, subName, subName);
+		final ICommandSyntax root = Support.createRoot("root");
+		final ICommandSyntax sub = Support.createSubCommand(root, subName, subName);
 
 		// Do and verify
 		Support.createParameter(sub, null, parameterName, ParameterType.INTEGER, null, null, true);
@@ -64,8 +64,8 @@ public class CommandSyntaxTest {
 		final String subName = "sub";
 		final String parameterName = "parameter";
 		final String defaultValue = "42";
-		final CommandSyntax root = Support.createRoot("root");
-		final CommandSyntax sub = Support.createSubCommand(root, subName, subName);
+		final ICommandSyntax root = Support.createRoot("root");
+		final ICommandSyntax sub = Support.createSubCommand(root, subName, subName);
 
 		// Do and verify
 		Support.createParameter(sub, null, parameterName, defaultValue, null, true);
@@ -79,8 +79,8 @@ public class CommandSyntaxTest {
 		final String subName = "sub";
 		final String parameterName = "parameter";
 		final String[] helpValues = new String[] { "113" };
-		final CommandSyntax root = Support.createRoot("root");
-		final CommandSyntax sub = Support.createSubCommand(root, subName, subName);
+		final ICommandSyntax root = Support.createRoot("root");
+		final ICommandSyntax sub = Support.createSubCommand(root, subName, subName);
 
 		// Do and verify
 		Support.createParameter(sub, null, parameterName, null, helpValues, true);
@@ -94,8 +94,8 @@ public class CommandSyntaxTest {
 		final String subName = "sub";
 		final String parameterName = "parameter";	
 		final String[] helpValues = new String[] { "113", "1477" };
-		final CommandSyntax root = Support.createRoot("root");
-		final CommandSyntax sub = Support.createSubCommand(root, subName, subName);
+		final ICommandSyntax root = Support.createRoot("root");
+		final ICommandSyntax sub = Support.createSubCommand(root, subName, subName);
 
 		// Do and verify
 		Support.createParameter(sub, null, parameterName, null, helpValues, true);
@@ -109,8 +109,8 @@ public class CommandSyntaxTest {
 		final String subName = "sub";
 		final String parameterName = "parameter";
 		final String[] helpValues = new String[] { "113", "1477" };
-		final CommandSyntax root = Support.createRoot("root");
-		final CommandSyntax sub = Support.createSubCommand(root, subName, subName);
+		final ICommandSyntax root = Support.createRoot("root");
+		final ICommandSyntax sub = Support.createSubCommand(root, subName, subName);
 
 		Support.createParameter(sub, null, parameterName, null, helpValues, false);	
 	}
@@ -122,8 +122,8 @@ public class CommandSyntaxTest {
 		final String subName = "sub";
 		final String parameterName = "parameter";
 		final String[] helpValues = new String[] { "113", "1477" };
-		final CommandSyntax root = Support.createRoot("root");
-		final CommandSyntax sub = Support.createSubCommand(root, subName, subName);
+		final ICommandSyntax root = Support.createRoot("root");
+		final ICommandSyntax sub = Support.createSubCommand(root, subName, subName);
 
 		Support.createParameter(sub, null, parameterName, helpValues[1], helpValues, false);
 	}
@@ -132,7 +132,7 @@ public class CommandSyntaxTest {
 	public void automaticPermissionSimple() 
 	{
 		// Prepare
-		CommandSyntax root = Support.createRoot("root");
+		ICommandSyntax root = Support.createRoot("root");
 		root.setPermissionsAutomatically();
 
 		// Do
@@ -141,7 +141,7 @@ public class CommandSyntaxTest {
 		} catch (CommandSyntaxException e) {
 			Assert.fail();
 		}		
-		CommandSyntax a = root.getSubCommand("a");
+		ICommandSyntax a = root.getSubCommand("a");
 		
 		// Verify
 		Assert.assertEquals("root.a", a.getRequiredPermission());
@@ -151,7 +151,7 @@ public class CommandSyntaxTest {
 	public void automaticPermissionHierarchy() 
 	{
 		// Prepare
-		CommandSyntax root = Support.createRoot("root");
+		ICommandSyntax root = Support.createRoot("root");
 		root.setPermissionsAutomatically();
 
 		// Do
@@ -161,9 +161,9 @@ public class CommandSyntaxTest {
 		} catch (CommandSyntaxException e) {
 			Assert.fail();
 		}		
-		CommandSyntax a = root.getSubCommand("a");
-		CommandSyntax b = root.getSubCommand("b");
-		CommandSyntax c = b.getSubCommand("c");
+		ICommandSyntax a = root.getSubCommand("a");
+		ICommandSyntax b = root.getSubCommand("b");
+		ICommandSyntax c = b.getSubCommand("c");
 		
 		// Verify
 		Assert.assertEquals("root.a", a.getRequiredPermission());
@@ -175,21 +175,21 @@ public class CommandSyntaxTest {
 	public void eithonfixesBuyCommand() 
 	{
 		// Prepare
-		final CommandSyntax root = Support.createRoot("eithonfixes");
+		final ICommandSyntax root = Support.createRoot("eithonfixes");
 		try {
 			root.parseSyntax("buy <player> <item> <price : REAL> <amount : INTEGER {1, ...}>");
 		} catch (CommandSyntaxException e) {
 			Assert.fail();
 		}
 		
-		CommandSyntax buy = root.getSubCommand("buy");
+		ICommandSyntax buy = root.getSubCommand("buy");
 	}
 
 	@Test
 	public void eithonTwoCommands() 
 	{
 		// Prepare
-		final CommandSyntax root = Support.createRoot("eithonfixes");
+		final ICommandSyntax root = Support.createRoot("eithonfixes");
 		try {
 			root.parseSyntax("buy <player> <item> <price : REAL> <amount : INTEGER {1, ...}>");
 			root.parseSyntax("debug <plugin> <level : INTEGER {0, 1, 2, _3_}>");
@@ -197,6 +197,6 @@ public class CommandSyntaxTest {
 			Assert.fail();
 		}
 		
-		CommandSyntax buy = root.getSubCommand("buy");
+		ICommandSyntax buy = root.getSubCommand("buy");
 	}
 }

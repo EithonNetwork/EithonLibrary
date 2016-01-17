@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 import net.eithon.library.time.TimeMisc;
 
-public class ParameterSyntax extends Syntax {
+public class ParameterSyntax extends Syntax implements IParameterSyntax {
 	private static String parameterName = "([^:{]+)";
 	private static String type = "([^{]+)";
 	private static String valueList = "([^}]+)";
@@ -31,7 +31,7 @@ public class ParameterSyntax extends Syntax {
 	public interface ValueGetter {
 		List<String> getValues(EithonCommand command);
 	}
-	
+
 	public interface DefaultGetter {
 		String getDefault(EithonCommand command);
 	}
@@ -59,23 +59,39 @@ public class ParameterSyntax extends Syntax {
 		this._validValues = new ArrayList<String>();
 	}
 
+	/* (non-Javadoc)
+	 * @see net.eithon.library.command.IParameterSyntax#getIsOptional()
+	 */
+	@Override
 	public boolean getIsOptional() { return this._isOptional; }
+	/* (non-Javadoc)
+	 * @see net.eithon.library.command.IParameterSyntax#getAcceptsAnyValue()
+	 */
+	@Override
 	public boolean getAcceptsAnyValue() { return this._acceptsAnyValue; }
+	/* (non-Javadoc)
+	 * @see net.eithon.library.command.IParameterSyntax#getDefault()
+	 */
+	@Override
 	public String getDefault() { return this._defaultValue; }
+	/* (non-Javadoc)
+	 * @see net.eithon.library.command.IParameterSyntax#getType()
+	 */
+	@Override
 	public ParameterType getType() { return this._type; }
-	
+
 
 	public void setDefault(String defaultValue) {
 		this._isOptional = defaultValue != null;
 		this._defaultValue = defaultValue;
 	}
 
-	public ParameterSyntax setMandatoryValues(ValueGetter valueGetter) {
+	public IParameterSyntax setMandatoryValues(ValueGetter valueGetter) {
 		this._valueGetter = valueGetter;
 		this._acceptsAnyValue = false;
 		return this;	}
 
-	public ParameterSyntax setExampleValues(ValueGetter valueGetter) {
+	public IParameterSyntax setExampleValues(ValueGetter valueGetter) {
 		this._valueGetter = valueGetter;
 		this._acceptsAnyValue = true;
 		return this;
@@ -120,8 +136,14 @@ public class ParameterSyntax extends Syntax {
 				argument, getName()));
 	}
 
+
+
+	public List<String> getValidValues() {
+		return getValidValues(null);
+	}
+
 	public List<String> getValidValues(EithonCommand command) {
-		if (this._valueGetter != null) {
+		if ((command != null) && (this._valueGetter != null)) {
 			this._validValues = new ArrayList<String>();
 			this._validValues.addAll(this._valueGetter.getValues(command));
 			this._validValues.sort(new Comparator<String>() {
@@ -272,7 +294,7 @@ class ValueListSyntax {
 					parameterName, valueList));
 		}
 	}
-	
+
 	public List<String> getValues() { return this._valueList; }
 	public String getDefault() {return this._defaultValue; }
 	public boolean acceptsAnyValue() {return this._acceptsAnyValue; }

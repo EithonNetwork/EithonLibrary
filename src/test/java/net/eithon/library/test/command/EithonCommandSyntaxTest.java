@@ -3,6 +3,7 @@ package net.eithon.library.test.command;
 import net.eithon.library.command.CommandSyntax;
 import net.eithon.library.command.CommandSyntaxException;
 import net.eithon.library.command.EithonCommand;
+import net.eithon.library.command.ICommandSyntax;
 import net.eithon.library.command.ParameterSyntax;
 import net.eithon.library.command.ParameterSyntax.ParameterType;
 
@@ -14,7 +15,7 @@ public class EithonCommandSyntaxTest {
 	public void rootOnly() 
 	{
 		// Prepare
-		CommandSyntax root = Support.createRoot("root");
+		ICommandSyntax root = Support.createRoot("root");
 		
 		// Do
 		root.setCommandExecutor(ec -> Assert.assertNotNull(ec));
@@ -30,9 +31,9 @@ public class EithonCommandSyntaxTest {
 		// Prepare
 		final String commandName = "sub";
 		final String commandSyntax = "sub";
-		final String command = "root sub";
-		CommandSyntax root = new CommandSyntax("root");
-		CommandSyntax sub = null;
+		final String command = "sub";
+		ICommandSyntax root = EithonCommand.createRootCommand("root");
+		ICommandSyntax sub = null;
 		try {
 			root.parseSyntax(commandSyntax);
 		} catch (CommandSyntaxException e) {
@@ -54,9 +55,9 @@ public class EithonCommandSyntaxTest {
 		// Prepare
 		final String commandName = "sub";
 		final String commandSyntax = "sub <parameter>";
-		final String command = "root sub a";
-		CommandSyntax root = new CommandSyntax("root");
-		CommandSyntax sub = null;
+		final String command = "sub a";
+		ICommandSyntax root = EithonCommand.createRootCommand("root");
+		ICommandSyntax sub = null;
 		try {
 			root.parseSyntax(commandSyntax);
 		} catch (CommandSyntaxException e) {
@@ -81,9 +82,9 @@ public class EithonCommandSyntaxTest {
 		// Prepare
 		final String commandName = "sub";
 		final String commandSyntax = "sub <parameter : INTEGER>";
-		final String command = "root sub 37";
-		CommandSyntax root = new CommandSyntax("root");
-		CommandSyntax sub = null;
+		final String command = "sub 37";
+		ICommandSyntax root = EithonCommand.createRootCommand("root");
+		ICommandSyntax sub = null;
 		try {
 			root.parseSyntax(commandSyntax);
 		} catch (CommandSyntaxException e) {
@@ -108,9 +109,9 @@ public class EithonCommandSyntaxTest {
 		// Prepare
 		final String commandName = "sub";
 		final String commandSyntax = "sub <parameter : INTEGER {_42_,...}>";
-		final String command = "root sub";
-		CommandSyntax root = new CommandSyntax("root");
-		CommandSyntax sub = null;
+		final String command = "sub";
+		ICommandSyntax root = EithonCommand.createRootCommand("root");
+		ICommandSyntax sub = null;
 		try {
 			root.parseSyntax(commandSyntax);
 		} catch (CommandSyntaxException e) {
@@ -135,9 +136,9 @@ public class EithonCommandSyntaxTest {
 		// Prepare
 		final String commandName = "sub";
 		final String commandSyntax = "sub <parameter {113,...}>";
-		final String command = "root sub 113";
-		CommandSyntax root = new CommandSyntax("root");
-		CommandSyntax sub = null;
+		final String command = "sub 113";
+		ICommandSyntax root = EithonCommand.createRootCommand("root");
+		ICommandSyntax sub = null;
 		try {
 			root.parseSyntax(commandSyntax);
 		} catch (CommandSyntaxException e) {
@@ -162,9 +163,9 @@ public class EithonCommandSyntaxTest {
 		// Prepare
 		final String commandName = "sub";
 		final String commandSyntax = "sub <parameter {113, 4477,...}>";
-		final String command = "root sub 4477";
-		CommandSyntax root = new CommandSyntax("root");
-		CommandSyntax sub = null;
+		final String command = "sub 4477";
+		ICommandSyntax root = EithonCommand.createRootCommand("root");
+		ICommandSyntax sub = null;
 		try {
 			root.parseSyntax(commandSyntax);
 		} catch (CommandSyntaxException e) {
@@ -189,9 +190,9 @@ public class EithonCommandSyntaxTest {
 		// Prepare
 		final String commandName = "sub";
 		final String commandSyntax = "sub <parameter {1,2}>";
-		final String command = "root sub 2";
-		CommandSyntax root = new CommandSyntax("root");
-		CommandSyntax sub = null;
+		final String command = "sub 2";
+		ICommandSyntax root = EithonCommand.createRootCommand("root");
+		ICommandSyntax sub = null;
 		try {
 			root.parseSyntax(commandSyntax);
 		} catch (CommandSyntaxException e) {
@@ -216,9 +217,9 @@ public class EithonCommandSyntaxTest {
 		// Prepare
 		final String commandName = "sub";
 		final String commandSyntax = "sub <parameter {1,2}>";
-		final String command = "root sub 3";
-		CommandSyntax root = new CommandSyntax("root");
-		CommandSyntax sub = null;
+		final String command = "sub 3";
+		ICommandSyntax root = EithonCommand.createRootCommand("root");
+		ICommandSyntax sub = null;
 		try {
 			root.parseSyntax(commandSyntax);
 		} catch (CommandSyntaxException e) {
@@ -244,9 +245,9 @@ public class EithonCommandSyntaxTest {
 		// Prepare
 		final String commandName = "sub";
 		final String commandSyntax = "sub <parameter {1,_2_}>";
-		final String command = "root sub";
-		CommandSyntax root = new CommandSyntax("root");
-		CommandSyntax sub = null;
+		final String command = "sub";
+		ICommandSyntax root = EithonCommand.createRootCommand("root");
+		ICommandSyntax sub = null;
 		try {
 			root.parseSyntax(commandSyntax);
 		} catch (CommandSyntaxException e) {

@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 
 public class Argument extends ArgumentBase{
 
-	public Argument(ParameterSyntax parameterSyntax, String argument) {
+	public Argument(IParameterSyntax parameterSyntax, String argument) {
 		super(parameterSyntax, argument);
 		// TODO Auto-generated constructor stub
 	}

@@ -13,7 +13,7 @@ import net.eithon.library.command.ParameterSyntax.ParameterType;
 
 import org.apache.commons.lang.NotImplementedException;
 
-public class CommandSyntax extends Syntax {	
+public class CommandSyntax extends Syntax implements ICommandSyntax {	
 	private static String leftHand = "([^<= ]+) *= *";
 	private static String parameter = "([^>]+)";
 	private static String rest = "(.*)";
@@ -31,19 +31,35 @@ public class CommandSyntax extends Syntax {
 	private String _permission;
 	private boolean _automaticPermissions;
 
-	public CommandSyntax(String name) {
+	CommandSyntax(String name) {
 		super(name);
 		this._permission = null;
 		this._parameterSyntaxMap =new HashMap<String, ParameterSyntax>();
 		this._subCommands = new HashMap<String, CommandSyntax>();
 	}
 
+	/* (non-Javadoc)
+	 * @see net.eithon.library.command.ICommandSyntax#getSubCommand(java.lang.String)
+	 */
+	@Override
 	public CommandSyntax getSubCommand(String command) { return this._subCommands.get(command); }
-	public ParameterSyntax getParameterSyntax(String parameterName) { return this._parameterSyntaxMap.get(parameterName); }
+	/* (non-Javadoc)
+	 * @see net.eithon.library.command.ICommandSyntax#getParameterSyntax(java.lang.String)
+	 */
+	@Override
+	public IParameterSyntax getParameterSyntax(String parameterName) { return this._parameterSyntaxMap.get(parameterName); }
 	public boolean hasSubCommands() { return this._subCommands.size() > 0; }
 	public boolean hasParameters() { return this._parameterSyntaxMap.size() > 0; }
 	public List<ParameterSyntax> getParameterSyntaxList() { return this._parameterSyntaxMap.values().stream().collect(Collectors.toList());	}
+	/* (non-Javadoc)
+	 * @see net.eithon.library.command.ICommandSyntax#setPermissionsAutomatically()
+	 */
+	@Override
 	public void setPermissionsAutomatically() { this._automaticPermissions = true;}
+	/* (non-Javadoc)
+	 * @see net.eithon.library.command.ICommandSyntax#getRequiredPermission()
+	 */
+	@Override
 	public String getRequiredPermission() { return this._permission; }
 
 	public List<String> getSubCommands() {
@@ -60,41 +76,73 @@ public class CommandSyntax extends Syntax {
 		return subCommands;
 	}
 
+	/* (non-Javadoc)
+	 * @see net.eithon.library.command.ICommandSyntax#addCommand(java.lang.String)
+	 */
+	@Override
 	public CommandSyntax addCommand(String name) {
 		CommandSyntax commandSyntax = new CommandSyntax(name);
 		this._subCommands.put(name, commandSyntax);
 		return commandSyntax;
 	}
 
-	public ParameterSyntax addParameter(String name) {
+	/* (non-Javadoc)
+	 * @see net.eithon.library.command.ICommandSyntax#addParameter(java.lang.String)
+	 */
+	@Override
+	public IParameterSyntax addParameter(String name) {
 		return addParameter(name, ParameterType.STRING);
 	}
 
-	public ParameterSyntax addParameter(String name, ParameterType type) {
+	/* (non-Javadoc)
+	 * @see net.eithon.library.command.ICommandSyntax#addParameter(java.lang.String, net.eithon.library.command.ParameterSyntax.ParameterType)
+	 */
+	@Override
+	public IParameterSyntax addParameter(String name, ParameterType type) {
 		ParameterSyntax parameterSyntax = new ParameterSyntax(name, type);
 		return addParameter(parameterSyntax);
 	}
 
-	public ParameterSyntax addNamedParameter(String name, String leftSide) {
+	/* (non-Javadoc)
+	 * @see net.eithon.library.command.ICommandSyntax#addNamedParameter(java.lang.String, java.lang.String)
+	 */
+	@Override
+	public IParameterSyntax addNamedParameter(String name, String leftSide) {
 		ParameterSyntax parameterSyntax = new ParameterSyntax(name, ParameterType.STRING, leftSide);
 		return addParameter(parameterSyntax);
 	}
 
-	public ParameterSyntax addNamedParameter(String name, ParameterType type, String leftSide) {
+	/* (non-Javadoc)
+	 * @see net.eithon.library.command.ICommandSyntax#addNamedParameter(java.lang.String, net.eithon.library.command.ParameterSyntax.ParameterType, java.lang.String)
+	 */
+	@Override
+	public IParameterSyntax addNamedParameter(String name, ParameterType type, String leftSide) {
 		ParameterSyntax parameterSyntax = new ParameterSyntax(name, type, leftSide);
 		return addParameter(parameterSyntax);
 	}
 
-	public ParameterSyntax addParameter(ParameterSyntax parameterSyntax) {
+	/* (non-Javadoc)
+	 * @see net.eithon.library.command.ICommandSyntax#addParameter(net.eithon.library.command.ParameterSyntax)
+	 */
+	@Override
+	public IParameterSyntax addParameter(ParameterSyntax parameterSyntax) {
 		this._parameterSyntaxMap.put(parameterSyntax.getName(), parameterSyntax);
 		return parameterSyntax;
 	}
 
-	public CommandSyntax setCommandExecutor(CommandExecutor commandExecutor) {
+	/* (non-Javadoc)
+	 * @see net.eithon.library.command.ICommandSyntax#setCommandExecutor(net.eithon.library.command.CommandSyntax.CommandExecutor)
+	 */
+	@Override
+	public ICommandSyntax setCommandExecutor(CommandExecutor commandExecutor) {
 		this._commandExecutor = commandExecutor;
 		return this;
 	}
 
+	/* (non-Javadoc)
+	 * @see net.eithon.library.command.ICommandSyntax#setPermission(java.lang.String)
+	 */
+	@Override
 	public void setPermission(String permission) {
 		this._permission = permission;
 	}
@@ -119,7 +167,11 @@ public class CommandSyntax extends Syntax {
 		return this._commandExecutor;
 	}
 
-	public CommandSyntax parseSyntax(String commandLine) throws CommandSyntaxException {
+	/* (non-Javadoc)
+	 * @see net.eithon.library.command.ICommandSyntax#parseSyntax(java.lang.String)
+	 */
+	@Override
+	public ICommandSyntax parseSyntax(String commandLine) throws CommandSyntaxException {
 		if ((this._permission == null) && (this._automaticPermissions)) this._permission = getName();
 		return parseSyntax(commandLine, this._permission);
 	}
@@ -170,7 +222,7 @@ public class CommandSyntax extends Syntax {
 				commandSyntax.toString(commandLineList, soFar.toString());
 			}
 		} else {
-			for (ParameterSyntax parameterSyntax : this._parameterSyntaxMap.values()) {
+			for (IParameterSyntax parameterSyntax : this._parameterSyntaxMap.values()) {
 				soFar.append(" ");			
 				soFar.append(parameterSyntax.toString());
 			}

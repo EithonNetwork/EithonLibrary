@@ -21,11 +21,18 @@ public class EithonCommand {
 	private CommandSyntax _commandSyntax;
 	private HashMap<String, Argument> _arguments;
 
-	public EithonCommand(CommandSyntax commandSyntax, CommandSender sender, Command cmd, String alias, String[] args) {
+	public EithonCommand(ICommandSyntax commandSyntax, CommandSender sender, Command cmd, String alias, String[] args) {
+		if (!(commandSyntax instanceof CommandSyntax)) {
+			throw new IllegalArgumentException("The argument commandSyntax could not be casted to CommandSyntax");
+		}
 		this._sender = sender;
 		this._commandQueue = new LinkedList<String>();
 		this._commandQueue.addAll(Arrays.asList(args));
-		this._commandSyntax = commandSyntax;
+		this._commandSyntax = (CommandSyntax) commandSyntax;
+	}
+	
+	public static ICommandSyntax createRootCommand(String commandName) {
+		return new CommandSyntax(commandName);
 	}
 
 	public boolean execute() {
@@ -52,7 +59,7 @@ public class EithonCommand {
 			String commandName = this._commandQueue.poll();
 			CommandSyntax subCommand = commandSyntax.getSubCommand(commandName);
 			if (subCommand == null) {
-				this._sender.sendMessage(String.format("Expected command \"%s\", got \"%s\"", this._commandSyntax.getName(), commandName));
+				sendMessage(String.format("Expected command \"%s\", got \"%s\"", this._commandSyntax.getName(), commandName));
 				return false;
 			}
 			return execute(subCommand);

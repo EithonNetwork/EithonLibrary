@@ -5,21 +5,24 @@ import java.util.List;
 
 import net.eithon.library.command.CommandSyntax;
 import net.eithon.library.command.CommandSyntaxException;
+import net.eithon.library.command.EithonCommand;
+import net.eithon.library.command.ICommandSyntax;
+import net.eithon.library.command.IParameterSyntax;
 import net.eithon.library.command.ParameterSyntax;
 import net.eithon.library.command.ParameterSyntax.ParameterType;
 
 import org.junit.Assert;
 
 class Support {
-	static CommandSyntax createRoot(String name) {
-		final CommandSyntax root = new CommandSyntax(name); 
+	static ICommandSyntax createRoot(String name) {
+		final ICommandSyntax root = EithonCommand.createRootCommand(name); 
 		Assert.assertNotNull(root);	
 		Assert.assertEquals(name,root.getName());
 		Assert.assertEquals(name,root.toString());
 		return root;
 	}
 
-	static CommandSyntax createSubCommand(CommandSyntax root, String name, String command) {
+	static ICommandSyntax createSubCommand(ICommandSyntax root, String name, String command) {
 		// Prepare
 		final String completeCommand = String.format("%s %s", root.toString(), command);
 
@@ -31,7 +34,7 @@ class Support {
 		}	
 
 		// Verify
-		final CommandSyntax sub = root.getSubCommand(name);
+		final ICommandSyntax sub = root.getSubCommand(name);
 		Assert.assertNotNull(sub);	
 		Assert.assertEquals(name,sub.getName());		
 		Assert.assertEquals(command,sub.toString());
@@ -40,11 +43,11 @@ class Support {
 		return sub;
 	}
 
-	static ParameterSyntax createParameter(CommandSyntax command, String leftSide, String name, String defaultValue, String[] validValues, boolean acceptsAnyValue) { 
+	static IParameterSyntax createParameter(ICommandSyntax command, String leftSide, String name, String defaultValue, String[] validValues, boolean acceptsAnyValue) { 
 		return createParameter(command, leftSide, name, ParameterType.STRING, defaultValue, validValues, acceptsAnyValue);
 	}
 
-	static ParameterSyntax createParameter(CommandSyntax command, String leftSide, String name, ParameterType type, String defaultValue, String[] validValues, boolean acceptsAnyValue) {
+	static IParameterSyntax createParameter(ICommandSyntax command, String leftSide, String name, ParameterType type, String defaultValue, String[] validValues, boolean acceptsAnyValue) {
 		// Prepare
 		String parameter = "";
 		if (leftSide != null) parameter += leftSide+"=";

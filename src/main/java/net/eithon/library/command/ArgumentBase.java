@@ -1,13 +1,12 @@
 package net.eithon.library.command;
 
-import net.eithon.library.command.ParameterSyntax;
 
 public class ArgumentBase {
-	private ParameterSyntax _parameterSyntax;
+	private IParameterSyntax _parameterSyntax;
 	private String _value;
 
 
-	public ArgumentBase(ParameterSyntax parameterSyntax, String argument) {
+	public ArgumentBase(IParameterSyntax parameterSyntax, String argument) {
 		this._parameterSyntax = parameterSyntax;
 		this._value = argument;
 		// TODO Auto-generated constructor stub
