@@ -5,9 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import net.eithon.library.command.syntax.CommandSyntax;
-import net.eithon.library.command.syntax.CommandSyntax.CommandExecutor;
-import net.eithon.library.command.syntax.CommandSyntaxException;
+import net.eithon.library.command.CommandSyntax.CommandExecutor;
 import net.eithon.library.extensions.EithonPlayer;
 
 import org.bukkit.command.Command;
@@ -29,6 +27,7 @@ public class EithonCommand {
 	}
 
 	public boolean execute() {
+		/*
 		if (this._commandQueue.size() < 1) {
 			sendMessage(String.format("Empty command. Expected it to start with \"%s\"", this._commandSyntax.getName()));
 			return false;
@@ -38,6 +37,7 @@ public class EithonCommand {
 			sendMessage(String.format("Expected command \"%s\", got \"%s\"", this._commandSyntax.getName(), command));
 			return false;
 		}
+		*/
 		return execute(this._commandSyntax);
 	}
 
@@ -47,17 +47,17 @@ public class EithonCommand {
 				sendMessage(String.format("Too short command. Expected one of the following: %s", String.join(", ", this._commandSyntax.getSubCommands())));
 				return false;
 			}
-			String command = this._commandQueue.poll();
-			CommandSyntax subCommand = commandSyntax.getSubCommand(command);
+			String commandName = this._commandQueue.poll();
+			CommandSyntax subCommand = commandSyntax.getSubCommand(commandName);
 			if (subCommand == null) {
-				this._sender.sendMessage(String.format("Expected command \"%s\", got \"%s\"", this._commandSyntax.getName(), command));
+				this._sender.sendMessage(String.format("Expected command \"%s\", got \"%s\"", this._commandSyntax.getName(), commandName));
 				return false;
 			}
 			return execute(subCommand);
 		}
 		this._arguments = new HashMap<String, Argument>();
 		try {
-			CommandExecutor executor = commandSyntax.parseArguments(this._commandQueue, this._arguments);
+			CommandExecutor executor = commandSyntax.parseArguments(this, this._commandQueue, this._arguments);
 			if (executor == null) return false;
 			executor.execute(this);
 		} catch (CommandSyntaxException e) {

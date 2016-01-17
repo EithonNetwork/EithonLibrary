@@ -3,10 +3,10 @@ package net.eithon.library.test.command;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.eithon.library.command.syntax.CommandSyntax;
-import net.eithon.library.command.syntax.CommandSyntaxException;
-import net.eithon.library.command.syntax.ParameterSyntax;
-import net.eithon.library.command.syntax.ParameterSyntax.ParameterType;
+import net.eithon.library.command.CommandSyntax;
+import net.eithon.library.command.CommandSyntaxException;
+import net.eithon.library.command.ParameterSyntax;
+import net.eithon.library.command.ParameterSyntax.ParameterType;
 
 import org.junit.Assert;
 

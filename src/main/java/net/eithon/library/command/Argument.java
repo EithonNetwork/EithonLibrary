@@ -1,6 +1,6 @@
 package net.eithon.library.command;
 
-import net.eithon.library.command.syntax.ParameterSyntax;
+import net.eithon.library.extensions.EithonPlayer;
 import net.eithon.library.time.TimeMisc;
 
 import org.bukkit.entity.Player;
@@ -16,7 +16,10 @@ public class Argument extends ArgumentBase{
 	public long asTicks() { return TimeMisc.stringToTicks(asString()); }
 
 	public Player asPlayer() {
-		// TODO Auto-generated method stub
-		return null;
+		String playerName = asString();
+		if (playerName == null) return null;
+		EithonPlayer eithonPlayer = EithonPlayer.getFromString(playerName);
+		if (eithonPlayer == null) return null;
+		return eithonPlayer.getPlayer();
 	}
 }

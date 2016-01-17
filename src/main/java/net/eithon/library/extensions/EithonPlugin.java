@@ -3,7 +3,7 @@ package net.eithon.library.extensions;
 import java.io.File;
 import java.util.HashMap;
 
-import net.eithon.library.command.syntax.CommandSyntax;
+import net.eithon.library.command.CommandSyntax;
 import net.eithon.library.facades.EithonLibraryFacade;
 import net.eithon.library.facades.ZPermissionsFacade;
 import net.eithon.library.file.FileMisc;

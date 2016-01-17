@@ -6,10 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import net.eithon.library.command.syntax.CommandSyntaxException;
-import net.eithon.library.command.syntax.CommandSyntax;
-import net.eithon.library.command.syntax.ParameterSyntax;
-
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;

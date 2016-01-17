@@ -1,4 +1,4 @@
-package net.eithon.library.command.syntax;
+package net.eithon.library.command;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -9,9 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import net.eithon.library.command.Argument;
-import net.eithon.library.command.EithonCommand;
-import net.eithon.library.command.syntax.ParameterSyntax.ParameterType;
+import net.eithon.library.command.ParameterSyntax.ParameterType;
 
 import org.apache.commons.lang.NotImplementedException;
 
@@ -101,14 +99,14 @@ public class CommandSyntax extends Syntax {
 		this._permission = permission;
 	}
 
-	public CommandExecutor parseArguments(Queue<String> argumentQueue, HashMap<String, Argument> collectedArguments) throws CommandSyntaxException {
+	public CommandExecutor parseArguments(EithonCommand command, Queue<String> argumentQueue, HashMap<String, Argument> collectedArguments) throws CommandSyntaxException {
 		if (this._subCommands.size() > 0) {
-			String command = argumentQueue.poll();
-			CommandSyntax commandSyntax = this._subCommands.get(command);
+			String commandName = argumentQueue.poll();
+			CommandSyntax commandSyntax = this._subCommands.get(commandName);
 			if (commandSyntax == null) {
-				throw new CommandSyntaxException(String.format("Unexpected sub command: %s", command));
+				throw new CommandSyntaxException(String.format("Unexpected sub command: %s", commandName));
 			}
-			return commandSyntax.parseArguments(argumentQueue, collectedArguments);
+			return commandSyntax.parseArguments(command, argumentQueue, collectedArguments);
 		}
 
 		for (ParameterSyntax parameterSyntax : this._parameterSyntaxMap.values()) {
@@ -116,7 +114,7 @@ public class CommandSyntax extends Syntax {
 			if (!argumentQueue.isEmpty()) {
 				argument = argumentQueue.poll();
 			}
-			parameterSyntax.parseArguments(argument, collectedArguments);
+			parameterSyntax.parseArguments(command, argument, collectedArguments);
 		}
 		return this._commandExecutor;
 	}

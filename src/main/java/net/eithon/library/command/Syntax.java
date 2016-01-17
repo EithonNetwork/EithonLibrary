@@ -1,4 +1,4 @@
-package net.eithon.library.command.syntax;
+package net.eithon.library.command;
 
 
 public class Syntax {

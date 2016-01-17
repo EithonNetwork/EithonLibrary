@@ -1,6 +1,6 @@
 package net.eithon.library.command;
 
-import net.eithon.library.command.syntax.ParameterSyntax;
+import net.eithon.library.command.ParameterSyntax;
 
 public class ArgumentBase {
 	private ParameterSyntax _parameterSyntax;
