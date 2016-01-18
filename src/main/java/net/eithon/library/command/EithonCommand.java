@@ -30,34 +30,16 @@ public class EithonCommand {
 		this._commandQueue = new LinkedList<String>();
 		this._commandQueue.addAll(Arrays.asList(args));
 		this._commandSyntax = (CommandSyntax) commandSyntax;
-		parseArguments(this._commandSyntax);
+		this._arguments = new HashMap<String, Argument>();
+		try {
+			this._executor = this._commandSyntax.parseArguments(this, this._commandQueue, this._arguments);
+		} catch (CommandSyntaxException e) {
+			sendMessage(e.getMessage());
+		}
 	}
 	
 	public static ICommandSyntax createRootCommand(String commandName) {
 		return new CommandSyntax(commandName);
-	}
-
-	public void parseArguments(CommandSyntax commandSyntax) {
-		if (commandSyntax.hasSubCommands()) {
-			if (this._commandQueue.size() < 1) {
-				sendMessage(String.format("Too short command. Expected one of the following: %s", String.join(", ", this._commandSyntax.getSubCommands())));
-				return;
-			}
-			String commandName = this._commandQueue.poll();
-			CommandSyntax subCommand = commandSyntax.getSubCommand(commandName);
-			if (subCommand == null) {
-				sendMessage(String.format("Expected command \"%s\", got \"%s\"", this._commandSyntax.getName(), commandName));
-				return;
-			}
-			parseArguments(subCommand);
-			return;
-		}
-		this._arguments = new HashMap<String, Argument>();
-		try {
-			this._executor = commandSyntax.parseArguments(this, this._commandQueue, this._arguments);
-		} catch (CommandSyntaxException e) {
-			sendMessage(e.getMessage());
-		}
 	}
 
 	public boolean execute() {
