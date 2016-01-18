@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 import net.eithon.library.time.TimeMisc;
 
-public class ParameterSyntax extends Syntax implements IParameterSyntax {
+class ParameterSyntax extends Syntax implements IAdvancedParameterSyntax {
 	private static String parameterName = "([^:{]+)";
 	private static String type = "([^{]+)";
 	private static String valueList = "([^}]+)";
@@ -25,8 +25,6 @@ public class ParameterSyntax extends Syntax implements IParameterSyntax {
 	private String _defaultValue;
 	private boolean _acceptsAnyValue;
 	private DefaultGetter _defaultGetter;
-
-	public enum ParameterType { STRING, REAL, INTEGER, Player, REST, BOOLEAN, TIME_SPAN };
 
 	public interface ValueGetter {
 		List<String> getValues(EithonCommand command);
@@ -253,6 +251,9 @@ public class ParameterSyntax extends Syntax implements IParameterSyntax {
 	public void setDefaultValue(DefaultGetter defaultGetter) {
 		this._defaultGetter = defaultGetter;
 	}
+
+	@Override
+	public IAdvancedParameterSyntax getAdvancedMethods() { return this; }
 }
 
 class ValueListSyntax {

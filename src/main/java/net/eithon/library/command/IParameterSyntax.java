@@ -1,10 +1,11 @@
 package net.eithon.library.command;
 
 import net.eithon.library.command.ParameterSyntax.DefaultGetter;
-import net.eithon.library.command.ParameterSyntax.ParameterType;
 import net.eithon.library.command.ParameterSyntax.ValueGetter;
 
 public interface IParameterSyntax {
+
+	public enum ParameterType { STRING, REAL, INTEGER, Player, REST, BOOLEAN, TIME_SPAN };
 
 	public abstract boolean getIsOptional();
 
@@ -19,5 +20,7 @@ public interface IParameterSyntax {
 	public abstract IParameterSyntax setExampleValues(ValueGetter valueGetter);
 
 	public abstract void setDefaultValue(DefaultGetter defaultGetter);
+
+	public abstract IAdvancedParameterSyntax getAdvancedMethods();
 
 }

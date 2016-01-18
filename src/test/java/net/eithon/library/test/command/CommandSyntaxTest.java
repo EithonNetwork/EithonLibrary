@@ -2,7 +2,8 @@ package net.eithon.library.test.command;
 
 import net.eithon.library.command.CommandSyntaxException;
 import net.eithon.library.command.ICommandSyntax;
-import net.eithon.library.command.ParameterSyntax.ParameterType;
+import net.eithon.library.command.IParameterSyntax;
+import net.eithon.library.command.IParameterSyntax.ParameterType;
 
 import org.junit.Assert;
 import org.junit.Test;

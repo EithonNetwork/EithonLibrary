@@ -9,7 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import net.eithon.library.command.ParameterSyntax.ParameterType;
+import net.eithon.library.command.IParameterSyntax.ParameterType;
 
 import org.apache.commons.lang.NotImplementedException;
 
@@ -228,5 +228,12 @@ public class CommandSyntax extends Syntax implements ICommandSyntax {
 			}
 			commandLineList.add(soFar.toString().trim());
 		}
+	}
+
+	@Override
+	public IParameterSyntax parseParameterSyntax(String leftSide,
+			String parameter) throws CommandSyntaxException {
+		ParameterSyntax parameterSyntax = ParameterSyntax.parseSyntax(leftSide, parameter);
+		return addParameter(parameterSyntax);
 	}
 }

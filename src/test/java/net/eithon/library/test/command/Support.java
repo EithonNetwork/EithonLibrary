@@ -3,13 +3,12 @@ package net.eithon.library.test.command;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.eithon.library.command.CommandSyntax;
 import net.eithon.library.command.CommandSyntaxException;
 import net.eithon.library.command.EithonCommand;
+import net.eithon.library.command.IAdvancedParameterSyntax;
 import net.eithon.library.command.ICommandSyntax;
 import net.eithon.library.command.IParameterSyntax;
-import net.eithon.library.command.ParameterSyntax;
-import net.eithon.library.command.ParameterSyntax.ParameterType;
+import net.eithon.library.command.IParameterSyntax.ParameterType;
 
 import org.junit.Assert;
 
@@ -61,13 +60,14 @@ class Support {
 		}
 
 		// Do
-		ParameterSyntax parameterSyntax = null;
+		IParameterSyntax ps = null;
 		try {
-			parameterSyntax = ParameterSyntax.parseSyntax(null, parameter);
-			command.addParameter(parameterSyntax);
+			ps = command.parseParameterSyntax(null, parameter);
 		} catch (CommandSyntaxException e) {
 			Assert.fail();
 		}
+		
+		IAdvancedParameterSyntax parameterSyntax = ps.getAdvancedMethods();
 
 		// Verify
 		Assert.assertNotNull(parameterSyntax);

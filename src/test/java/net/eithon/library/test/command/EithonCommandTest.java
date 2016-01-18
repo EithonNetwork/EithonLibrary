@@ -1,16 +1,13 @@
 package net.eithon.library.test.command;
 
-import net.eithon.library.command.CommandSyntax;
 import net.eithon.library.command.CommandSyntaxException;
 import net.eithon.library.command.EithonCommand;
 import net.eithon.library.command.ICommandSyntax;
-import net.eithon.library.command.ParameterSyntax;
-import net.eithon.library.command.ParameterSyntax.ParameterType;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-public class EithonCommandSyntaxTest {
+public class EithonCommandTest {
 	@Test
 	public void rootOnly() 
 	{

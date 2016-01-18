@@ -1,7 +1,7 @@
 package net.eithon.library.command;
 
 import net.eithon.library.command.CommandSyntax.CommandExecutor;
-import net.eithon.library.command.ParameterSyntax.ParameterType;
+import net.eithon.library.command.IParameterSyntax.ParameterType;
 
 public interface ICommandSyntax {
 	public abstract String getName();
@@ -15,6 +15,8 @@ public interface ICommandSyntax {
 	public abstract String getRequiredPermission();
 
 	public abstract ICommandSyntax addCommand(String name);
+	
+	public abstract IParameterSyntax parseParameterSyntax(String leftSide, String parameter) throws CommandSyntaxException;
 
 	public abstract IParameterSyntax addParameter(String name);
 
