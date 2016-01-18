@@ -176,14 +176,17 @@ public class CommandSyntaxTest {
 	public void eithonfixesBuyCommand() 
 	{
 		// Prepare
+		String commandLine = "buy <player> <item> <price : REAL> <amount : INTEGER {1, ...}>";
 		final ICommandSyntax root = Support.createRoot("eithonfixes");
 		try {
-			root.parseCommandSyntax("buy <player> <item> <price : REAL> <amount : INTEGER {1, ...}>");
+			root.parseCommandSyntax(commandLine);
 		} catch (CommandSyntaxException e) {
 			Assert.fail();
 		}
 		
-		root.getSubCommand("buy");
+		ICommandSyntax buy = root.getSubCommand("buy");
+		Assert.assertEquals(commandLine, buy.toString());
+		
 	}
 
 	@Test
