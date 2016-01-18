@@ -20,7 +20,6 @@ public class EithonCommand {
 	private Queue<String> _commandQueue;
 	private CommandSyntax _commandSyntax;
 	private HashMap<String, Argument> _arguments;
-	private CommandExecutor _executor;
 
 	public EithonCommand(ICommandSyntax commandSyntax, CommandSender sender, Command cmd, String alias, String[] args) {
 		if (!(commandSyntax instanceof CommandSyntax)) {
@@ -31,11 +30,6 @@ public class EithonCommand {
 		this._commandQueue.addAll(Arrays.asList(args));
 		this._commandSyntax = (CommandSyntax) commandSyntax;
 		this._arguments = new HashMap<String, Argument>();
-		try {
-			this._executor = this._commandSyntax.parseArguments(this, this._commandQueue, this._arguments);
-		} catch (CommandSyntaxException e) {
-			sendMessage(e.getMessage());
-		}
 	}
 	
 	public static ICommandSyntax createRootCommand(String commandName) {
@@ -43,8 +37,14 @@ public class EithonCommand {
 	}
 
 	public boolean execute() {
-		if (this._executor == null) return false;
-		this._executor.execute(this);
+		CommandExecutor executor = null;
+		try {
+			executor = this._commandSyntax.parseArguments(this, this._commandQueue, this._arguments);
+		} catch (CommandSyntaxException e) {
+			sendMessage(e.getMessage());
+		}
+		if (executor == null) return false;
+		executor.execute(this);
 		return true;
 	}
 

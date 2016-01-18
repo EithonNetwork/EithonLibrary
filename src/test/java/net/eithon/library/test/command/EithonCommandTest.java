@@ -1,5 +1,7 @@
 package net.eithon.library.test.command;
 
+import java.util.List;
+
 import net.eithon.library.command.CommandSyntaxException;
 import net.eithon.library.command.EithonCommand;
 import net.eithon.library.command.ICommandSyntax;
@@ -262,5 +264,35 @@ public class EithonCommandTest {
 		
 		// Verify
 		Assert.assertTrue(ec.execute());
+	}
+
+	@Test
+	public void tabCompleter() 
+	{
+		// Prepare
+		final String commandName = "sub";
+		final String commandSyntax = "sub <parameter {113, 4477,...}>";
+		final String command = "sub";
+		ICommandSyntax root = EithonCommand.createRootCommand("root");
+		ICommandSyntax sub = null;
+		try {
+			root.parseCommandSyntax(commandSyntax);
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+		sub = root.getSubCommand(commandName);
+		
+		// Do
+		sub.setCommandExecutor(ec -> {
+			Assert.assertNotNull(ec);
+			Assert.assertEquals(4477, ec.getArgument("parameter").asInteger());
+		});
+		EithonCommand ec = new EithonCommand(root, null, null, "alias", command.split(" "));
+		List<String> list = ec.tabComplete();
+		
+		// Verify
+		Assert.assertEquals(2, list.size());
+		Assert.assertEquals("113", list.get(0));
+		Assert.assertEquals("4477", list.get(1));
 	}
 }
