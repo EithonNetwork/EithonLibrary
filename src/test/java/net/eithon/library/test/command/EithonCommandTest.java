@@ -32,7 +32,7 @@ public class EithonCommandTest {
 		ICommandSyntax root = EithonCommand.createRootCommand("root");
 		ICommandSyntax sub = null;
 		try {
-			root.parseSyntax(commandSyntax);
+			root.parseCommandSyntax(commandSyntax);
 		} catch (CommandSyntaxException e) {
 			Assert.fail();
 		}
@@ -56,7 +56,7 @@ public class EithonCommandTest {
 		ICommandSyntax root = EithonCommand.createRootCommand("root");
 		ICommandSyntax sub = null;
 		try {
-			root.parseSyntax(commandSyntax);
+			root.parseCommandSyntax(commandSyntax);
 		} catch (CommandSyntaxException e) {
 			Assert.fail();
 		}
@@ -83,7 +83,7 @@ public class EithonCommandTest {
 		ICommandSyntax root = EithonCommand.createRootCommand("root");
 		ICommandSyntax sub = null;
 		try {
-			root.parseSyntax(commandSyntax);
+			root.parseCommandSyntax(commandSyntax);
 		} catch (CommandSyntaxException e) {
 			Assert.fail();
 		}
@@ -110,7 +110,7 @@ public class EithonCommandTest {
 		ICommandSyntax root = EithonCommand.createRootCommand("root");
 		ICommandSyntax sub = null;
 		try {
-			root.parseSyntax(commandSyntax);
+			root.parseCommandSyntax(commandSyntax);
 		} catch (CommandSyntaxException e) {
 			Assert.fail();
 		}
@@ -137,7 +137,7 @@ public class EithonCommandTest {
 		ICommandSyntax root = EithonCommand.createRootCommand("root");
 		ICommandSyntax sub = null;
 		try {
-			root.parseSyntax(commandSyntax);
+			root.parseCommandSyntax(commandSyntax);
 		} catch (CommandSyntaxException e) {
 			Assert.fail();
 		}
@@ -164,7 +164,7 @@ public class EithonCommandTest {
 		ICommandSyntax root = EithonCommand.createRootCommand("root");
 		ICommandSyntax sub = null;
 		try {
-			root.parseSyntax(commandSyntax);
+			root.parseCommandSyntax(commandSyntax);
 		} catch (CommandSyntaxException e) {
 			Assert.fail();
 		}
@@ -191,7 +191,7 @@ public class EithonCommandTest {
 		ICommandSyntax root = EithonCommand.createRootCommand("root");
 		ICommandSyntax sub = null;
 		try {
-			root.parseSyntax(commandSyntax);
+			root.parseCommandSyntax(commandSyntax);
 		} catch (CommandSyntaxException e) {
 			Assert.fail();
 		}
@@ -218,7 +218,7 @@ public class EithonCommandTest {
 		ICommandSyntax root = EithonCommand.createRootCommand("root");
 		ICommandSyntax sub = null;
 		try {
-			root.parseSyntax(commandSyntax);
+			root.parseCommandSyntax(commandSyntax);
 		} catch (CommandSyntaxException e) {
 			Assert.fail();
 		}
@@ -246,7 +246,7 @@ public class EithonCommandTest {
 		ICommandSyntax root = EithonCommand.createRootCommand("root");
 		ICommandSyntax sub = null;
 		try {
-			root.parseSyntax(commandSyntax);
+			root.parseCommandSyntax(commandSyntax);
 		} catch (CommandSyntaxException e) {
 			Assert.fail();
 		}

@@ -13,13 +13,13 @@ import net.eithon.library.command.IParameterSyntax.ParameterType;
 
 import org.apache.commons.lang.NotImplementedException;
 
-public class CommandSyntax extends Syntax implements ICommandSyntax {	
+class CommandSyntax implements ICommandSyntaxAdvanced {	
 	private static String leftHand = "([^<= ]+) *= *";
 	private static String parameter = "([^>]+)";
 	private static String rest = "(.*)";
 	private static Pattern namedParameterPattern= Pattern.compile("^(" + leftHand + ")?<" + parameter + ">" + rest);
-	private static String command = "([^ <>{}:]+)";
-	private static Pattern commandPattern = Pattern.compile("^" + command + rest);
+	private static String keyWord = "([^ <>{}:]+)";
+	private static Pattern keyWordPattern = Pattern.compile("^" + keyWord + rest);
 
 	public interface CommandExecutor {
 		public void execute(EithonCommand command);
@@ -30,9 +30,10 @@ public class CommandSyntax extends Syntax implements ICommandSyntax {
 	private CommandExecutor _commandExecutor;
 	private String _permission;
 	private boolean _automaticPermissions;
+	private String _name;
 
 	CommandSyntax(String name) {
-		super(name);
+		this._name = name;
 		this._permission = null;
 		this._parameterSyntaxMap =new HashMap<String, ParameterSyntax>();
 		this._subCommands = new HashMap<String, CommandSyntax>();
@@ -42,13 +43,14 @@ public class CommandSyntax extends Syntax implements ICommandSyntax {
 	 * @see net.eithon.library.command.ICommandSyntax#getSubCommand(java.lang.String)
 	 */
 	@Override
-	public CommandSyntax getSubCommand(String command) { return this._subCommands.get(command); }
+	public CommandSyntax getSubCommand(String commandName) { return this._subCommands.get(commandName); }
 	/* (non-Javadoc)
 	 * @see net.eithon.library.command.ICommandSyntax#getParameterSyntax(java.lang.String)
 	 */
 	@Override
 	public IParameterSyntax getParameterSyntax(String parameterName) { return this._parameterSyntaxMap.get(parameterName); }
 	public boolean hasSubCommands() { return this._subCommands.size() > 0; }
+	public String getName() { return this._name; }
 	public boolean hasParameters() { return this._parameterSyntaxMap.size() > 0; }
 	public List<ParameterSyntax> getParameterSyntaxList() { return this._parameterSyntaxMap.values().stream().collect(Collectors.toList());	}
 	/* (non-Javadoc)
@@ -80,9 +82,9 @@ public class CommandSyntax extends Syntax implements ICommandSyntax {
 	 * @see net.eithon.library.command.ICommandSyntax#addCommand(java.lang.String)
 	 */
 	@Override
-	public CommandSyntax addCommand(String name) {
-		CommandSyntax commandSyntax = new CommandSyntax(name);
-		this._subCommands.put(name, commandSyntax);
+	public CommandSyntax addKeyWord(String keyWord) {
+		CommandSyntax commandSyntax = new CommandSyntax(keyWord);
+		this._subCommands.put(keyWord, commandSyntax);
 		return commandSyntax;
 	}
 
@@ -171,12 +173,12 @@ public class CommandSyntax extends Syntax implements ICommandSyntax {
 	 * @see net.eithon.library.command.ICommandSyntax#parseSyntax(java.lang.String)
 	 */
 	@Override
-	public ICommandSyntax parseSyntax(String commandLine) throws CommandSyntaxException {
+	public ICommandSyntax parseCommandSyntax(String commandLine) throws CommandSyntaxException {
 		if ((this._permission == null) && (this._automaticPermissions)) this._permission = getName();
-		return parseSyntax(commandLine, this._permission);
+		return parseCommandSyntax(commandLine, this._permission);
 	}
 	
-	private CommandSyntax parseSyntax(String commandLine, String permission) throws CommandSyntaxException {
+	private CommandSyntax parseCommandSyntax(String commandLine, String permission) throws CommandSyntaxException {
 		String remainingPart = commandLine.trim();
 		if (remainingPart.isEmpty()) return this;
 
@@ -187,10 +189,11 @@ public class CommandSyntax extends Syntax implements ICommandSyntax {
 			String parameter = matcher.group(3);
 			ParameterSyntax parameterSyntax = ParameterSyntax.parseSyntax(leftSide, parameter);
 			addParameter(parameterSyntax);
-			parseSyntax(matcher.group(4), permission);
+			parseCommandSyntax(matcher.group(4), permission);
+			return this;
 		} else {
 			// Command
-			matcher = commandPattern.matcher(remainingPart);
+			matcher = keyWordPattern.matcher(remainingPart);
 			if (!matcher.matches()) {
 				throw new CommandSyntaxException(String.format("Expected to find a command token here: \"%s\"", remainingPart));
 			}
@@ -199,11 +202,11 @@ public class CommandSyntax extends Syntax implements ICommandSyntax {
 			}
 			String name = matcher.group(1);
 			String commandPermssion = permission + "." + name;
-			CommandSyntax subCommand = addCommand(name)
-					.parseSyntax(matcher.group(2), commandPermssion);
+			CommandSyntax subCommand = addKeyWord(name);
+			subCommand.parseCommandSyntax(matcher.group(2), commandPermssion);
 			if (!subCommand.hasSubCommands() && (permission != null)) subCommand.setPermission(commandPermssion);
+			return subCommand;
 		}
-		return this;
 	}
 
 	@Override
@@ -231,9 +234,11 @@ public class CommandSyntax extends Syntax implements ICommandSyntax {
 	}
 
 	@Override
-	public IParameterSyntax parseParameterSyntax(String leftSide,
-			String parameter) throws CommandSyntaxException {
+	public IParameterSyntax parseParameterSyntax(String leftSide, String parameter) throws CommandSyntaxException {
 		ParameterSyntax parameterSyntax = ParameterSyntax.parseSyntax(leftSide, parameter);
 		return addParameter(parameterSyntax);
 	}
+
+	@Override
+	public ICommandSyntaxAdvanced getAdvancedMethods() { return this; }
 }

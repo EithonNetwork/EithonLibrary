@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 import net.eithon.library.time.TimeMisc;
 
-class ParameterSyntax extends Syntax implements IAdvancedParameterSyntax {
+class ParameterSyntax implements IParameterSyntaxAdvanced {
 	private static String parameterName = "([^:{]+)";
 	private static String type = "([^{]+)";
 	private static String valueList = "([^}]+)";
@@ -25,21 +25,37 @@ class ParameterSyntax extends Syntax implements IAdvancedParameterSyntax {
 	private String _defaultValue;
 	private boolean _acceptsAnyValue;
 	private DefaultGetter _defaultGetter;
+	private String _name;
 
-	public interface ValueGetter {
-		List<String> getValues(EithonCommand command);
-	}
-
-	public interface DefaultGetter {
-		String getDefault(EithonCommand command);
-	}
-
-	public static List<String> fromArray(String[] array) {
-		ArrayList<String> list = new ArrayList<String>();
-		for (String string : array) {
-			list.add(string);
+	public static ParameterSyntax parseSyntax(String leftSide, String parameter) throws CommandSyntaxException {
+		Matcher matcher = insideParameterPattern.matcher(parameter);
+		if (!matcher.matches()) {
+			throw new CommandSyntaxException(String.format("Could not parse \"<%s>\". Format accepted: \"<name : TYPE {valuelist}>\", where \": TYPE\" and \"{valuelist}\" are optional.", parameter));
 		}
-		return list;
+		String parameterName = matcher.group(1).trim();
+		ParameterType type = ParameterType.STRING;
+		if (matcher.group(3) != null) {
+			String typeAsString = matcher.group(3).trim();
+			try {
+				type = ParameterType.valueOf(typeAsString);
+			} catch (Exception e) {
+				String typesAsString = getParameterTypesAsString();
+				throw new CommandSyntaxException(String.format("\"<%s>\" is not one of the know types (%s).",
+						typeAsString, typesAsString));
+			}
+		}
+		ParameterSyntax parameterSyntax;
+		if ((leftSide == null) || leftSide.isEmpty()) parameterSyntax= new ParameterSyntax(parameterName, type);
+		else parameterSyntax= new ParameterSyntax(parameterName, type, leftSide);
+		if (matcher.group(5) == null) return parameterSyntax;
+		String valueList = matcher.group(5).trim();
+		if ((valueList != null) && !valueList.isEmpty()) {
+			ValueListSyntax valueListParser = new ValueListSyntax(parameterName, valueList);
+			parameterSyntax.setValues(valueListParser.getValues());
+			parameterSyntax.setDefault(valueListParser.getDefault());
+			parameterSyntax.setAcceptsAnyValue(valueListParser.acceptsAnyValue());
+		}
+		return parameterSyntax;
 	}
 
 	public ParameterSyntax(String name, ParameterType type) {
@@ -47,7 +63,7 @@ class ParameterSyntax extends Syntax implements IAdvancedParameterSyntax {
 	}
 
 	ParameterSyntax(String parameterName, ParameterType type, String leftHandName) {
-		super(parameterName);
+		this._name = parameterName;
 		this._leftHandName = leftHandName;
 		this._type = type;
 		this._isNamed = leftHandName != null;
@@ -57,25 +73,10 @@ class ParameterSyntax extends Syntax implements IAdvancedParameterSyntax {
 		this._validValues = new ArrayList<String>();
 	}
 
-	/* (non-Javadoc)
-	 * @see net.eithon.library.command.IParameterSyntax#getIsOptional()
-	 */
-	@Override
+	public String getName() { return this._name; }
 	public boolean getIsOptional() { return this._isOptional; }
-	/* (non-Javadoc)
-	 * @see net.eithon.library.command.IParameterSyntax#getAcceptsAnyValue()
-	 */
-	@Override
 	public boolean getAcceptsAnyValue() { return this._acceptsAnyValue; }
-	/* (non-Javadoc)
-	 * @see net.eithon.library.command.IParameterSyntax#getDefault()
-	 */
-	@Override
 	public String getDefault() { return this._defaultValue; }
-	/* (non-Javadoc)
-	 * @see net.eithon.library.command.IParameterSyntax#getType()
-	 */
-	@Override
 	public ParameterType getType() { return this._type; }
 
 
@@ -209,37 +210,6 @@ class ParameterSyntax extends Syntax implements IAdvancedParameterSyntax {
 
 	public void setAcceptsAnyValue(boolean acceptsAnyValue) { this._acceptsAnyValue = acceptsAnyValue; }
 
-	public static ParameterSyntax parseSyntax(String leftSide, String parameter) throws CommandSyntaxException {
-		Matcher matcher = insideParameterPattern.matcher(parameter);
-		if (!matcher.matches()) {
-			throw new CommandSyntaxException(String.format("Could not parse \"<%s>\". Format accepted: \"<name : TYPE {valuelist}>\", where \": TYPE\" and \"{valuelist}\" are optional.", parameter));
-		}
-		String parameterName = matcher.group(1).trim();
-		ParameterType type = ParameterType.STRING;
-		if (matcher.group(3) != null) {
-			String typeAsString = matcher.group(3).trim();
-			try {
-				type = ParameterType.valueOf(typeAsString);
-			} catch (Exception e) {
-				String typesAsString = getParameterTypesAsString();
-				throw new CommandSyntaxException(String.format("\"<%s>\" is not one of the know types (%s).",
-						typeAsString, typesAsString));
-			}
-		}
-		ParameterSyntax parameterSyntax;
-		if ((leftSide == null) || leftSide.isEmpty()) parameterSyntax= new ParameterSyntax(parameterName, type);
-		else parameterSyntax= new ParameterSyntax(parameterName, type, leftSide);
-		if (matcher.group(5) == null) return parameterSyntax;
-		String valueList = matcher.group(5).trim();
-		if ((valueList != null) && !valueList.isEmpty()) {
-			ValueListSyntax valueListParser = new ValueListSyntax(parameterName, valueList);
-			parameterSyntax.setValues(valueListParser.getValues());
-			parameterSyntax.setDefault(valueListParser.getDefault());
-			parameterSyntax.setAcceptsAnyValue(valueListParser.acceptsAnyValue());
-		}
-		return parameterSyntax;
-	}
-
 	private static String getParameterTypesAsString() {
 		List<String> typesAsList = new ArrayList<String>();
 		for (ParameterType t : ParameterType.values()) {
@@ -253,7 +223,7 @@ class ParameterSyntax extends Syntax implements IAdvancedParameterSyntax {
 	}
 
 	@Override
-	public IAdvancedParameterSyntax getAdvancedMethods() { return this; }
+	public IParameterSyntaxAdvanced getAdvancedMethods() { return this; }
 }
 
 class ValueListSyntax {

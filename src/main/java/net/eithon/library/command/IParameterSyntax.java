@@ -1,26 +1,33 @@
 package net.eithon.library.command;
 
-import net.eithon.library.command.ParameterSyntax.DefaultGetter;
-import net.eithon.library.command.ParameterSyntax.ValueGetter;
+import java.util.List;
 
 public interface IParameterSyntax {
 
 	public enum ParameterType { STRING, REAL, INTEGER, Player, REST, BOOLEAN, TIME_SPAN };
 
-	public abstract boolean getIsOptional();
+	public interface ValueGetter {
+		List<String> getValues(EithonCommand command);
+	}
 
-	public abstract boolean getAcceptsAnyValue();
+	public interface DefaultGetter {
+		String getDefault(EithonCommand command);
+	}
 
-	public abstract String getDefault();
+	public void setDefaultValue(DefaultGetter defaultGetter);
 
-	public abstract ParameterType getType();
+	public IParameterSyntax setExampleValues(ValueGetter valueGetter);
 
-	public abstract IParameterSyntax setMandatoryValues(ValueGetter valueGetter);
+	public IParameterSyntax setMandatoryValues(ValueGetter valueGetter);
 
-	public abstract IParameterSyntax setExampleValues(ValueGetter valueGetter);
+	public boolean getIsOptional();
 
-	public abstract void setDefaultValue(DefaultGetter defaultGetter);
+	public boolean getAcceptsAnyValue();
 
-	public abstract IAdvancedParameterSyntax getAdvancedMethods();
+	public String getDefault();
+
+	public ParameterType getType();
+
+	public IParameterSyntaxAdvanced getAdvancedMethods();
 
 }

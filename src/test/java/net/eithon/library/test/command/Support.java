@@ -5,7 +5,8 @@ import java.util.List;
 
 import net.eithon.library.command.CommandSyntaxException;
 import net.eithon.library.command.EithonCommand;
-import net.eithon.library.command.IAdvancedParameterSyntax;
+import net.eithon.library.command.ICommandSyntaxAdvanced;
+import net.eithon.library.command.IParameterSyntaxAdvanced;
 import net.eithon.library.command.ICommandSyntax;
 import net.eithon.library.command.IParameterSyntax;
 import net.eithon.library.command.IParameterSyntax.ParameterType;
@@ -27,7 +28,7 @@ class Support {
 
 		// Do
 		try {
-			root.parseSyntax(command);
+			root.parseCommandSyntax(command);
 		} catch (CommandSyntaxException e) {
 			Assert.fail();
 		}	
@@ -49,7 +50,6 @@ class Support {
 	static IParameterSyntax createParameter(ICommandSyntax command, String leftSide, String name, ParameterType type, String defaultValue, String[] validValues, boolean acceptsAnyValue) {
 		// Prepare
 		String parameter = "";
-		if (leftSide != null) parameter += leftSide+"=";
 		parameter += name;
 		if (type != ParameterType.STRING) {
 			parameter += " : " + type.toString();
@@ -60,14 +60,15 @@ class Support {
 		}
 
 		// Do
-		IParameterSyntax ps = null;
+		IParameterSyntaxAdvanced parameterSyntax = null;
+		
 		try {
-			ps = command.parseParameterSyntax(null, parameter);
+			ICommandSyntaxAdvanced c = command.getAdvancedMethods();
+			IParameterSyntax ps = c.parseParameterSyntax(leftSide, parameter);		
+			parameterSyntax = ps.getAdvancedMethods();
 		} catch (CommandSyntaxException e) {
 			Assert.fail();
 		}
-		
-		IAdvancedParameterSyntax parameterSyntax = ps.getAdvancedMethods();
 
 		// Verify
 		Assert.assertNotNull(parameterSyntax);
@@ -79,7 +80,6 @@ class Support {
 		Assert.assertEquals(values.length - (acceptsAnyValue ? 1 : 0), valueList.size());
 		if (defaultValue != null) Assert.assertTrue(valueList.contains(defaultValue));
 		if (validValues != null) {
-			int i = 0;
 			for (String value : validValues) {
 				Assert.assertTrue(valueList.contains(value));
 			}

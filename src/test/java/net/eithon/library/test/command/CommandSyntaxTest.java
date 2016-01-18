@@ -138,7 +138,7 @@ public class CommandSyntaxTest {
 
 		// Do
 		try {
-			root.parseSyntax("a");
+			root.parseCommandSyntax("a");
 		} catch (CommandSyntaxException e) {
 			Assert.fail();
 		}		
@@ -157,8 +157,8 @@ public class CommandSyntaxTest {
 
 		// Do
 		try {
-			root.parseSyntax("a");
-			root.parseSyntax("b c");
+			root.parseCommandSyntax("a");
+			root.parseCommandSyntax("b c");
 		} catch (CommandSyntaxException e) {
 			Assert.fail();
 		}		
@@ -178,12 +178,12 @@ public class CommandSyntaxTest {
 		// Prepare
 		final ICommandSyntax root = Support.createRoot("eithonfixes");
 		try {
-			root.parseSyntax("buy <player> <item> <price : REAL> <amount : INTEGER {1, ...}>");
+			root.parseCommandSyntax("buy <player> <item> <price : REAL> <amount : INTEGER {1, ...}>");
 		} catch (CommandSyntaxException e) {
 			Assert.fail();
 		}
 		
-		ICommandSyntax buy = root.getSubCommand("buy");
+		root.getSubCommand("buy");
 	}
 
 	@Test
@@ -192,12 +192,12 @@ public class CommandSyntaxTest {
 		// Prepare
 		final ICommandSyntax root = Support.createRoot("eithonfixes");
 		try {
-			root.parseSyntax("buy <player> <item> <price : REAL> <amount : INTEGER {1, ...}>");
-			root.parseSyntax("debug <plugin> <level : INTEGER {0, 1, 2, _3_}>");
+			root.parseCommandSyntax("buy <player> <item> <price : REAL> <amount : INTEGER {1, ...}>");
+			root.parseCommandSyntax("debug <plugin> <level : INTEGER {0, 1, 2, _3_}>");
 		} catch (CommandSyntaxException e) {
 			Assert.fail();
 		}
 		
-		ICommandSyntax buy = root.getSubCommand("buy");
+		root.getSubCommand("buy");
 	}
 }
