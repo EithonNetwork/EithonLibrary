@@ -20,6 +20,7 @@ public class EithonCommand {
 	private Queue<String> _commandQueue;
 	private CommandSyntax _commandSyntax;
 	private HashMap<String, Argument> _arguments;
+	private CommandExecutor _executor;
 
 	public EithonCommand(ICommandSyntax commandSyntax, CommandSender sender, Command cmd, String alias, String[] args) {
 		if (!(commandSyntax instanceof CommandSyntax)) {
@@ -29,50 +30,39 @@ public class EithonCommand {
 		this._commandQueue = new LinkedList<String>();
 		this._commandQueue.addAll(Arrays.asList(args));
 		this._commandSyntax = (CommandSyntax) commandSyntax;
+		parseArguments(this._commandSyntax);
 	}
 	
 	public static ICommandSyntax createRootCommand(String commandName) {
 		return new CommandSyntax(commandName);
 	}
 
-	public boolean execute() {
-		/*
-		if (this._commandQueue.size() < 1) {
-			sendMessage(String.format("Empty command. Expected it to start with \"%s\"", this._commandSyntax.getName()));
-			return false;
-		}
-		String command = this._commandQueue.poll();
-		if (!command.equals(this._commandSyntax.getName())) {
-			sendMessage(String.format("Expected command \"%s\", got \"%s\"", this._commandSyntax.getName(), command));
-			return false;
-		}
-		*/
-		return execute(this._commandSyntax);
-	}
-
-	public boolean execute(CommandSyntax commandSyntax) {
+	public void parseArguments(CommandSyntax commandSyntax) {
 		if (commandSyntax.hasSubCommands()) {
 			if (this._commandQueue.size() < 1) {
 				sendMessage(String.format("Too short command. Expected one of the following: %s", String.join(", ", this._commandSyntax.getSubCommands())));
-				return false;
+				return;
 			}
 			String commandName = this._commandQueue.poll();
 			CommandSyntax subCommand = commandSyntax.getSubCommand(commandName);
 			if (subCommand == null) {
 				sendMessage(String.format("Expected command \"%s\", got \"%s\"", this._commandSyntax.getName(), commandName));
-				return false;
+				return;
 			}
-			return execute(subCommand);
+			parseArguments(subCommand);
+			return;
 		}
 		this._arguments = new HashMap<String, Argument>();
 		try {
-			CommandExecutor executor = commandSyntax.parseArguments(this, this._commandQueue, this._arguments);
-			if (executor == null) return false;
-			executor.execute(this);
+			this._executor = commandSyntax.parseArguments(this, this._commandQueue, this._arguments);
 		} catch (CommandSyntaxException e) {
 			sendMessage(e.getMessage());
-			return false;
 		}
+	}
+
+	public boolean execute() {
+		if (this._executor == null) return false;
+		this._executor.execute(this);
 		return true;
 	}
 
