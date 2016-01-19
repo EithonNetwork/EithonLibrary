@@ -21,10 +21,6 @@ class CommandSyntax implements ICommandSyntaxAdvanced {
 	private static String keyWord = "([^ <>{}:]+)";
 	private static Pattern keyWordPattern = Pattern.compile("^" + keyWord + rest);
 
-	public interface CommandExecutor {
-		public void execute(EithonCommand command);
-	}
-
 	private ArrayList<ParameterSyntax> _parameterSyntaxMap;
 	private HashMap<String, CommandSyntax> _subCommands;
 	private CommandExecutor _commandExecutor;

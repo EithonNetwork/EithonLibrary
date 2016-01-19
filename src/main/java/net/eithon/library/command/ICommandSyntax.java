@@ -1,8 +1,10 @@
 package net.eithon.library.command;
 
-import net.eithon.library.command.CommandSyntax.CommandExecutor;
-
 public interface ICommandSyntax {
+
+	public interface CommandExecutor {
+		public void execute(EithonCommand command);
+	}
 	
 	public ICommandSyntaxAdvanced addKeyWord(String name);
 

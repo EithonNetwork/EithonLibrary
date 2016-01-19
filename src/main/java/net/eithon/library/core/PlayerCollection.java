@@ -51,6 +51,11 @@ public class PlayerCollection<T> implements Iterable<T>, Serializable {
 		return this.playerInfo.get(playerId);
 	}
 
+	public boolean hasInformation(EithonPlayer player) {
+		UUID id = player.getUniqueId();
+		return hasInformation(id);
+	}
+
 	public boolean hasInformation(Player player) {
 		UUID id = player.getUniqueId();
 		return hasInformation(id);

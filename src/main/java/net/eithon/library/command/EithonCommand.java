@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import net.eithon.library.command.CommandSyntax.CommandExecutor;
+import net.eithon.library.command.ICommandSyntax.CommandExecutor;
 import net.eithon.library.extensions.EithonPlayer;
 
 import org.bukkit.command.Command;
@@ -107,7 +107,10 @@ public class EithonCommand {
 
 		for (ParameterSyntax parameterSyntax : commandSyntax.getParameterSyntaxList()) {
 			String argument = argumentQueue.poll();
-			if ((argument == null) || argument.isEmpty()) return getHintAsList(parameterSyntax);
+			if ((argument == null) || argument.isEmpty()) {
+				if (this._displayHints) return getHintAsList(parameterSyntax);
+				else return parameterSyntax.getValidValues(this);
+			}
 			if (argument.equals(parameterSyntax.getHint())) argument = argumentQueue.poll();
 			if ((argument == null) || argument.isEmpty()) return parameterSyntax.getValidValues(this);
 			if (argumentQueue.isEmpty()) {

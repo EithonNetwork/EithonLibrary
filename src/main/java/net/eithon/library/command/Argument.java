@@ -3,6 +3,7 @@ package net.eithon.library.command;
 import net.eithon.library.extensions.EithonPlayer;
 import net.eithon.library.time.TimeMisc;
 
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 public class Argument {
@@ -38,12 +39,22 @@ public class Argument {
 	public long asSeconds() { return TimeMisc.stringToSeconds(asString()); }
 	public long asTicks() { return TimeMisc.stringToTicks(asString()); }
 
-	public Player asPlayer() {
+	public EithonPlayer asEithonPlayer() {
 		String playerName = asString();
 		if (playerName == null) return null;
-		EithonPlayer eithonPlayer = EithonPlayer.getFromString(playerName);
+		return EithonPlayer.getFromString(playerName);
+	}
+
+	public Player asPlayer() {
+		EithonPlayer eithonPlayer = asEithonPlayer();
 		if (eithonPlayer == null) return null;
 		return eithonPlayer.getPlayer();
+	}
+
+	public OfflinePlayer asOfflinePlayer() {
+		EithonPlayer eithonPlayer = asEithonPlayer();
+		if (eithonPlayer == null) return null;
+		return eithonPlayer.getOfflinePlayer();
 	}
 }
 
