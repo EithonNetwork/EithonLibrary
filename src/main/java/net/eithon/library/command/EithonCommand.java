@@ -126,7 +126,7 @@ public class EithonCommand {
 
 	private List<String> getHintAsList(ParameterSyntax parameterSyntax) {
 		List<String> hint = new ArrayList<String>();
-		hint.add(parameterSyntax.getHint());
+		hint.add(parameterSyntax.getHint() + " ");
 		return hint;
 	}
 
