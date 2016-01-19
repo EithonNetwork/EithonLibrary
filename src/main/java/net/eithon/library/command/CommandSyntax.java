@@ -25,43 +25,30 @@ class CommandSyntax implements ICommandSyntaxAdvanced {
 		public void execute(EithonCommand command);
 	}
 
-	private HashMap<String, ParameterSyntax> _parameterSyntaxMap;
+	private ArrayList<ParameterSyntax> _parameterSyntaxMap;
 	private HashMap<String, CommandSyntax> _subCommands;
 	private CommandExecutor _commandExecutor;
 	private String _permission;
 	private boolean _automaticPermissions;
 	private String _name;
+	private boolean _displayHints;
 
 	CommandSyntax(String name) {
 		this._name = name;
 		this._permission = null;
-		this._parameterSyntaxMap =new HashMap<String, ParameterSyntax>();
+		this._displayHints = true;
+		this._parameterSyntaxMap = new ArrayList<ParameterSyntax>();
 		this._subCommands = new HashMap<String, CommandSyntax>();
 	}
 
-	/* (non-Javadoc)
-	 * @see net.eithon.library.command.ICommandSyntax#getSubCommand(java.lang.String)
-	 */
-	@Override
 	public CommandSyntax getSubCommand(String commandName) { return this._subCommands.get(commandName); }
-	/* (non-Javadoc)
-	 * @see net.eithon.library.command.ICommandSyntax#getParameterSyntax(java.lang.String)
-	 */
-	@Override
-	public IParameterSyntax getParameterSyntax(String parameterName) { return this._parameterSyntaxMap.get(parameterName); }
+	public IParameterSyntax getParameterSyntax(String parameterName) { return this._parameterSyntaxMap.stream().filter(ps -> parameterName.equals(ps.getName())).findFirst().get(); }
 	public boolean hasSubCommands() { return this._subCommands.size() > 0; }
 	public String getName() { return this._name; }
 	public boolean hasParameters() { return this._parameterSyntaxMap.size() > 0; }
-	public List<ParameterSyntax> getParameterSyntaxList() { return this._parameterSyntaxMap.values().stream().collect(Collectors.toList());	}
-	/* (non-Javadoc)
-	 * @see net.eithon.library.command.ICommandSyntax#setPermissionsAutomatically()
-	 */
-	@Override
+	public List<ParameterSyntax> getParameterSyntaxList() { return this._parameterSyntaxMap.stream().collect(Collectors.toList());	}
+	public boolean getDisplayHints() { return this._displayHints; }
 	public void setPermissionsAutomatically() { this._automaticPermissions = true;}
-	/* (non-Javadoc)
-	 * @see net.eithon.library.command.ICommandSyntax#getRequiredPermission()
-	 */
-	@Override
 	public String getRequiredPermission() { return this._permission; }
 
 	public List<String> getSubCommands() {
@@ -78,10 +65,6 @@ class CommandSyntax implements ICommandSyntaxAdvanced {
 		return subCommands;
 	}
 
-	/* (non-Javadoc)
-	 * @see net.eithon.library.command.ICommandSyntax#addCommand(java.lang.String)
-	 */
-	@Override
 	public CommandSyntax addKeyWord(String keyWord) {
 		CommandSyntax commandSyntax = new CommandSyntax(keyWord);
 		this._subCommands.put(keyWord, commandSyntax);
@@ -128,7 +111,7 @@ class CommandSyntax implements ICommandSyntaxAdvanced {
 	 */
 	@Override
 	public IParameterSyntax addParameter(ParameterSyntax parameterSyntax) {
-		this._parameterSyntaxMap.put(parameterSyntax.getName(), parameterSyntax);
+		this._parameterSyntaxMap.add(parameterSyntax);
 		return parameterSyntax;
 	}
 
@@ -159,7 +142,7 @@ class CommandSyntax implements ICommandSyntaxAdvanced {
 			return commandSyntax.parseArguments(command, argumentQueue, collectedArguments);
 		}
 
-		for (ParameterSyntax parameterSyntax : this._parameterSyntaxMap.values()) {
+		for (ParameterSyntax parameterSyntax : this._parameterSyntaxMap) {
 			String argument = null;
 			if (!argumentQueue.isEmpty()) {
 				argument = argumentQueue.poll();
@@ -225,7 +208,7 @@ class CommandSyntax implements ICommandSyntaxAdvanced {
 				commandSyntax.toString(commandLineList, soFar.toString());
 			}
 		} else {
-			for (IParameterSyntax parameterSyntax : this._parameterSyntaxMap.values()) {
+			for (IParameterSyntax parameterSyntax : this._parameterSyntaxMap) {
 				soFar.append(" ");			
 				soFar.append(parameterSyntax.toString());
 			}

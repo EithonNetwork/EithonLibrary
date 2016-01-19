@@ -224,6 +224,8 @@ class ParameterSyntax implements IParameterSyntaxAdvanced {
 
 	@Override
 	public IParameterSyntaxAdvanced getAdvancedMethods() { return this; }
+
+	public String getHint() { return String.format("(%s)", this._name);} 
 }
 
 class ValueListSyntax {

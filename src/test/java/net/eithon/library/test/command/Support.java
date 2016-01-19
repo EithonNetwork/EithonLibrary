@@ -106,4 +106,8 @@ class Support {
 		if (acceptsAnyValue) list.add("...");
 		return list.toArray(new String[0]);
 	}
+
+	static EithonCommand createEithonCommand(final ICommandSyntax root, final String command) {
+		return new EithonCommand(root, null, null, "alias", command.split(" "));
+	}
 }

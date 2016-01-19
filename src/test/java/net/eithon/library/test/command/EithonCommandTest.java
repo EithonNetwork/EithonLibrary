@@ -42,7 +42,7 @@ public class EithonCommandTest {
 		
 		// Do
 		sub.setCommandExecutor(ec -> Assert.assertNotNull(ec));
-		EithonCommand ec = new EithonCommand(root, null, null, "alias", command.split(" "));
+		EithonCommand ec = Support.createEithonCommand(root, command);
 		
 		// Verify
 		Assert.assertTrue(ec.execute());
@@ -69,7 +69,7 @@ public class EithonCommandTest {
 			Assert.assertNotNull(ec);
 			Assert.assertEquals("a", ec.getArgument("parameter").asString());
 		});
-		EithonCommand ec = new EithonCommand(root, null, null, "alias", command.split(" "));
+		EithonCommand ec = Support.createEithonCommand(root, command);
 		
 		// Verify
 		Assert.assertTrue(ec.execute());
@@ -96,7 +96,7 @@ public class EithonCommandTest {
 			Assert.assertNotNull(ec);
 			Assert.assertEquals(37, ec.getArgument("parameter").asInteger());
 		});
-		EithonCommand ec = new EithonCommand(root, null, null, "alias", command.split(" "));
+		EithonCommand ec = Support.createEithonCommand(root, command);
 		
 		// Verify
 		Assert.assertTrue(ec.execute());
@@ -123,7 +123,7 @@ public class EithonCommandTest {
 			Assert.assertNotNull(ec);
 			Assert.assertEquals(42, ec.getArgument("parameter").asInteger());
 		});
-		EithonCommand ec = new EithonCommand(root, null, null, "alias", command.split(" "));
+		EithonCommand ec = Support.createEithonCommand(root, command);
 		
 		// Verify
 		Assert.assertTrue(ec.execute());
@@ -150,7 +150,7 @@ public class EithonCommandTest {
 			Assert.assertNotNull(ec);
 			Assert.assertEquals(113, ec.getArgument("parameter").asInteger());
 		});
-		EithonCommand ec = new EithonCommand(root, null, null, "alias", command.split(" "));
+		EithonCommand ec = Support.createEithonCommand(root, command);
 		
 		// Verify
 		Assert.assertTrue(ec.execute());
@@ -177,7 +177,7 @@ public class EithonCommandTest {
 			Assert.assertNotNull(ec);
 			Assert.assertEquals(4477, ec.getArgument("parameter").asInteger());
 		});
-		EithonCommand ec = new EithonCommand(root, null, null, "alias", command.split(" "));
+		EithonCommand ec = Support.createEithonCommand(root, command);
 		
 		// Verify
 		Assert.assertTrue(ec.execute());
@@ -204,7 +204,7 @@ public class EithonCommandTest {
 			Assert.assertNotNull(ec);
 			Assert.assertEquals(2, ec.getArgument("parameter").asInteger());
 		});
-		EithonCommand ec = new EithonCommand(root, null, null, "alias", command.split(" "));
+		EithonCommand ec = Support.createEithonCommand(root, command);
 		
 		// Verify
 		Assert.assertTrue(ec.execute());
@@ -232,7 +232,7 @@ public class EithonCommandTest {
 			Assert.assertEquals(3, ec.getArgument("parameter").asInteger());
 		});
 		
-		EithonCommand ec = new EithonCommand(root, null, null, "alias", command.split(" "));
+		EithonCommand ec = Support.createEithonCommand(root, command);
 		
 		// Verify
 		Assert.assertFalse(ec.execute());
@@ -260,7 +260,7 @@ public class EithonCommandTest {
 			Assert.assertEquals(2, ec.getArgument("parameter").asInteger());
 		});
 		
-		EithonCommand ec = new EithonCommand(root, null, null, "alias", command.split(" "));
+		EithonCommand ec = Support.createEithonCommand(root, command);
 		
 		// Verify
 		Assert.assertTrue(ec.execute());
@@ -268,6 +268,36 @@ public class EithonCommandTest {
 
 	@Test
 	public void tabCompleter() 
+	{
+		// Prepare
+		final String commandName = "sub";
+		final String commandSyntax = "sub <parameter {113, 4477,...}>";
+		final String command = "sub (parameter)";
+		ICommandSyntax root = EithonCommand.createRootCommand("root");
+		ICommandSyntax sub = null;
+		try {
+			root.parseCommandSyntax(commandSyntax);
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+		sub = root.getSubCommand(commandName);
+		
+		// Do
+		sub.setCommandExecutor(ec -> {
+			Assert.assertNotNull(ec);
+			Assert.assertEquals(4477, ec.getArgument("parameter").asInteger());
+		});
+		EithonCommand ec = Support.createEithonCommand(root, command);
+		List<String> list = ec.tabComplete();
+		
+		// Verify
+		Assert.assertEquals(2, list.size());
+		Assert.assertEquals("113", list.get(0));
+		Assert.assertEquals("4477", list.get(1));
+	}
+
+	@Test
+	public void tabCompleteHint() 
 	{
 		// Prepare
 		final String commandName = "sub";
@@ -287,12 +317,11 @@ public class EithonCommandTest {
 			Assert.assertNotNull(ec);
 			Assert.assertEquals(4477, ec.getArgument("parameter").asInteger());
 		});
-		EithonCommand ec = new EithonCommand(root, null, null, "alias", command.split(" "));
+		EithonCommand ec = Support.createEithonCommand(root, command);
 		List<String> list = ec.tabComplete();
 		
 		// Verify
-		Assert.assertEquals(2, list.size());
-		Assert.assertEquals("113", list.get(0));
-		Assert.assertEquals("4477", list.get(1));
+		Assert.assertEquals(1, list.size());
+		Assert.assertEquals("(parameter)", list.get(0));
 	}
 }

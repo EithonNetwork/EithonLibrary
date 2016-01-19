@@ -20,6 +20,7 @@ public class EithonCommand {
 	private Queue<String> _commandQueue;
 	private CommandSyntax _commandSyntax;
 	private HashMap<String, Argument> _arguments;
+	private boolean _displayHints;
 
 	public EithonCommand(ICommandSyntax commandSyntax, CommandSender sender, Command cmd, String alias, String[] args) {
 		if (!(commandSyntax instanceof CommandSyntax)) {
@@ -86,6 +87,7 @@ public class EithonCommand {
 
 	public List<String> tabComplete() {
 		Queue<String> argumentQueue = this._commandQueue;
+		this._displayHints = this._commandSyntax.getDisplayHints();
 		return tabComplete(this._commandSyntax, argumentQueue);
 	}
 
@@ -105,6 +107,8 @@ public class EithonCommand {
 
 		for (ParameterSyntax parameterSyntax : commandSyntax.getParameterSyntaxList()) {
 			String argument = argumentQueue.poll();
+			if ((argument == null) || argument.isEmpty()) return getHintAsList(parameterSyntax);
+			if (argument.equals(parameterSyntax.getHint())) argument = argumentQueue.poll();
 			if ((argument == null) || argument.isEmpty()) return parameterSyntax.getValidValues(this);
 			if (argumentQueue.isEmpty()) {
 				List<String> found = findPartialMatches(argument, parameterSyntax.getValidValues(this));
@@ -119,6 +123,12 @@ public class EithonCommand {
 			if (argumentQueue.isEmpty()) return null;
 		}
 		return null;
+	}
+
+	private List<String> getHintAsList(ParameterSyntax parameterSyntax) {
+		List<String> hint = new ArrayList<String>();
+		hint.add(parameterSyntax.getHint());
+		return hint;
 	}
 
 	private static List<String> findPartialMatches(String partial, List<String> valueList) {
