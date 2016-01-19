@@ -112,7 +112,7 @@ class ParameterSyntax implements IParameterSyntaxAdvanced {
 				if (collectedArguments != null) collectedArguments.put(getName(), parameterValue);
 				return;
 			}	
-			throw new CommandSyntaxException(String.format("Expected a value for argument %s", getName()));
+			throw new CommandSyntaxException(String.format("Expected a value for argument <%s>", getName()));
 		}
 		verifyValueIsOkAccordingToType(argument);
 		if (this._acceptsAnyValue) {
@@ -131,7 +131,7 @@ class ParameterSyntax implements IParameterSyntaxAdvanced {
 				}
 			}
 		}
-		throw new CommandSyntaxException(String.format("The value \"%s\" was not an accepted value for argument %s.",
+		throw new CommandSyntaxException(String.format("The value \"%s\" was not an accepted value for argument <%s>.",
 				argument, getName()));
 	}
 
@@ -243,12 +243,12 @@ class ValueListSyntax {
 		String[] values = valueList.split(",");
 		for (String value : values) {
 			if (this._acceptsAnyValue) {
-				throw new IllegalArgumentException(String.format("Parameter \"%s\": The \"...\" must be last in the value list (%s)",
+				throw new IllegalArgumentException(String.format("Parameter <%s>: The \"...\" must be last in the value list (%s)",
 						parameterName, valueList));				
 			}
 			value = value.trim();
 			if (value.isEmpty()) {
-				throw new IllegalArgumentException(String.format("Parameter \"%s\": The value list \"%s\" contained an empty element", 
+				throw new IllegalArgumentException(String.format("Parameter <%s>: The value list \"%s\" contained an empty element", 
 						parameterName, valueList));
 			}
 			if (value.equals("...")) {
@@ -263,7 +263,7 @@ class ValueListSyntax {
 			this._valueList.add(value);
 		}
 		if (!this._acceptsAnyValue && (this._valueList.size() == 1)) {
-			throw new IllegalArgumentException(String.format("Parameter \"%s\": A value list with only one element does not make any sense. Did you mean {%s, ...}?", 
+			throw new IllegalArgumentException(String.format("Parameter <%s>: A value list with only one element does not make any sense. Did you mean {%s, ...}?", 
 					parameterName, valueList));
 		}
 	}
