@@ -13,6 +13,11 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 3.6 (2016-01-19)
+
+* NEW: Entirely new command interpreter with tab completion.
+* CHANGE: Some refactoring of bungee to make it easier to test.
+
 ### 3.5.3 (2016-01-13)
 
 * BUG: Leading literal bracket did not get color.
