@@ -324,4 +324,79 @@ public class EithonCommandTest {
 		Assert.assertEquals(1, list.size());
 		Assert.assertEquals("(parameter)", list.get(0));
 	}
+
+	@Test
+	public void tabCompleteHintsForEithonFixesBuyCommandNoSpace() 
+	{
+		// Prepare
+		final String commandName = "buy";
+		final String commandSyntax = "buy <player> <item> <price : REAL> <amount : INTEGER {1, ...}>";
+		ICommandSyntax root = EithonCommand.createRootCommand("eithonfixes");
+		ICommandSyntax sub = null;
+		try {
+			root.parseCommandSyntax(commandSyntax);
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+		sub = root.getSubCommand(commandName);
+		
+		// Do
+		EithonCommand ec = Support.createEithonCommand(root, "buy Eithon");
+		List<String> list = ec.tabComplete();
+		
+		// Verify
+		Assert.assertNotNull(list);
+		Assert.assertEquals(1, list.size());
+		Assert.assertEquals("(item)", list.get(0));
+	}
+
+	@Test
+	public void tabCompleteHintsForEithonFixesBuyCommandWithSpace() 
+	{
+		// Prepare
+		final String commandName = "buy";
+		final String commandSyntax = "buy <player> <item> <price : REAL> <amount : INTEGER {1, ...}>";
+		ICommandSyntax root = EithonCommand.createRootCommand("eithonfixes");
+		ICommandSyntax sub = null;
+		try {
+			root.parseCommandSyntax(commandSyntax);
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+		sub = root.getSubCommand(commandName);
+		
+		// Do
+		EithonCommand ec = Support.createEithonCommand(root, "buy Eithon ");
+		List<String> list = ec.tabComplete();
+		
+		// Verify
+		Assert.assertNotNull(list);
+		Assert.assertEquals(1, list.size());
+		Assert.assertEquals("(item)", list.get(0));
+	}
+
+	@Test
+	public void tabCompleteHintsForEithonFixesBuyCommand3() 
+	{
+		// Prepare
+		final String commandName = "buy";
+		final String commandSyntax = "buy <player> <item> <price : REAL> <amount : INTEGER {1, ...}>";
+		ICommandSyntax root = EithonCommand.createRootCommand("eithonfixes");
+		ICommandSyntax sub = null;
+		try {
+			root.parseCommandSyntax(commandSyntax);
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+		sub = root.getSubCommand(commandName);
+		
+		// Do
+		EithonCommand ec = Support.createEithonCommand(root, "buy Eithon gold");
+		List<String> list = ec.tabComplete();
+		
+		// Verify
+		Assert.assertNotNull(list);
+		Assert.assertEquals(1, list.size());
+		Assert.assertEquals("(price)", list.get(0));
+	}
 }

@@ -120,7 +120,6 @@ public class EithonCommand {
 				sendMessage(e.getMessage());
 				return null;
 			}
-			if (argumentQueue.isEmpty()) return null;
 		}
 		return null;
 	}
