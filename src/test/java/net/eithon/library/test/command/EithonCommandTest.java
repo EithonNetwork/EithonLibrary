@@ -322,7 +322,7 @@ public class EithonCommandTest {
 		
 		// Verify
 		Assert.assertEquals(1, list.size());
-		Assert.assertEquals("(parameter)", list.get(0));
+		Assert.assertEquals("(parameter) ", list.get(0));
 	}
 
 	@Test
@@ -347,7 +347,7 @@ public class EithonCommandTest {
 		// Verify
 		Assert.assertNotNull(list);
 		Assert.assertEquals(1, list.size());
-		Assert.assertEquals("(item)", list.get(0));
+		Assert.assertEquals("(item) ", list.get(0));
 	}
 
 	@Test
@@ -372,7 +372,7 @@ public class EithonCommandTest {
 		// Verify
 		Assert.assertNotNull(list);
 		Assert.assertEquals(1, list.size());
-		Assert.assertEquals("(item)", list.get(0));
+		Assert.assertEquals("(item) ", list.get(0));
 	}
 
 	@Test
@@ -397,6 +397,27 @@ public class EithonCommandTest {
 		// Verify
 		Assert.assertNotNull(list);
 		Assert.assertEquals(1, list.size());
-		Assert.assertEquals("(price)", list.get(0));
+		Assert.assertEquals("(price) ", list.get(0));
+	}
+
+	@Test
+	public void executeWithHints() 
+	{
+		// Prepare
+		final String commandName = "freeze";
+		final String commandSyntax = "freeze <player>";
+		ICommandSyntax root = EithonCommand.createRootCommand("eithonfixes");
+		ICommandSyntax sub = null;
+		try {
+			root.parseCommandSyntax(commandSyntax);
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+		sub = root.getSubCommand(commandName);		
+		sub.setCommandExecutor(ec -> Assert.assertNotNull(ec));
+		
+		// Do
+		EithonCommand ec = Support.createEithonCommand(root, "freeze (player) Eithon");
+		Assert.assertTrue(ec.execute());
 	}
 }

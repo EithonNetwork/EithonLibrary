@@ -20,7 +20,6 @@ class CommandSyntax implements ICommandSyntaxAdvanced {
 	private static Pattern namedParameterPattern = Pattern.compile("^(" + leftHand + ")?<" + parameter + ">" + rest);
 	private static String keyWord = "([^ <>{}:]+)";
 	private static Pattern keyWordPattern = Pattern.compile("^" + keyWord + rest);
-	private static Pattern hintPattern = Pattern.compile("^\\([^)]*\\)");
 
 	private ArrayList<ParameterSyntax> _parameterSyntaxMap;
 	private HashMap<String, CommandSyntax> _subCommands;
@@ -131,13 +130,7 @@ class CommandSyntax implements ICommandSyntaxAdvanced {
 
 	public CommandExecutor parseArguments(EithonCommand command, Queue<String> argumentQueue, HashMap<String, Argument> collectedArguments) throws CommandSyntaxException {
 		if (this._subCommands.size() > 0) {
-			String keyWord = null;
-			Matcher matcher = null;
-			do {
-				keyWord = argumentQueue.poll();
-				matcher = hintPattern.matcher(keyWord);
-			} while (matcher.matches());
-
+			String keyWord = argumentQueue.poll();
 			CommandSyntax commandSyntax = this._subCommands.get(keyWord);
 			if (commandSyntax == null) {
 				throw new CommandSyntaxException(String.format("Unexpected key word: %s", keyWord));
@@ -147,12 +140,18 @@ class CommandSyntax implements ICommandSyntaxAdvanced {
 
 		for (ParameterSyntax parameterSyntax : this._parameterSyntaxMap) {
 			String argument = null;
-			if (!argumentQueue.isEmpty()) {
-				argument = argumentQueue.poll();
-			}
+			if (!argumentQueue.isEmpty()) argument = argumentQueue.poll();
+			argument = skipHint(argumentQueue, parameterSyntax, argument);
 			parameterSyntax.parseArguments(command, argument, collectedArguments);
 		}
 		return this._commandExecutor;
+	}
+
+	public String skipHint(Queue<String> argumentQueue, ParameterSyntax parameterSyntax, String argument) {
+		if ((argument != null) && !argumentQueue.isEmpty()) {
+			if (argument.equals(parameterSyntax.getHint())) argument = argumentQueue.poll();
+		}
+		return argument;
 	}
 
 	/* (non-Javadoc)

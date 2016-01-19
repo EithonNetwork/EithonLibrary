@@ -17,6 +17,7 @@ Eithon java code library for Minecraft.
 
 * NEW: Added asEithonPlayer() and asOfflinePlayer() to the command argument class.
 * CHANGE: Now uses ':' as an alternative to '=' for named parameters
+* CHANGE: PlayerCollection now can handle OfflinePlayer
 * BUG: Hints were parsed as keywords.
 
 ### 3.6 (2016-01-19)
