@@ -13,6 +13,18 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 3.7 (2016-01-20)
+
+* NEW: Added asEithonPlayer() and asOfflinePlayer() to the command argument class.
+* CHANGE: Now uses ':' as an alternative to '=' for named parameters
+* CHANGE: PlayerCollection now can handle OfflinePlayer
+* BUG: Hints were parsed as keywords.
+
+### 3.6 (2016-01-19)
+
+* NEW: Entirely new command interpreter with tab completion.
+* CHANGE: Some refactoring of bungee to make it easier to test.
+
 ### 3.5.3 (2016-01-13)
 
 * BUG: Leading literal bracket did not get color.

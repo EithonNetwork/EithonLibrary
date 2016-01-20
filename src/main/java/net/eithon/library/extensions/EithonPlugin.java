@@ -1,12 +1,16 @@
 package net.eithon.library.extensions;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
+import net.eithon.library.command.ICommandSyntax;
 import net.eithon.library.facades.EithonLibraryFacade;
 import net.eithon.library.facades.ZPermissionsFacade;
 import net.eithon.library.file.FileMisc;
-import net.eithon.library.plugin.CommandParser;
 import net.eithon.library.plugin.Configuration;
 import net.eithon.library.plugin.GeneralMessage;
 import net.eithon.library.plugin.ICommandHandler;
@@ -17,19 +21,21 @@ import net.eithon.plugin.eithonlibrary.EithonLibraryApi;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class EithonPlugin extends JavaPlugin implements Listener {
+public class EithonPlugin extends JavaPlugin implements Listener, TabCompleter {
 	private static HashMap<String, EithonPlugin> instances = new HashMap<String, EithonPlugin>();
 	private Logger _logger;
 	private Configuration _config;
-	private ICommandHandler _commandHandler;
+	private ICommandHandler _commandHandlerOld;
+	private ICommandSyntax _commandSyntax;
 	private Listener _eventListener;
 	private EithonLibraryApi _eithonLibraryApi;
 
 	public EithonPlugin() {}
-	
+
 	@Override
 	public void onEnable() {
 		Logger.initialize();
@@ -44,33 +50,64 @@ public class EithonPlugin extends JavaPlugin implements Listener {
 		ZPermissionsFacade.initialize(this);
 		this._eithonLibraryApi = new EithonLibraryFacade(this).getApi();
 	}
-	
+
 	public EithonLibraryApi getApi() { return this._eithonLibraryApi;	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (this._commandHandler == null) {
+		if ((this._commandHandlerOld == null) && (this._commandSyntax == null)) {
 			this._logger.error("EithonPlugin has not been activated, can't execute command \"%s\".", label);
 			return false;
 		}
-		CommandParser commandParser = new CommandParser(this._commandHandler, sender, cmd, label, args);
-		return commandParser.execute();
+		if (this._commandHandlerOld != null) {
+			return new net.eithon.library.plugin.CommandParser(this._commandHandlerOld, sender, cmd, label, args)
+			.execute();
+		}
+		return new net.eithon.library.command.EithonCommand(this._commandSyntax, sender, cmd, label, args)
+			.execute();
 	}
 
-	public void activate(ICommandHandler commandHandler, Listener eventListener) {
-		this._commandHandler = commandHandler;
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {
+		Queue<String> argumentQueue = new LinkedList<String>();
+		argumentQueue.addAll(Arrays.asList(args));
+		argumentQueue.poll();
+		return new net.eithon.library.command.EithonCommand(this._commandSyntax, sender, cmd, alias, args)
+		.tabComplete();
+	}
+
+	public void activate(Listener eventListener) {
+		this._commandSyntax = null;
+		this._commandHandlerOld = null;
 		this._eventListener = eventListener;
 		if (this._eventListener == null) this._eventListener = this;
 		getServer().getPluginManager().registerEvents(this._eventListener, this);
 	}
 
+	@Deprecated
+	public void activate(ICommandHandler commandHandler, Listener eventListener) {
+		this._commandHandlerOld = commandHandler;
+		this._eventListener = eventListener;
+		if (this._eventListener == null) this._eventListener = this;
+		getServer().getPluginManager().registerEvents(this._eventListener, this);
+	}
+
+	public void activate(ICommandSyntax commandSyntax, Listener eventListener) {
+		this._commandSyntax = commandSyntax;
+		this._eventListener = eventListener;
+		if (this._eventListener == null) this._eventListener = this;
+		getServer().getPluginManager().registerEvents(this._eventListener, this);
+		getCommand(commandSyntax.getName()).setTabCompleter(this);
+	}
+
 	@Override
 	public void onDisable() {
-		this._commandHandler = null;
+		this._commandHandlerOld = null;
+		this._commandSyntax = null;
 		this._eventListener = null;
 		instances.remove(getName());
 	}
-	
+
 	public static EithonPlugin getByName(String name) {
 		return instances.get(name);
 	}
@@ -78,7 +115,7 @@ public class EithonPlugin extends JavaPlugin implements Listener {
 	public Configuration getConfiguration() { return this._config; }
 
 	public Logger getEithonLogger() { return this._logger; }
-	
+
 	public File getDataFile(String fileName) {
 		return FileMisc.getPluginDataFile(this, fileName);
 	}

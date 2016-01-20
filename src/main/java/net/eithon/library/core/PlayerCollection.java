@@ -14,6 +14,7 @@ import java.util.function.Predicate;
 
 import net.eithon.library.extensions.EithonPlayer;
 
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 public class PlayerCollection<T> implements Iterable<T>, Serializable {
@@ -28,7 +29,13 @@ public class PlayerCollection<T> implements Iterable<T>, Serializable {
 		UUID id = eithonPlayer.getUniqueId();
 		put(id, info);
 	}
+	
 	public void put(Player player, T info) {
+		UUID id = player.getUniqueId();
+		put(id, info);
+	}
+	
+	public void put(OfflinePlayer player, T info) {
 		UUID id = player.getUniqueId();
 		put(id, info);
 	}
@@ -42,6 +49,11 @@ public class PlayerCollection<T> implements Iterable<T>, Serializable {
 		return get(id);
 	}
 
+	public T get(OfflinePlayer player) {
+		UUID id = player.getUniqueId();
+		return get(id);
+	}
+
 	public T get(Player player) {
 		UUID id = player.getUniqueId();
 		return get(id);
@@ -49,6 +61,16 @@ public class PlayerCollection<T> implements Iterable<T>, Serializable {
 
 	public T get(UUID playerId) {
 		return this.playerInfo.get(playerId);
+	}
+
+	public boolean hasInformation(EithonPlayer player) {
+		UUID id = player.getUniqueId();
+		return hasInformation(id);
+	}
+
+	public boolean hasInformation(OfflinePlayer player) {
+		UUID id = player.getUniqueId();
+		return hasInformation(id);
 	}
 
 	public boolean hasInformation(Player player) {
@@ -61,6 +83,11 @@ public class PlayerCollection<T> implements Iterable<T>, Serializable {
 	}
 
 	public void remove(EithonPlayer player) {
+		UUID id = player.getUniqueId();
+		remove(id);
+	}
+
+	public void remove(OfflinePlayer player) {
 		UUID id = player.getUniqueId();
 		remove(id);
 	}

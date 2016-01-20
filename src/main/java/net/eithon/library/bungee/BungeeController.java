@@ -12,7 +12,7 @@ import org.json.simple.JSONObject;
 
 public class BungeeController {
 
-	static BungeeListener bungeeListener;
+	private BungeeListener _bungeeListener;
 	private BungeeSender _bungeeSender;
 	private EithonPlugin _eithonPlugin;
 	private String _serverName;
@@ -21,20 +21,25 @@ public class BungeeController {
 		this._eithonPlugin = eithonPlugin;
 		createBungeeSender(eithonPlugin);
 		createBungeeListener(eithonPlugin);
-		this._bungeeSender.getServer();
 	}
 
 	public void createBungeeSender(EithonPlugin eithonPlugin) {
 		eithonPlugin.getServer().getMessenger().registerOutgoingPluginChannel(eithonPlugin, "BungeeCord");
-		this._bungeeSender = new BungeeSender(eithonPlugin);
+		this._bungeeSender = new BungeeSender(eithonPlugin, this);
 	}
 
 	private void createBungeeListener(EithonPlugin eithonPlugin) {
-		bungeeListener = new BungeeListener(eithonPlugin, this);
-		eithonPlugin.getServer().getMessenger().registerIncomingPluginChannel(eithonPlugin, "BungeeCord", bungeeListener);
+		this._bungeeListener = new BungeeListener(eithonPlugin, this);
+		eithonPlugin.getServer().getMessenger().registerIncomingPluginChannel(eithonPlugin, "BungeeCord", this._bungeeListener);
 	}
 
-	public String getServerName() { return this._serverName; }
+	public void initialize() {
+		this._bungeeSender.getServer();
+	}
+
+	public String getBungeeServerName() { return this._serverName; }
+	public String getMinecraftServerName() { return this._eithonPlugin.getServer().getServerName(); }
+	
 
 	void setServerName(String serverName) { this._serverName = serverName; }
 
@@ -67,7 +72,7 @@ public class BungeeController {
 			verbose("sendEventToServer", "targetServerName NULL, Leave");
 			return false;
 		}
-		String thisServerName = this.getServerName();
+		String thisServerName = this.getBungeeServerName();
 		EithonBungeeEvent info = new EithonBungeeEvent(thisServerName, name, jsonObject);
 		boolean success = this._bungeeSender.forward(targetServerName, "CallEvent", info, rejectOld);
 		verbose("sendEventToServer", String.format("Leave, success=%s", success ? "TRUE" : "FALSE"));
@@ -82,7 +87,7 @@ public class BungeeController {
 		}
 		String mainGroup = getHighestGroup(player);
 		verbose("joinQuitEvent", String.format("mainGroup=%s", mainGroup));
-		String serverName = getServerName();
+		String serverName = getBungeeServerName();
 		verbose("joinQuitEvent", String.format("serverName=%s", serverName));
 		JoinQuitInfo info = new JoinQuitInfo(serverName, player.getUniqueId(), player.getName(), mainGroup);
 		boolean success = this._bungeeSender.forwardToAll(eventName, info, true);
@@ -101,6 +106,35 @@ public class BungeeController {
 			}
 		}
 		return null;
+	}
+
+	public void simulateSendPluginMessage(BungeeController receiverServer, Player player, byte[] message) {
+		MessageOut messageOut;
+		MessageIn messageIn = new MessageIn(message);
+		String subchannel = messageIn.readString();
+		if (subchannel.equals("Forward")) {
+			String destinationServer = messageIn.readString();
+			String pluginChannel = messageIn.readString();
+			byte[] body = messageIn.readByteArray();
+			messageOut = new MessageOut()
+			.add(pluginChannel)
+			.add(body);
+		} else if (subchannel.equals("GetServer")) {
+			final String serverName = this.getMinecraftServerName();
+			final String targetServerName = String.format("bungee_%s", serverName);
+			messageOut = new MessageOut()
+			.add(subchannel)
+			.add(targetServerName);
+		} else {
+			messageOut = new MessageOut()
+			.add(message);
+		}
+		receiverServer.simulateReceivePluginMessage(player, messageOut);
+	}
+
+	private void simulateReceivePluginMessage(Player player,
+			MessageOut messageOut) {
+		this._bungeeListener.onPluginMessageReceived("BungeeCord", player, messageOut.toByteArray());
 	}
 
 	private void verbose(String method, String format, Object... args) {
