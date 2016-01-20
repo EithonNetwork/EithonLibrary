@@ -1,6 +1,8 @@
 package net.eithon.library.test.command;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import net.eithon.library.command.CommandSyntaxException;
@@ -106,8 +108,18 @@ class Support {
 		if (acceptsAnyValue) list.add("...");
 		return list.toArray(new String[0]);
 	}
+	
+	static String[] split(String command) {
+		String[] array = command.split(" ");
+		List<String> list = new ArrayList<String>();
+		list.addAll(Arrays.asList(array));
+		if (command.matches(".* $")) {
+			list.add("");
+		}
+		return list.toArray(new String[0]);
+	}
 
 	static EithonCommand createEithonCommand(final ICommandSyntax root, final String command) {
-		return new EithonCommand(root, null, null, "alias", command.split(" "));
+		return new EithonCommand(root, null, null, "alias", split(command));
 	}
 }

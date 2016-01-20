@@ -92,36 +92,35 @@ public class EithonCommand {
 	}
 
 	public List<String> tabComplete(CommandSyntax commandSyntax, Queue<String> argumentQueue) {
+		if (argumentQueue.isEmpty()) throw new IllegalArgumentException("argumentQueue unexpectedly was empty");
 		if (commandSyntax.hasSubCommands()) {
 			String command = argumentQueue.poll();
-			if ((command == null) || command.isEmpty()) return commandSyntax.getSubCommands();
-			CommandSyntax subCommandSyntax = commandSyntax.getSubCommand(command);
-			if (subCommandSyntax != null) return tabComplete(subCommandSyntax, argumentQueue);
 			if (argumentQueue.isEmpty()) {
 				List<String> found = findPartialMatches(command, commandSyntax.getSubCommands());
-				if (!found.isEmpty()) return found;
+				return found;
 			}
+			CommandSyntax subCommandSyntax = commandSyntax.getSubCommand(command);
+			if (subCommandSyntax != null) return tabComplete(subCommandSyntax, argumentQueue);
 			sendMessage(String.format("Unexpected sub command: %s", command));
 			return null;
 		}
 
 		for (ParameterSyntax parameterSyntax : commandSyntax.getParameterSyntaxList()) {
 			String argument = argumentQueue.poll();
-			if ((argument == null) || argument.isEmpty()) {
-				if (this._displayHints) return getHintAsList(parameterSyntax);
+			boolean hintGiven = false;
+			String hint = parameterSyntax.getHint();
+			if ((hint != null) && hint.contains(argument)) {
+				hintGiven = true;
+				argument = argumentQueue.poll();
+				if (argument == null) return getHintAsList(parameterSyntax);
+			}
+			if (argument.isEmpty()) {
+				if (this._displayHints && !hintGiven) return getHintAsList(parameterSyntax);
 				else return parameterSyntax.getValidValues(this);
 			}
-			if (argument.equals(parameterSyntax.getHint())) argument = argumentQueue.poll();
-			if ((argument == null) || argument.isEmpty()) return parameterSyntax.getValidValues(this);
 			if (argumentQueue.isEmpty()) {
 				List<String> found = findPartialMatches(argument, parameterSyntax.getValidValues(this));
-				if (!found.isEmpty()) return found;			
-			}
-			try {
-				parameterSyntax.parseArguments(this, argument, null);
-			} catch (CommandSyntaxException e) {
-				sendMessage(e.getMessage());
-				return null;
+				return found;			
 			}
 		}
 		return null;

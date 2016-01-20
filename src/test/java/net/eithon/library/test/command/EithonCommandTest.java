@@ -272,7 +272,7 @@ public class EithonCommandTest {
 		// Prepare
 		final String commandName = "sub";
 		final String commandSyntax = "sub <parameter {113, 4477,...}>";
-		final String command = "sub (parameter)";
+		final String command = "sub (parameter) ";
 		ICommandSyntax root = EithonCommand.createRootCommand("root");
 		ICommandSyntax sub = null;
 		try {
@@ -302,7 +302,7 @@ public class EithonCommandTest {
 		// Prepare
 		final String commandName = "sub";
 		final String commandSyntax = "sub <parameter {113, 4477,...}>";
-		final String command = "sub";
+		final String command = "sub ";
 		ICommandSyntax root = EithonCommand.createRootCommand("root");
 		ICommandSyntax sub = null;
 		try {
@@ -346,8 +346,7 @@ public class EithonCommandTest {
 		
 		// Verify
 		Assert.assertNotNull(list);
-		Assert.assertEquals(1, list.size());
-		Assert.assertEquals("(item) ", list.get(0));
+		Assert.assertEquals(0, list.size());
 	}
 
 	@Test
@@ -391,7 +390,7 @@ public class EithonCommandTest {
 		sub = root.getSubCommand(commandName);
 		
 		// Do
-		EithonCommand ec = Support.createEithonCommand(root, "buy Eithon gold");
+		EithonCommand ec = Support.createEithonCommand(root, "buy Eithon gold ");
 		List<String> list = ec.tabComplete();
 		
 		// Verify
@@ -422,6 +421,32 @@ public class EithonCommandTest {
 	}
 
 	@Test
+	public void subpartOfHint() 
+	{
+		// Prepare
+		final String commandName = "freeze";
+		final String commandSyntax = "freeze <player>";
+		ICommandSyntax root = EithonCommand.createRootCommand("eithonfixes");
+		ICommandSyntax sub = null;
+		try {
+			root.parseCommandSyntax(commandSyntax);
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+		sub = root.getSubCommand(commandName);		
+		sub.setCommandExecutor(ec -> Assert.assertNotNull(ec));
+		
+		// Do
+		EithonCommand ec = Support.createEithonCommand(root, "freeze (play");
+		List<String> list = ec.tabComplete();
+		
+		// Verify
+		Assert.assertNotNull(list);
+		Assert.assertEquals(1, list.size());
+		Assert.assertEquals("(player) ", list.get(0));
+	}
+
+	@Test
 	public void repeatedTabs() 
 	{
 		// Prepare
@@ -438,7 +463,7 @@ public class EithonCommandTest {
 		sub.setCommandExecutor(ec -> Assert.assertNotNull(ec));
 		
 		// Do
-		EithonCommand ec = Support.createEithonCommand(root, "freeze");
+		EithonCommand ec = Support.createEithonCommand(root, "freeze ");
 		List<String> list = ec.tabComplete();
 		
 		// Verify
