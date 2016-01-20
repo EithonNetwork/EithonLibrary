@@ -13,7 +13,7 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
-### 3.7 (2016-01-19)
+### 3.7 (2016-01-20)
 
 * NEW: Added asEithonPlayer() and asOfflinePlayer() to the command argument class.
 * CHANGE: Now uses ':' as an alternative to '=' for named parameters
