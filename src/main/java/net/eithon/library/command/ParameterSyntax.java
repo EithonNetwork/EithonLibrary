@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 import net.eithon.library.time.TimeMisc;
 
-class ParameterSyntax implements IParameterSyntaxAdvanced {
+class ParameterSyntax extends Syntax implements IParameterSyntaxAdvanced {
 	private static String parameterName = "([^:{]+)";
 	private static String type = "([^{]+)";
 	private static String valueList = "([^}]+)";
@@ -25,7 +25,6 @@ class ParameterSyntax implements IParameterSyntaxAdvanced {
 	private String _defaultValue;
 	private boolean _acceptsAnyValue;
 	private DefaultGetter _defaultGetter;
-	private String _name;
 
 	public static ParameterSyntax parseSyntax(String leftSide, String parameter) throws CommandSyntaxException {
 		Matcher matcher = insideParameterPattern.matcher(parameter);
@@ -63,7 +62,7 @@ class ParameterSyntax implements IParameterSyntaxAdvanced {
 	}
 
 	ParameterSyntax(String parameterName, ParameterType type, String leftHandName) {
-		this._name = parameterName;
+		super(parameterName);
 		this._leftHandName = leftHandName;
 		this._type = type;
 		this._isNamed = leftHandName != null;
@@ -73,7 +72,6 @@ class ParameterSyntax implements IParameterSyntaxAdvanced {
 		this._validValues = new ArrayList<String>();
 	}
 
-	public String getName() { return this._name; }
 	public boolean getIsOptional() { return this._isOptional; }
 	public boolean getAcceptsAnyValue() { return this._acceptsAnyValue; }
 	public String getDefault() { return this._defaultValue; }
@@ -225,7 +223,7 @@ class ParameterSyntax implements IParameterSyntaxAdvanced {
 	@Override
 	public IParameterSyntaxAdvanced getAdvancedMethods() { return this; }
 
-	public String getHint() { return String.format("(%s)", this._name); } 
+	public String getHint() { return String.format("(%s)", getName()); } 
 }
 
 class ValueListSyntax {
