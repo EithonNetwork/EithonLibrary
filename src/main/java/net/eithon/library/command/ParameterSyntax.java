@@ -83,16 +83,20 @@ class ParameterSyntax extends Syntax implements IParameterSyntaxAdvanced {
 	@Override
 	public ParameterSyntax setDisplayHint(boolean displayHint) { return (ParameterSyntax) super.setDisplayHint(displayHint); }
 
-	public IParameterSyntax setDefaultValue(DefaultGetter defaultGetter) {
+	public IParameterSyntax setDefaultGetter(DefaultGetter defaultGetter) {
 		this._defaultGetter = defaultGetter;
 		return this;
 	} 
 
 
-	public void setDefault(String defaultValue) {
+	public ParameterSyntax setDefault(String defaultValue) {
 		this._isOptional = defaultValue != null;
 		this._defaultValue = defaultValue;
+		return this;
 	}
+
+	public ParameterSyntax setDefault(long defaultValue) { return setDefault(Long.toString(defaultValue)); }
+	public ParameterSyntax setDefault(double defaultValue) { return setDefault(Double.toString(defaultValue)); }
 
 	public IParameterSyntax setMandatoryValues(ValueGetter valueGetter) {
 		this._valueGetter = valueGetter;

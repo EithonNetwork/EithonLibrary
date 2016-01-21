@@ -1,9 +1,13 @@
 package net.eithon.library.time;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import net.eithon.library.core.PlayerCollection;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.entity.Player;
 
 public class CoolDown {
@@ -89,6 +93,11 @@ public class CoolDown {
 			this._players.put(player, coolDownInfo);
 		}
 		coolDownInfo.addIncidentIfAllowed();
+	}
+	
+	public List<Player> getPlayers() {
+		Server server = Bukkit.getServer();
+		return this._players.getPlayers().stream().map(id->server.getPlayer(id)).collect(Collectors.toList());
 	}
 }
 

@@ -14,7 +14,13 @@ public interface IParameterSyntax {
 		String getDefault(EithonCommand command);
 	}
 
-	public IParameterSyntax setDefaultValue(DefaultGetter defaultGetter);
+	public IParameterSyntax setDefault(String defaultValue);
+
+	public IParameterSyntax setDefault(long defaultValue);
+
+	public IParameterSyntax setDefault(double defaultValue);
+
+	public IParameterSyntax setDefaultGetter(DefaultGetter defaultGetter);
 
 	public IParameterSyntax setExampleValues(ValueGetter valueGetter);
 
