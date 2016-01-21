@@ -14,11 +14,15 @@ public interface IParameterSyntax {
 		String getDefault(EithonCommand command);
 	}
 
-	public void setDefaultValue(DefaultGetter defaultGetter);
+	public IParameterSyntax setDefaultValue(DefaultGetter defaultGetter);
 
 	public IParameterSyntax setExampleValues(ValueGetter valueGetter);
 
 	public IParameterSyntax setMandatoryValues(ValueGetter valueGetter);
+
+	public IParameterSyntax setHint(String hint);
+
+	public IParameterSyntax setDisplayHint(boolean displayHint);
 
 	public boolean getIsOptional();
 

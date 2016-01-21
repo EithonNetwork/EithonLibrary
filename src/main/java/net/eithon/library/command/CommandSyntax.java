@@ -62,6 +62,7 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 	public CommandSyntax addKeyWord(String keyWord) {
 		CommandSyntax commandSyntax = new CommandSyntax(keyWord);
 		this._subCommands.put(keyWord, commandSyntax);
+		commandSyntax.inherit(this);
 		return commandSyntax;
 	}
 
@@ -86,6 +87,7 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 	
 	public IParameterSyntax addParameter(ParameterSyntax parameterSyntax) {
 		this._parameterSyntaxMap.add(parameterSyntax);
+		parameterSyntax.inherit(this);
 		return parameterSyntax;
 	}
 
