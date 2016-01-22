@@ -68,7 +68,7 @@ class ParameterSyntax extends Syntax implements IParameterSyntaxAdvanced {
 		this._leftHandName = leftHandName;
 		this._type = type;
 		this._isNamed = leftHandName != null;
-		this._isOptional = this._isNamed;
+		this._isOptional = this._isNamed || (type == ParameterType.REST);
 		this._valueGetter = null;
 		this._acceptsAnyValue = true;
 		this._validValues = new ArrayList<String>();
