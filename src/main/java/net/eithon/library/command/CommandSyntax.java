@@ -142,7 +142,14 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 			String parameter = matcher.group(4);
 			ParameterSyntax parameterSyntax = ParameterSyntax.parseSyntax(leftSide, parameter);
 			addParameter(parameterSyntax);
-			parseCommandSyntax(matcher.group(5), permission);
+			String rest = matcher.group(5);
+			if ((parameterSyntax.getType() == ParameterType.REST) 
+					&& (rest != null) && (rest.trim().length() > 0)) {
+				throw new CommandSyntaxException(
+						String.format("Parameter %s was of type REST, this means that it should be last, but after it came \"%s\".",
+						parameterSyntax.getName(), rest));
+			}
+			parseCommandSyntax(rest, permission);
 			return this;
 		} else {
 			// Command

@@ -220,4 +220,17 @@ public class CommandSyntaxTest {
 		Assert.assertTrue(parameterSyntax.getIsOptional());
 		
 	}
+
+	@Test
+	public void parameterRestMustBeLast() 
+	{
+
+		final ICommandSyntax root = Support.createRoot("eithonfixes");
+		ICommandSyntax sub = null;
+		try {
+			sub = root.parseCommandSyntax("sub <parameter : REST> <hidden>");
+			Assert.fail();
+		} catch (CommandSyntaxException e) {
+		}
+	}
 }
