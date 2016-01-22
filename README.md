@@ -13,9 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
-### 3.8 (2016-01-??)
+### 3.8 (2016-01-22)
 
 * NEW: Better control over command hints.
+* BUG: The REST type for command parameters didn't work
 
 ### 3.7 (2016-01-20)
 
