@@ -321,8 +321,8 @@ public class EithonCommandTest {
 		List<String> list = ec.tabComplete();
 
 		// Verify
-		Assert.assertEquals(1, list.size());
-		Assert.assertEquals("(parameter) ", list.get(0));
+		Assert.assertEquals(2, list.size());
+		Assert.assertEquals("(parameter) 113", list.get(0));
 	}
 
 	@Test

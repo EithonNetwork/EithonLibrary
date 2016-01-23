@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 3.9 (2016-01-23)
+
+* CHANGE: tabComplete now gives both the hint and a value
+
 ### 3.8 (2016-01-22)
 
 * NEW: Better control over command hints.

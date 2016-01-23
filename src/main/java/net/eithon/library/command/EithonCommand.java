@@ -31,7 +31,7 @@ public class EithonCommand {
 		this._commandSyntax = (CommandSyntax) commandSyntax;
 		this._arguments = new HashMap<String, Argument>();
 	}
-	
+
 	public static ICommandSyntax createRootCommand(String commandName) {
 		return new CommandSyntax(commandName);
 	}
@@ -125,8 +125,16 @@ public class EithonCommand {
 	}
 
 	private List<String> getHintAsList(ParameterSyntax parameterSyntax) {
+		String hintPrefix = parameterSyntax.getHint() + " ";
 		List<String> hint = new ArrayList<String>();
-		hint.add(parameterSyntax.getHint() + " ");
+		List<String> validValues = parameterSyntax.getValidValues(this);
+		if (validValues.isEmpty()) {
+			hint.add(hintPrefix);
+		} else {
+			for (String value : validValues) {
+				hint.add(hintPrefix + value);	
+			}
+		}
 		return hint;
 	}
 
