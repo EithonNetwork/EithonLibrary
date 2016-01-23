@@ -15,6 +15,7 @@ Eithon java code library for Minecraft.
 
 ### 3.9 (2016-01-23)
 
+* NEW: Added BukkitValueLists for Players, Worlds, etc.
 * CHANGE: tabComplete now gives both the hint and a value
 
 ### 3.8 (2016-01-22)

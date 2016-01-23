@@ -86,7 +86,11 @@ public class EithonCommand {
 
 	public List<String> tabComplete() {
 		Queue<String> argumentQueue = this._commandQueue;
-		return tabComplete(this._commandSyntax, argumentQueue);
+		List<String> list = tabComplete(this._commandSyntax, argumentQueue);
+		if ((list != null) && (list.size() == 1)) {
+			sendMessage(String.format("RETURN: %s", list.get(0)));
+		}
+		return list;
 	}
 
 	private List<String> tabComplete(CommandSyntax commandSyntax, Queue<String> argumentQueue) {
