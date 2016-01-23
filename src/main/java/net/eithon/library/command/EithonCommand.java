@@ -19,6 +19,7 @@ public class EithonCommand {
 	private CommandSender _sender;
 	private Queue<String> _commandQueue;
 	private CommandSyntax _commandSyntax;
+	private String _alias;
 	private HashMap<String, Argument> _arguments;
 
 	public EithonCommand(ICommandSyntax commandSyntax, CommandSender sender, Command cmd, String alias, String[] args) {
@@ -26,12 +27,13 @@ public class EithonCommand {
 			throw new IllegalArgumentException("The argument commandSyntax could not be casted to CommandSyntax");
 		}
 		this._sender = sender;
+		this._alias = alias;
 		this._commandQueue = new LinkedList<String>();
 		this._commandQueue.addAll(Arrays.asList(args));
 		this._commandSyntax = (CommandSyntax) commandSyntax;
 		this._arguments = new HashMap<String, Argument>();
 	}
-	
+
 	public static ICommandSyntax createRootCommand(String commandName) {
 		return new CommandSyntax(commandName);
 	}
@@ -39,12 +41,13 @@ public class EithonCommand {
 	public boolean execute() {
 		CommandExecutor executor = null;
 		try {
-			executor = this._commandSyntax.parseArguments(this, this._commandQueue, this._arguments);
-		} catch (CommandSyntaxException e) {
-			sendMessage(e.getMessage());
+			executor = this._commandSyntax.parseArguments(this, this._commandQueue, this._arguments, "syntax: ");
+		} catch (CommandParseException e) {
+			sendMessage(e.getSyntaxDocumentation());
+			String message = e.getMessage();
+			if (message != null) sendMessage(message);
 		}
-		if (executor == null) return false;
-		executor.execute(this);
+		if (executor != null) executor.execute(this);
 		return true;
 	}
 
@@ -86,20 +89,24 @@ public class EithonCommand {
 
 	public List<String> tabComplete() {
 		Queue<String> argumentQueue = this._commandQueue;
-		return tabComplete(this._commandSyntax, argumentQueue);
+		List<String> list = tabComplete(this._commandSyntax, argumentQueue);
+		if ((list != null) && (list.size() == 1)) {
+			sendMessage(String.format("RETURN: %s", list.get(0)));
+		}
+		return list;
 	}
 
-	public List<String> tabComplete(CommandSyntax commandSyntax, Queue<String> argumentQueue) {
+	private List<String> tabComplete(CommandSyntax commandSyntax, Queue<String> argumentQueue) {
 		if (argumentQueue.isEmpty()) throw new IllegalArgumentException("argumentQueue unexpectedly was empty");
 		if (commandSyntax.hasSubCommands()) {
-			String command = argumentQueue.poll();
+			String keyWord = argumentQueue.poll();
 			if (argumentQueue.isEmpty()) {
-				List<String> found = findPartialMatches(command, commandSyntax.getSubCommands());
+				List<String> found = findPartialMatches(keyWord, commandSyntax.getKeyWordList());
 				return found;
 			}
-			CommandSyntax subCommandSyntax = commandSyntax.getSubCommand(command);
+			CommandSyntax subCommandSyntax = commandSyntax.getSubCommand(keyWord);
 			if (subCommandSyntax != null) return tabComplete(subCommandSyntax, argumentQueue);
-			sendMessage(String.format("Unexpected sub command: %s", command));
+			sendMessage(String.format("Unexpected key word: %s", keyWord));
 			return null;
 		}
 
@@ -125,8 +132,16 @@ public class EithonCommand {
 	}
 
 	private List<String> getHintAsList(ParameterSyntax parameterSyntax) {
+		String hintPrefix = parameterSyntax.getHint() + " ";
 		List<String> hint = new ArrayList<String>();
-		hint.add(parameterSyntax.getHint() + " ");
+		List<String> validValues = parameterSyntax.getValidValues(this);
+		if (validValues.isEmpty()) {
+			hint.add(hintPrefix);
+		} else {
+			for (String value : validValues) {
+				hint.add(hintPrefix + value);	
+			}
+		}
 		return hint;
 	}
 

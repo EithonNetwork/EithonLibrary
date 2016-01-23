@@ -10,18 +10,29 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class EithonCommandTest {
+	private boolean _hasExecuted;
+	private int _executeNumber;
+
+	private boolean getHasExecuted() { return this._hasExecuted;	}
+	private int getExecuteNumber() { return this._executeNumber;	}
+
+	private void setHasExecuted(boolean hasExecuted) { this._hasExecuted = hasExecuted; }
+	private void setExecuteNumber(int executeNumber) { this._executeNumber = executeNumber; }
+	
 	@Test
 	public void rootOnly() 
 	{
 		// Prepare
 		ICommandSyntax root = Support.createRoot("root");
+		root.setCommandExecutor(ec -> {Assert.assertNotNull(ec);setHasExecuted(true);});
 
 		// Do
-		root.setCommandExecutor(ec -> Assert.assertNotNull(ec));
 		EithonCommand command = new EithonCommand(root, null, null, "alias", new String[] {"root"});
 
 		// Verify
+		setHasExecuted(false);
 		Assert.assertTrue(command.execute());
+		Assert.assertTrue(getHasExecuted());
 	}
 
 	@Test
@@ -41,11 +52,13 @@ public class EithonCommandTest {
 		sub = root.getSubCommand(commandName);
 
 		// Do
-		sub.setCommandExecutor(ec -> Assert.assertNotNull(ec));
+		sub.setCommandExecutor(ec -> {Assert.assertNotNull(ec); setHasExecuted(true);});
 		EithonCommand ec = Support.createEithonCommand(root, command);
 
 		// Verify
+		setHasExecuted(false);
 		Assert.assertTrue(ec.execute());
+		Assert.assertTrue(getHasExecuted());
 	}
 
 	@Test
@@ -68,11 +81,14 @@ public class EithonCommandTest {
 		sub.setCommandExecutor(ec -> {
 			Assert.assertNotNull(ec);
 			Assert.assertEquals("a", ec.getArgument("parameter").asString());
+			setHasExecuted(true);
 		});
 		EithonCommand ec = Support.createEithonCommand(root, command);
 
 		// Verify
+		setHasExecuted(false);
 		Assert.assertTrue(ec.execute());
+		Assert.assertTrue(getHasExecuted());
 	}
 
 	@Test
@@ -95,11 +111,14 @@ public class EithonCommandTest {
 		sub.setCommandExecutor(ec -> {
 			Assert.assertNotNull(ec);
 			Assert.assertEquals(37, ec.getArgument("parameter").asInteger());
+			setHasExecuted(true);
 		});
 		EithonCommand ec = Support.createEithonCommand(root, command);
 
 		// Verify
+		setHasExecuted(false);
 		Assert.assertTrue(ec.execute());
+		Assert.assertTrue(getHasExecuted());
 	}
 
 	@Test
@@ -122,11 +141,14 @@ public class EithonCommandTest {
 		sub.setCommandExecutor(ec -> {
 			Assert.assertNotNull(ec);
 			Assert.assertEquals(42, ec.getArgument("parameter").asInteger());
+			setHasExecuted(true);
 		});
 		EithonCommand ec = Support.createEithonCommand(root, command);
 
 		// Verify
+		setHasExecuted(false);
 		Assert.assertTrue(ec.execute());
+		Assert.assertTrue(getHasExecuted());
 	}
 
 	@Test
@@ -149,11 +171,14 @@ public class EithonCommandTest {
 		sub.setCommandExecutor(ec -> {
 			Assert.assertNotNull(ec);
 			Assert.assertEquals(113, ec.getArgument("parameter").asInteger());
+			setHasExecuted(true);
 		});
 		EithonCommand ec = Support.createEithonCommand(root, command);
 
 		// Verify
+		setHasExecuted(false);
 		Assert.assertTrue(ec.execute());
+		Assert.assertTrue(getHasExecuted());
 	}
 
 	@Test
@@ -176,11 +201,14 @@ public class EithonCommandTest {
 		sub.setCommandExecutor(ec -> {
 			Assert.assertNotNull(ec);
 			Assert.assertEquals(4477, ec.getArgument("parameter").asInteger());
+			setHasExecuted(true);
 		});
 		EithonCommand ec = Support.createEithonCommand(root, command);
 
 		// Verify
+		setHasExecuted(false);
 		Assert.assertTrue(ec.execute());
+		Assert.assertTrue(getHasExecuted());
 	}
 
 	@Test
@@ -203,11 +231,14 @@ public class EithonCommandTest {
 		sub.setCommandExecutor(ec -> {
 			Assert.assertNotNull(ec);
 			Assert.assertEquals(2, ec.getArgument("parameter").asInteger());
+			setHasExecuted(true);
 		});
 		EithonCommand ec = Support.createEithonCommand(root, command);
 
 		// Verify
+		setHasExecuted(false);
 		Assert.assertTrue(ec.execute());
+		Assert.assertTrue(getHasExecuted());
 	}
 
 	@Test
@@ -227,15 +258,14 @@ public class EithonCommandTest {
 		sub = root.getSubCommand(commandName);
 
 		// Do
-		sub.setCommandExecutor(ec -> {
-			Assert.assertNotNull(ec);
-			Assert.assertEquals(3, ec.getArgument("parameter").asInteger());
-		});
+		sub.setCommandExecutor(ec -> setHasExecuted(true));
 
 		EithonCommand ec = Support.createEithonCommand(root, command);
 
 		// Verify
-		Assert.assertFalse(ec.execute());
+		setHasExecuted(false);
+		Assert.assertTrue(ec.execute());
+		Assert.assertFalse(this.getHasExecuted());
 	}
 
 	@Test
@@ -258,12 +288,15 @@ public class EithonCommandTest {
 		sub.setCommandExecutor(ec -> {
 			Assert.assertNotNull(ec);
 			Assert.assertEquals(2, ec.getArgument("parameter").asInteger());
+			setHasExecuted(true);
 		});
 
 		EithonCommand ec = Support.createEithonCommand(root, command);
 
 		// Verify
+		setHasExecuted(false);
 		Assert.assertTrue(ec.execute());
+		Assert.assertTrue(getHasExecuted());
 	}
 
 	@Test
@@ -321,8 +354,8 @@ public class EithonCommandTest {
 		List<String> list = ec.tabComplete();
 
 		// Verify
-		Assert.assertEquals(1, list.size());
-		Assert.assertEquals("(parameter) ", list.get(0));
+		Assert.assertEquals(2, list.size());
+		Assert.assertEquals("(parameter) 113", list.get(0));
 	}
 
 	@Test
@@ -488,20 +521,112 @@ public class EithonCommandTest {
 
 		// blacklist add
 		try {
-			root.parseCommandSyntax("blacklist <profanity> <is-literal : BOOLEAN {_true_, false}> <synonyms:REST>");
+			root.parseCommandSyntax("blacklist add <profanity> <is-literal : BOOLEAN {_true_, false}> <synonyms:REST>");
 		} catch (CommandSyntaxException e) {
 			Assert.fail();
 		}
-		ICommandSyntax blacklist = root.getSubCommand("blacklist");		
-		blacklist.setCommandExecutor(ec -> {
+		ICommandSyntax add = root.getSubCommand("blacklist").getSubCommand("add");		
+		add.setCommandExecutor(ec -> {
 			String rest = ec.getArgument("synonyms").asString();
 			Assert.assertNotNull(rest);
 			Assert.assertEquals("snurgel snargel", rest);
+			setHasExecuted(true);
 		});
 
 		// Do & Verify
-		EithonCommand ec = Support.createEithonCommand(root, "add snigel true snurgel snargel");
+		EithonCommand ec = Support.createEithonCommand(root, "blacklist add snigel true snurgel snargel");
 		Assert.assertNotNull(ec);
-		ec.execute();
+		setHasExecuted(false);
+		Assert.assertTrue(ec.execute());
+		Assert.assertTrue(getHasExecuted());
+	}
+
+	@Test
+	public void tabAfterEnd() 
+	{
+		// Prepare
+		ICommandSyntax root = EithonCommand.createRootCommand("root");
+
+		// blacklist add
+		try {
+			root.parseCommandSyntax("buy <amount : INTEGER {0,1,2,3,4}>");
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+		root.getSubCommand("buy")
+		.setCommandExecutor(ec -> {
+			int amount = ec.getArgument("amount").asInteger();
+			Assert.assertEquals(3, amount);
+		});
+
+		// Do & Verify
+		EithonCommand ec = Support.createEithonCommand(root, "buy (amount) 3 ");
+		Assert.assertNotNull(ec);
+		List<String> list = ec.tabComplete();
+		Assert.assertNull(list);
+	}
+
+	@Test
+	public void tabAfterNonCommand() 
+	{
+		// Prepare
+		ICommandSyntax root = EithonCommand.createRootCommand("root");
+
+		// blacklist add
+		try {
+			root.parseCommandSyntax("buy <amount : INTEGER {0,1,2,3,4}>");
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+		root.getSubCommand("buy")
+		.setCommandExecutor(ec -> {
+			int amount = ec.getArgument("amount").asInteger();
+			Assert.assertEquals(3, amount);
+		});
+
+		// Do & Verify
+		EithonCommand ec = Support.createEithonCommand(root, "wrong ");
+		Assert.assertNotNull(ec);
+		List<String> list = ec.tabComplete();
+		Assert.assertNull(list);
+	}
+
+	@Test
+	public void ambigousCommand() 
+	{
+		// Prepare
+		ICommandSyntax root = EithonCommand.createRootCommand("eithonfixes");
+		try {
+			root.parseCommandSyntax("restart <timespan : TIME_SPAN>");
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+		try {
+			root.parseCommandSyntax("restart cancel");
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+		ICommandSyntax one = root.getSubCommand("restart");		
+		ICommandSyntax two = one.getSubCommand("cancel");		
+		one.setCommandExecutor(ec -> {Assert.assertNotNull(ec); setExecuteNumber(1);});		
+		two.setCommandExecutor(ec -> {Assert.assertNotNull(ec); setExecuteNumber(2);});
+
+		// Do
+		EithonCommand ec = Support.createEithonCommand(root, "restart 10m");
+		Assert.assertNotNull(ec);
+
+		// Verify
+		setExecuteNumber(0);
+		Assert.assertTrue(ec.execute());
+		//Assert.assertEquals(1, getExecuteNumber());
+		
+		// Do
+		ec = Support.createEithonCommand(root, "restart cancel");
+		Assert.assertNotNull(ec);
+
+		// Verify
+		setExecuteNumber(0);
+		Assert.assertTrue(ec.execute());
+		Assert.assertEquals(2, getExecuteNumber());
 	}
 }

@@ -13,6 +13,13 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 3.9 (2016-01-23)
+
+* NEW: Added syntax support when parsing of a user command failed.
+* NEW: Added BukkitValueLists for Players, Worlds, etc.
+* CHANGE: tabComplete now gives both the hint and a value
+* BUG: Now handles REST arguments.
+
 ### 3.8 (2016-01-22)
 
 * NEW: Better control over command hints.
