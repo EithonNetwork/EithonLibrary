@@ -100,21 +100,34 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 		this._permission = permission;
 	}
 
-	public CommandExecutor parseArguments(EithonCommand command, Queue<String> argumentQueue, HashMap<String, Argument> collectedArguments) throws CommandSyntaxException {
+	public CommandExecutor parseArguments(EithonCommand command, Queue<String> argumentQueue, HashMap<String, Argument> collectedArguments, String commandLineSofar) 
+			throws CommandParseException {
 		if (hasSubCommands()) {
 			String keyWord = argumentQueue.poll();
 			CommandSyntax commandSyntax = getSubCommand(keyWord);
 			if (commandSyntax == null) {
-				throw new CommandSyntaxException(String.format("Unexpected key word: %s", keyWord));
+				throw new CommandParseException(this.getSyntaxString(commandLineSofar),
+						keyWord == null ? null : String.format("Unexpected key word: %s", keyWord));
 			}
-			return commandSyntax.parseArguments(command, argumentQueue, collectedArguments);
+			commandLineSofar = commandLineSofar + " " + this.getName();
+			return commandSyntax.parseArguments(command, argumentQueue, collectedArguments, commandLineSofar);
 		}
 
-		for (ParameterSyntax parameterSyntax : this._parameterSyntaxList) {
+		for (ParameterSyntax parameterSyntax : this._parameterSyntaxList) {	
 			String argument = null;
-			if (!argumentQueue.isEmpty()) argument = argumentQueue.poll();
-			argument = skipHint(argumentQueue, parameterSyntax, argument);
-			parameterSyntax.parseArguments(command, argument, collectedArguments);
+			if (!argumentQueue.isEmpty()) {
+				if (parameterSyntax.getType() == ParameterType.REST) {
+					argument = argumentQueue.stream().reduce((a, b) -> String.format("%s %s", a, b)).get();
+				} else {
+					argument = argumentQueue.poll();
+					argument = skipHint(argumentQueue, parameterSyntax, argument);
+				}
+			}
+			try {
+				parameterSyntax.parseArguments(command, argument, collectedArguments);
+			} catch (ArgumentParseException e) {
+				throw new CommandParseException(this.getSyntaxString(commandLineSofar), e.getMessage());
+			}
 		}
 		return this._commandExecutor;
 	}
@@ -200,6 +213,33 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 			}
 			commandLineList.add(soFar.toString().trim());
 		}
+	}
+
+	public String getSyntaxString(String beginning) {
+		StringBuilder soFar = new StringBuilder(beginning);
+		soFar.append(" ");
+		soFar.append(this.getName());
+		if (hasSubCommands()) {
+			soFar.append(" ");
+			String[] subCommands = this._subCommandMap
+					.values()
+					.stream()
+					.map(sc -> sc.getName())
+					.sorted()
+					.collect(Collectors.toList())
+					.toArray(new String[0]);
+			soFar.append(String.join(" | ", subCommands));
+		} else if (hasParameters()) {
+			soFar.append(" ");
+			String[] parameters = this._parameterSyntaxList
+					.stream()
+					.map(p -> p.getSyntaxString())
+					.sorted()
+					.collect(Collectors.toList())
+					.toArray(new String[0]);
+			soFar.append(String.join(" ", parameters));
+		}
+		return soFar.toString();
 	}
 
 	@Override

@@ -19,6 +19,7 @@ public class EithonCommand {
 	private CommandSender _sender;
 	private Queue<String> _commandQueue;
 	private CommandSyntax _commandSyntax;
+	private String _alias;
 	private HashMap<String, Argument> _arguments;
 
 	public EithonCommand(ICommandSyntax commandSyntax, CommandSender sender, Command cmd, String alias, String[] args) {
@@ -26,6 +27,7 @@ public class EithonCommand {
 			throw new IllegalArgumentException("The argument commandSyntax could not be casted to CommandSyntax");
 		}
 		this._sender = sender;
+		this._alias = alias;
 		this._commandQueue = new LinkedList<String>();
 		this._commandQueue.addAll(Arrays.asList(args));
 		this._commandSyntax = (CommandSyntax) commandSyntax;
@@ -39,12 +41,13 @@ public class EithonCommand {
 	public boolean execute() {
 		CommandExecutor executor = null;
 		try {
-			executor = this._commandSyntax.parseArguments(this, this._commandQueue, this._arguments);
-		} catch (CommandSyntaxException e) {
-			sendMessage(e.getMessage());
+			executor = this._commandSyntax.parseArguments(this, this._commandQueue, this._arguments, "syntax: ");
+		} catch (CommandParseException e) {
+			sendMessage(e.getSyntaxDocumentation());
+			String message = e.getMessage();
+			if (message != null) sendMessage(message);
 		}
-		if (executor == null) return false;
-		executor.execute(this);
+		if (executor != null) executor.execute(this);
 		return true;
 	}
 
@@ -96,14 +99,14 @@ public class EithonCommand {
 	private List<String> tabComplete(CommandSyntax commandSyntax, Queue<String> argumentQueue) {
 		if (argumentQueue.isEmpty()) throw new IllegalArgumentException("argumentQueue unexpectedly was empty");
 		if (commandSyntax.hasSubCommands()) {
-			String command = argumentQueue.poll();
+			String keyWord = argumentQueue.poll();
 			if (argumentQueue.isEmpty()) {
-				List<String> found = findPartialMatches(command, commandSyntax.getKeyWordList());
+				List<String> found = findPartialMatches(keyWord, commandSyntax.getKeyWordList());
 				return found;
 			}
-			CommandSyntax subCommandSyntax = commandSyntax.getSubCommand(command);
+			CommandSyntax subCommandSyntax = commandSyntax.getSubCommand(keyWord);
 			if (subCommandSyntax != null) return tabComplete(subCommandSyntax, argumentQueue);
-			sendMessage(String.format("Unexpected sub command: %s", command));
+			sendMessage(String.format("Unexpected key word: %s", keyWord));
 			return null;
 		}
 

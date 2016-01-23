@@ -118,14 +118,15 @@ class ParameterSyntax extends Syntax implements IParameterSyntaxAdvanced {
 		this._validValues.addAll(values);
 	}
 
-	public void parseArguments(EithonCommand command, String argument, HashMap<String, Argument> collectedArguments) throws CommandSyntaxException {
+	public void parseArguments(EithonCommand command, String argument, HashMap<String, Argument> collectedArguments) 
+			throws ArgumentParseException {
 		Argument parameterValue = new Argument(this, argument);
 		if (argument == null) {
 			if (this._isOptional) {
 				if (collectedArguments != null) collectedArguments.put(getName(), parameterValue);
 				return;
 			}	
-			throw new CommandSyntaxException(String.format("Expected a value for argument <%s>", getName()));
+			throw new ArgumentParseException(String.format("Expected a value for argument <%s>", getName()));
 		}
 		verifyValueIsOkAccordingToType(argument);
 		if (this._acceptsAnyValue) {
@@ -144,7 +145,7 @@ class ParameterSyntax extends Syntax implements IParameterSyntaxAdvanced {
 				}
 			}
 		}
-		throw new CommandSyntaxException(String.format("The value \"%s\" was not an accepted value for argument <%s>.",
+		throw new ArgumentParseException(String.format("The value \"%s\" was not an accepted value for argument <%s>.",
 				argument, getName()));
 	}
 
@@ -171,7 +172,7 @@ class ParameterSyntax extends Syntax implements IParameterSyntaxAdvanced {
 		return this._validValues;
 	}
 
-	private boolean verifyValueIsOkAccordingToType(String argument) throws CommandSyntaxException {
+	private boolean verifyValueIsOkAccordingToType(String argument) throws ArgumentParseException {
 		try {
 			switch (this._type) {
 			case BOOLEAN:
@@ -190,7 +191,7 @@ class ParameterSyntax extends Syntax implements IParameterSyntaxAdvanced {
 				break;
 			}
 		} catch (final Exception e) {
-			throw new CommandSyntaxException(String.format("\"%s\" is not of type %s", argument, this._type.toString()));
+			throw new ArgumentParseException(String.format("\"%s\" is not of type %s", argument, this._type.toString()));
 		}
 		return true;
 	}
@@ -198,11 +199,24 @@ class ParameterSyntax extends Syntax implements IParameterSyntaxAdvanced {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder("");
-		if (!this._isNamed) sb.append(String.format("<%s", this.getName()));
-		else sb.append(String.format("%s=<%s", this._leftHandName, this.getName()));
+		if (this._isNamed) sb.append(this._leftHandName + ":");
+		sb.append(String.format("<%s", this.getName())); 
 		if (this._type != ParameterType.STRING) sb.append(String.format(" : %s", this._type.toString()));
 		if (this._validValues.size()>0) sb.append(String.format(" {%s}", validValuesAsString(true)));
 		sb.append(">");
+		return sb.toString();
+	}
+
+	public String getSyntaxString() {
+		String syntaxString = getSyntaxString2();
+		if (this._isNamed || !this._isOptional) return syntaxString;
+		return String.format("[%s]", syntaxString);
+	}
+
+	private String getSyntaxString2() {
+		StringBuilder sb = new StringBuilder("");
+		if (this._isNamed) sb.append(this._leftHandName + ":"); 
+		sb.append(String.format("<%s>", this.getName()));
 		return sb.toString();
 	}
 
