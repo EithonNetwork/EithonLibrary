@@ -203,4 +203,34 @@ public class CommandSyntaxTest {
 		
 		root.getSubCommand("buy");
 	}
+
+	@Test
+	public void parameterRest() 
+	{
+
+		final ICommandSyntax root = Support.createRoot("eithonfixes");
+		ICommandSyntax sub = null;
+		try {
+			sub = root.parseCommandSyntax("sub <parameter : REST>");
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+		IParameterSyntax parameterSyntax = sub.getParameterSyntax("parameter");
+		
+		Assert.assertTrue(parameterSyntax.getIsOptional());
+		
+	}
+
+	@Test
+	public void parameterRestMustBeLast() 
+	{
+
+		final ICommandSyntax root = Support.createRoot("eithonfixes");
+		ICommandSyntax sub = null;
+		try {
+			sub = root.parseCommandSyntax("sub <parameter : REST> <hidden>");
+			Assert.fail();
+		} catch (CommandSyntaxException e) {
+		}
+	}
 }

@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 import net.eithon.library.time.TimeMisc;
 
-class ParameterSyntax implements IParameterSyntaxAdvanced {
+class ParameterSyntax extends Syntax implements IParameterSyntaxAdvanced {
 	private static String parameterName = "([^:{]+)";
 	private static String type = "([^{]+)";
 	private static String valueList = "([^}]+)";
@@ -25,7 +25,7 @@ class ParameterSyntax implements IParameterSyntaxAdvanced {
 	private String _defaultValue;
 	private boolean _acceptsAnyValue;
 	private DefaultGetter _defaultGetter;
-	private String _name;
+	private String _hint;
 
 	public static ParameterSyntax parseSyntax(String leftSide, String parameter) throws CommandSyntaxException {
 		Matcher matcher = insideParameterPattern.matcher(parameter);
@@ -63,27 +63,40 @@ class ParameterSyntax implements IParameterSyntaxAdvanced {
 	}
 
 	ParameterSyntax(String parameterName, ParameterType type, String leftHandName) {
-		this._name = parameterName;
+		super(parameterName);
+		this._hint = getName();
 		this._leftHandName = leftHandName;
 		this._type = type;
 		this._isNamed = leftHandName != null;
-		this._isOptional = this._isNamed;
+		this._isOptional = this._isNamed || (type == ParameterType.REST);
 		this._valueGetter = null;
 		this._acceptsAnyValue = true;
 		this._validValues = new ArrayList<String>();
 	}
 
-	public String getName() { return this._name; }
 	public boolean getIsOptional() { return this._isOptional; }
 	public boolean getAcceptsAnyValue() { return this._acceptsAnyValue; }
 	public String getDefault() { return this._defaultValue; }
 	public ParameterType getType() { return this._type; }
+	public String getHint() { return String.format("(%s)", this._hint); } 
+	public ParameterSyntax setHint(String hint) { this._hint = hint; return this;}
+	@Override
+	public ParameterSyntax setDisplayHint(boolean displayHint) { return (ParameterSyntax) super.setDisplayHint(displayHint); }
+
+	public IParameterSyntax setDefaultGetter(DefaultGetter defaultGetter) {
+		this._defaultGetter = defaultGetter;
+		return this;
+	} 
 
 
-	public void setDefault(String defaultValue) {
+	public ParameterSyntax setDefault(String defaultValue) {
 		this._isOptional = defaultValue != null;
 		this._defaultValue = defaultValue;
+		return this;
 	}
+
+	public ParameterSyntax setDefault(long defaultValue) { return setDefault(Long.toString(defaultValue)); }
+	public ParameterSyntax setDefault(double defaultValue) { return setDefault(Double.toString(defaultValue)); }
 
 	public IParameterSyntax setMandatoryValues(ValueGetter valueGetter) {
 		this._valueGetter = valueGetter;
@@ -218,14 +231,7 @@ class ParameterSyntax implements IParameterSyntaxAdvanced {
 		return String.join(", ", typesAsList);
 	}
 
-	public void setDefaultValue(DefaultGetter defaultGetter) {
-		this._defaultGetter = defaultGetter;
-	}
-
-	@Override
 	public IParameterSyntaxAdvanced getAdvancedMethods() { return this; }
-
-	public String getHint() { return String.format("(%s)", this._name); } 
 }
 
 class ValueListSyntax {

@@ -4,8 +4,6 @@ import java.util.List;
 
 public interface IParameterSyntaxAdvanced extends IParameterSyntax {
 
-	public void setDefault(String defaultValue);
-
 	public void setValues(String... args);
 
 	public void setValues(List<String> values);

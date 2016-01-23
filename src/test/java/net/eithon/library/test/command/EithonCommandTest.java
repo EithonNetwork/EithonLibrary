@@ -15,11 +15,11 @@ public class EithonCommandTest {
 	{
 		// Prepare
 		ICommandSyntax root = Support.createRoot("root");
-		
+
 		// Do
 		root.setCommandExecutor(ec -> Assert.assertNotNull(ec));
 		EithonCommand command = new EithonCommand(root, null, null, "alias", new String[] {"root"});
-		
+
 		// Verify
 		Assert.assertTrue(command.execute());
 	}
@@ -39,11 +39,11 @@ public class EithonCommandTest {
 			Assert.fail();
 		}
 		sub = root.getSubCommand(commandName);
-		
+
 		// Do
 		sub.setCommandExecutor(ec -> Assert.assertNotNull(ec));
 		EithonCommand ec = Support.createEithonCommand(root, command);
-		
+
 		// Verify
 		Assert.assertTrue(ec.execute());
 	}
@@ -63,14 +63,14 @@ public class EithonCommandTest {
 			Assert.fail();
 		}
 		sub = root.getSubCommand(commandName);
-		
+
 		// Do
 		sub.setCommandExecutor(ec -> {
 			Assert.assertNotNull(ec);
 			Assert.assertEquals("a", ec.getArgument("parameter").asString());
 		});
 		EithonCommand ec = Support.createEithonCommand(root, command);
-		
+
 		// Verify
 		Assert.assertTrue(ec.execute());
 	}
@@ -90,14 +90,14 @@ public class EithonCommandTest {
 			Assert.fail();
 		}
 		sub = root.getSubCommand(commandName);
-		
+
 		// Do
 		sub.setCommandExecutor(ec -> {
 			Assert.assertNotNull(ec);
 			Assert.assertEquals(37, ec.getArgument("parameter").asInteger());
 		});
 		EithonCommand ec = Support.createEithonCommand(root, command);
-		
+
 		// Verify
 		Assert.assertTrue(ec.execute());
 	}
@@ -117,14 +117,14 @@ public class EithonCommandTest {
 			Assert.fail();
 		}
 		sub = root.getSubCommand(commandName);
-		
+
 		// Do
 		sub.setCommandExecutor(ec -> {
 			Assert.assertNotNull(ec);
 			Assert.assertEquals(42, ec.getArgument("parameter").asInteger());
 		});
 		EithonCommand ec = Support.createEithonCommand(root, command);
-		
+
 		// Verify
 		Assert.assertTrue(ec.execute());
 	}
@@ -144,14 +144,14 @@ public class EithonCommandTest {
 			Assert.fail();
 		}
 		sub = root.getSubCommand(commandName);
-		
+
 		// Do
 		sub.setCommandExecutor(ec -> {
 			Assert.assertNotNull(ec);
 			Assert.assertEquals(113, ec.getArgument("parameter").asInteger());
 		});
 		EithonCommand ec = Support.createEithonCommand(root, command);
-		
+
 		// Verify
 		Assert.assertTrue(ec.execute());
 	}
@@ -171,14 +171,14 @@ public class EithonCommandTest {
 			Assert.fail();
 		}
 		sub = root.getSubCommand(commandName);
-		
+
 		// Do
 		sub.setCommandExecutor(ec -> {
 			Assert.assertNotNull(ec);
 			Assert.assertEquals(4477, ec.getArgument("parameter").asInteger());
 		});
 		EithonCommand ec = Support.createEithonCommand(root, command);
-		
+
 		// Verify
 		Assert.assertTrue(ec.execute());
 	}
@@ -198,14 +198,14 @@ public class EithonCommandTest {
 			Assert.fail();
 		}
 		sub = root.getSubCommand(commandName);
-		
+
 		// Do
 		sub.setCommandExecutor(ec -> {
 			Assert.assertNotNull(ec);
 			Assert.assertEquals(2, ec.getArgument("parameter").asInteger());
 		});
 		EithonCommand ec = Support.createEithonCommand(root, command);
-		
+
 		// Verify
 		Assert.assertTrue(ec.execute());
 	}
@@ -225,15 +225,15 @@ public class EithonCommandTest {
 			Assert.fail();
 		}
 		sub = root.getSubCommand(commandName);
-		
+
 		// Do
 		sub.setCommandExecutor(ec -> {
 			Assert.assertNotNull(ec);
 			Assert.assertEquals(3, ec.getArgument("parameter").asInteger());
 		});
-		
+
 		EithonCommand ec = Support.createEithonCommand(root, command);
-		
+
 		// Verify
 		Assert.assertFalse(ec.execute());
 	}
@@ -253,15 +253,15 @@ public class EithonCommandTest {
 			Assert.fail();
 		}
 		sub = root.getSubCommand(commandName);
-		
+
 		// Do
 		sub.setCommandExecutor(ec -> {
 			Assert.assertNotNull(ec);
 			Assert.assertEquals(2, ec.getArgument("parameter").asInteger());
 		});
-		
+
 		EithonCommand ec = Support.createEithonCommand(root, command);
-		
+
 		// Verify
 		Assert.assertTrue(ec.execute());
 	}
@@ -281,7 +281,7 @@ public class EithonCommandTest {
 			Assert.fail();
 		}
 		sub = root.getSubCommand(commandName);
-		
+
 		// Do
 		sub.setCommandExecutor(ec -> {
 			Assert.assertNotNull(ec);
@@ -289,7 +289,7 @@ public class EithonCommandTest {
 		});
 		EithonCommand ec = Support.createEithonCommand(root, command);
 		List<String> list = ec.tabComplete();
-		
+
 		// Verify
 		Assert.assertEquals(2, list.size());
 		Assert.assertEquals("113", list.get(0));
@@ -311,7 +311,7 @@ public class EithonCommandTest {
 			Assert.fail();
 		}
 		sub = root.getSubCommand(commandName);
-		
+
 		// Do
 		sub.setCommandExecutor(ec -> {
 			Assert.assertNotNull(ec);
@@ -319,7 +319,7 @@ public class EithonCommandTest {
 		});
 		EithonCommand ec = Support.createEithonCommand(root, command);
 		List<String> list = ec.tabComplete();
-		
+
 		// Verify
 		Assert.assertEquals(1, list.size());
 		Assert.assertEquals("(parameter) ", list.get(0));
@@ -339,11 +339,11 @@ public class EithonCommandTest {
 			Assert.fail();
 		}
 		sub = root.getSubCommand(commandName);
-		
+
 		// Do
 		EithonCommand ec = Support.createEithonCommand(root, "buy Eithon");
 		List<String> list = ec.tabComplete();
-		
+
 		// Verify
 		Assert.assertNotNull(list);
 		Assert.assertEquals(0, list.size());
@@ -363,11 +363,11 @@ public class EithonCommandTest {
 			Assert.fail();
 		}
 		sub = root.getSubCommand(commandName);
-		
+
 		// Do
 		EithonCommand ec = Support.createEithonCommand(root, "buy Eithon ");
 		List<String> list = ec.tabComplete();
-		
+
 		// Verify
 		Assert.assertNotNull(list);
 		Assert.assertEquals(1, list.size());
@@ -388,11 +388,11 @@ public class EithonCommandTest {
 			Assert.fail();
 		}
 		sub = root.getSubCommand(commandName);
-		
+
 		// Do
 		EithonCommand ec = Support.createEithonCommand(root, "buy Eithon gold ");
 		List<String> list = ec.tabComplete();
-		
+
 		// Verify
 		Assert.assertNotNull(list);
 		Assert.assertEquals(1, list.size());
@@ -414,7 +414,7 @@ public class EithonCommandTest {
 		}
 		sub = root.getSubCommand(commandName);		
 		sub.setCommandExecutor(ec -> Assert.assertNotNull(ec));
-		
+
 		// Do
 		EithonCommand ec = Support.createEithonCommand(root, "freeze (player) Eithon");
 		Assert.assertTrue(ec.execute());
@@ -435,11 +435,11 @@ public class EithonCommandTest {
 		}
 		sub = root.getSubCommand(commandName);		
 		sub.setCommandExecutor(ec -> Assert.assertNotNull(ec));
-		
+
 		// Do
 		EithonCommand ec = Support.createEithonCommand(root, "freeze (play");
 		List<String> list = ec.tabComplete();
-		
+
 		// Verify
 		Assert.assertNotNull(list);
 		Assert.assertEquals(1, list.size());
@@ -461,22 +461,47 @@ public class EithonCommandTest {
 		}
 		sub = root.getSubCommand(commandName);		
 		sub.setCommandExecutor(ec -> Assert.assertNotNull(ec));
-		
+
 		// Do
 		EithonCommand ec = Support.createEithonCommand(root, "freeze ");
 		List<String> list = ec.tabComplete();
-		
+
 		// Verify
 		Assert.assertNotNull(list);
 		Assert.assertEquals(1, list.size());
 		Assert.assertEquals("(player) ", list.get(0));
-		
+
 		// Do
 		ec = Support.createEithonCommand(root, "freeze (player) ");
 		list = ec.tabComplete();
-		
+
 		// Verify
 		Assert.assertNotNull(list);
 		Assert.assertEquals(0, list.size());
+	}
+
+	@Test
+	public void manyWordsInRest() 
+	{
+		// Prepare
+		ICommandSyntax root = EithonCommand.createRootCommand("eithoncop");
+
+		// blacklist add
+		try {
+			root.parseCommandSyntax("blacklist <profanity> <is-literal : BOOLEAN {_true_, false}> <synonyms:REST>");
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+		ICommandSyntax blacklist = root.getSubCommand("blacklist");		
+		blacklist.setCommandExecutor(ec -> {
+			String rest = ec.getArgument("synonyms").asString();
+			Assert.assertNotNull(rest);
+			Assert.assertEquals("snurgel snargel", rest);
+		});
+
+		// Do & Verify
+		EithonCommand ec = Support.createEithonCommand(root, "add snigel true snurgel snargel");
+		Assert.assertNotNull(ec);
+		ec.execute();
 	}
 }
