@@ -102,15 +102,18 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 
 	public CommandExecutor parseArguments(EithonCommand command, Queue<String> argumentQueue, HashMap<String, Argument> collectedArguments, String commandLineSofar) 
 			throws CommandParseException {
+
 		if (hasSubCommands()) {
 			String keyWord = argumentQueue.poll();
 			CommandSyntax commandSyntax = getSubCommand(keyWord);
-			if (commandSyntax == null) {
-				throw new CommandParseException(this.getSyntaxString(commandLineSofar),
+			if (commandSyntax != null) {
+				commandLineSofar = commandLineSofar + " " + this.getName();
+				return commandSyntax.parseArguments(command, argumentQueue, collectedArguments, commandLineSofar);
+			}
+			if (!hasParameters()) {
+				throw new CommandParseException(getSyntaxString(commandLineSofar),
 						keyWord == null ? null : String.format("Unexpected key word: %s", keyWord));
 			}
-			commandLineSofar = commandLineSofar + " " + this.getName();
-			return commandSyntax.parseArguments(command, argumentQueue, collectedArguments, commandLineSofar);
 		}
 
 		for (ParameterSyntax parameterSyntax : this._parameterSyntaxList) {	
@@ -126,7 +129,7 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 			try {
 				parameterSyntax.parseArguments(command, argument, collectedArguments);
 			} catch (ArgumentParseException e) {
-				throw new CommandParseException(this.getSyntaxString(commandLineSofar), e.getMessage());
+				throw new CommandParseException(getSyntaxString(commandLineSofar), e.getMessage());
 			}
 		}
 		return this._commandExecutor;
@@ -180,12 +183,10 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 		if (!matcher.matches()) {
 			throw new CommandSyntaxException(String.format("Expected to find a command token here: \"%s\"", remainingPart));
 		}
-		if (hasParameters()) {
-			throw new NotImplementedException("Sub commands after parameters is not yet supported.");
-		}
 		String name = matcher.group(1);
 		String commandPermssion = permission + "." + name;
-		CommandSyntax subCommand = addKeyWord(name);
+		CommandSyntax subCommand = getSubCommand(name);
+		if (subCommand == null) subCommand = addKeyWord(name);
 		subCommand.parseCommandSyntax(matcher.group(2), commandPermssion);
 		if (!subCommand.hasSubCommands() && (permission != null)) subCommand.setPermission(commandPermssion);
 		return subCommand;

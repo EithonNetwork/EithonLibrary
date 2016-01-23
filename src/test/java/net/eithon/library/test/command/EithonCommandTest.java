@@ -11,12 +11,13 @@ import org.junit.Test;
 
 public class EithonCommandTest {
 	private boolean _hasExecuted;
+	private int _executeNumber;
 
 	private boolean getHasExecuted() { return this._hasExecuted;	}
+	private int getExecuteNumber() { return this._executeNumber;	}
 
-	private void setHasExecuted(boolean hasExecuted) {
-		this._hasExecuted = hasExecuted;
-	}
+	private void setHasExecuted(boolean hasExecuted) { this._hasExecuted = hasExecuted; }
+	private void setExecuteNumber(int executeNumber) { this._executeNumber = executeNumber; }
 	
 	@Test
 	public void rootOnly() 
@@ -588,5 +589,44 @@ public class EithonCommandTest {
 		Assert.assertNotNull(ec);
 		List<String> list = ec.tabComplete();
 		Assert.assertNull(list);
+	}
+
+	@Test
+	public void ambigousCommand() 
+	{
+		// Prepare
+		ICommandSyntax root = EithonCommand.createRootCommand("eithonfixes");
+		try {
+			root.parseCommandSyntax("restart <timespan : TIME_SPAN>");
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+		try {
+			root.parseCommandSyntax("restart cancel");
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+		ICommandSyntax one = root.getSubCommand("restart");		
+		ICommandSyntax two = one.getSubCommand("cancel");		
+		one.setCommandExecutor(ec -> {Assert.assertNotNull(ec); setExecuteNumber(1);});		
+		two.setCommandExecutor(ec -> {Assert.assertNotNull(ec); setExecuteNumber(2);});
+
+		// Do
+		EithonCommand ec = Support.createEithonCommand(root, "restart 10m");
+		Assert.assertNotNull(ec);
+
+		// Verify
+		setExecuteNumber(0);
+		Assert.assertTrue(ec.execute());
+		//Assert.assertEquals(1, getExecuteNumber());
+		
+		// Do
+		ec = Support.createEithonCommand(root, "restart cancel");
+		Assert.assertNotNull(ec);
+
+		// Verify
+		setExecuteNumber(0);
+		Assert.assertTrue(ec.execute());
+		Assert.assertEquals(2, getExecuteNumber());
 	}
 }
