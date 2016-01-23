@@ -89,12 +89,12 @@ public class EithonCommand {
 		return tabComplete(this._commandSyntax, argumentQueue);
 	}
 
-	public List<String> tabComplete(CommandSyntax commandSyntax, Queue<String> argumentQueue) {
+	private List<String> tabComplete(CommandSyntax commandSyntax, Queue<String> argumentQueue) {
 		if (argumentQueue.isEmpty()) throw new IllegalArgumentException("argumentQueue unexpectedly was empty");
 		if (commandSyntax.hasSubCommands()) {
 			String command = argumentQueue.poll();
 			if (argumentQueue.isEmpty()) {
-				List<String> found = findPartialMatches(command, commandSyntax.getSubCommands());
+				List<String> found = findPartialMatches(command, commandSyntax.getKeyWordList());
 				return found;
 			}
 			CommandSyntax subCommandSyntax = commandSyntax.getSubCommand(command);

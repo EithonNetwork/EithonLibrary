@@ -21,8 +21,8 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 	private static String keyWord = "([^ <>{}:]+)";
 	private static Pattern keyWordPattern = Pattern.compile("^" + keyWord + rest);
 
-	private ArrayList<ParameterSyntax> _parameterSyntaxMap;
-	private HashMap<String, CommandSyntax> _subCommands;
+	private ArrayList<ParameterSyntax> _parameterSyntaxList;
+	private HashMap<String, CommandSyntax> _subCommandMap;
 	private CommandExecutor _commandExecutor;
 	private String _permission;
 	private boolean _automaticPermissions;
@@ -32,22 +32,22 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 		super(name);
 		this._permission = null;
 		this._displayHints = true;
-		this._parameterSyntaxMap = new ArrayList<ParameterSyntax>();
-		this._subCommands = new HashMap<String, CommandSyntax>();
+		this._parameterSyntaxList = new ArrayList<ParameterSyntax>();
+		this._subCommandMap = new HashMap<String, CommandSyntax>();
 	}
 
-	public CommandSyntax getSubCommand(String commandName) { return this._subCommands.get(commandName); }
-	public IParameterSyntax getParameterSyntax(String parameterName) { return this._parameterSyntaxMap.stream().filter(ps -> parameterName.equals(ps.getName())).findFirst().get(); }
-	public boolean hasSubCommands() { return this._subCommands.size() > 0; }
-	public boolean hasParameters() { return this._parameterSyntaxMap.size() > 0; }
-	public List<ParameterSyntax> getParameterSyntaxList() { return this._parameterSyntaxMap.stream().collect(Collectors.toList());	}
+	public CommandSyntax getSubCommand(String commandName) { return this._subCommandMap.get(commandName); }
+	public IParameterSyntax getParameterSyntax(String parameterName) { return this._parameterSyntaxList.stream().filter(ps -> parameterName.equals(ps.getName())).findFirst().get(); }
+	public boolean hasSubCommands() { return this._subCommandMap.size() > 0; }
+	public boolean hasParameters() { return this._parameterSyntaxList.size() > 0; }
+	public List<ParameterSyntax> getParameterSyntaxList() { return this._parameterSyntaxList.stream().collect(Collectors.toList());	}
 	public boolean getDisplayHints() { return this._displayHints; }
 	public void setPermissionsAutomatically() { this._automaticPermissions = true;}
 	public String getRequiredPermission() { return this._permission; }
 
-	public List<String> getSubCommands() {
+	public List<String> getKeyWordList() {
 		ArrayList<String> subCommands = new ArrayList<String>();
-		for (String name : this._subCommands.keySet()) {
+		for (String name : this._subCommandMap.keySet()) {
 			subCommands.add(name);
 		}
 		subCommands.sort(new Comparator<String>() {
@@ -61,7 +61,7 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 
 	public CommandSyntax addKeyWord(String keyWord) {
 		CommandSyntax commandSyntax = new CommandSyntax(keyWord);
-		this._subCommands.put(keyWord, commandSyntax);
+		this._subCommandMap.put(keyWord, commandSyntax);
 		commandSyntax.inherit(this);
 		return commandSyntax;
 	}
@@ -75,6 +75,12 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 		return addParameter(parameterSyntax);
 	}
 
+	public IParameterSyntax addParameter(ParameterSyntax parameterSyntax) {
+		this._parameterSyntaxList.add(parameterSyntax);
+		parameterSyntax.inherit(this);
+		return parameterSyntax;
+	}
+
 	public IParameterSyntax addNamedParameter(String name, String leftSide) {
 		ParameterSyntax parameterSyntax = new ParameterSyntax(name, ParameterType.STRING, leftSide);
 		return addParameter(parameterSyntax);
@@ -83,12 +89,6 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 	public IParameterSyntax addNamedParameter(String name, ParameterType type, String leftSide) {
 		ParameterSyntax parameterSyntax = new ParameterSyntax(name, type, leftSide);
 		return addParameter(parameterSyntax);
-	}
-	
-	public IParameterSyntax addParameter(ParameterSyntax parameterSyntax) {
-		this._parameterSyntaxMap.add(parameterSyntax);
-		parameterSyntax.inherit(this);
-		return parameterSyntax;
 	}
 
 	public ICommandSyntax setCommandExecutor(CommandExecutor commandExecutor) {
@@ -101,16 +101,16 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 	}
 
 	public CommandExecutor parseArguments(EithonCommand command, Queue<String> argumentQueue, HashMap<String, Argument> collectedArguments) throws CommandSyntaxException {
-		if (this._subCommands.size() > 0) {
+		if (hasSubCommands()) {
 			String keyWord = argumentQueue.poll();
-			CommandSyntax commandSyntax = this._subCommands.get(keyWord);
+			CommandSyntax commandSyntax = getSubCommand(keyWord);
 			if (commandSyntax == null) {
 				throw new CommandSyntaxException(String.format("Unexpected key word: %s", keyWord));
 			}
 			return commandSyntax.parseArguments(command, argumentQueue, collectedArguments);
 		}
 
-		for (ParameterSyntax parameterSyntax : this._parameterSyntaxMap) {
+		for (ParameterSyntax parameterSyntax : this._parameterSyntaxList) {
 			String argument = null;
 			if (!argumentQueue.isEmpty()) argument = argumentQueue.poll();
 			argument = skipHint(argumentQueue, parameterSyntax, argument);
@@ -120,9 +120,9 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 	}
 
 	public String skipHint(Queue<String> argumentQueue, ParameterSyntax parameterSyntax, String argument) {
-		if ((argument != null) && !argumentQueue.isEmpty()) {
-			if (argument.equals(parameterSyntax.getHint())) argument = argumentQueue.poll();
-		}
+		if ((argument != null) 
+				&& !argumentQueue.isEmpty()
+				&& (argument.equals(parameterSyntax.getHint()))) argument = argumentQueue.poll();
 		return argument;
 	}
 
@@ -137,36 +137,45 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 
 		Matcher matcher = namedParameterPattern.matcher(remainingPart);
 		if (matcher.matches()) {
-			// Parameter
-			String leftSide = matcher.group(2);
-			String parameter = matcher.group(4);
-			ParameterSyntax parameterSyntax = ParameterSyntax.parseSyntax(leftSide, parameter);
-			addParameter(parameterSyntax);
-			String rest = matcher.group(5);
-			if ((parameterSyntax.getType() == ParameterType.REST) 
-					&& (rest != null) && (rest.trim().length() > 0)) {
-				throw new CommandSyntaxException(
-						String.format("Parameter %s was of type REST, this means that it should be last, but after it came \"%s\".",
-						parameterSyntax.getName(), rest));
-			}
-			parseCommandSyntax(rest, permission);
+			parseParameter(permission, matcher.group(2), matcher.group(4), matcher.group(5));
 			return this;
 		} else {
-			// Command
-			matcher = keyWordPattern.matcher(remainingPart);
-			if (!matcher.matches()) {
-				throw new CommandSyntaxException(String.format("Expected to find a command token here: \"%s\"", remainingPart));
-			}
-			if (hasParameters()) {
-				throw new NotImplementedException("Sub commands after parameters is not yet supported.");
-			}
-			String name = matcher.group(1);
-			String commandPermssion = permission + "." + name;
-			CommandSyntax subCommand = addKeyWord(name);
-			subCommand.parseCommandSyntax(matcher.group(2), commandPermssion);
-			if (!subCommand.hasSubCommands() && (permission != null)) subCommand.setPermission(commandPermssion);
+			CommandSyntax subCommand = parseSubCommand(permission, remainingPart);
 			return subCommand;
 		}
+	}
+
+	private void parseParameter(String permission, String leftSide, String parameter, String rest)
+			throws CommandSyntaxException {
+		ParameterSyntax parameterSyntax = ParameterSyntax.parseSyntax(leftSide, parameter);
+		addParameter(parameterSyntax);
+		if ((parameterSyntax.getType() == ParameterType.REST) 
+				&& (rest != null) && (rest.trim().length() > 0)) {
+			throw new CommandSyntaxException(
+					String.format("Parameter %s was of type REST, this means that it should be last, but after it came \"%s\".",
+							parameterSyntax.getName(), rest));
+		}
+		parseCommandSyntax(rest, permission);
+	}
+
+
+	private CommandSyntax parseSubCommand(String permission, String remainingPart)
+			throws CommandSyntaxException {
+		Matcher matcher;
+		// Command
+		matcher = keyWordPattern.matcher(remainingPart);
+		if (!matcher.matches()) {
+			throw new CommandSyntaxException(String.format("Expected to find a command token here: \"%s\"", remainingPart));
+		}
+		if (hasParameters()) {
+			throw new NotImplementedException("Sub commands after parameters is not yet supported.");
+		}
+		String name = matcher.group(1);
+		String commandPermssion = permission + "." + name;
+		CommandSyntax subCommand = addKeyWord(name);
+		subCommand.parseCommandSyntax(matcher.group(2), commandPermssion);
+		if (!subCommand.hasSubCommands() && (permission != null)) subCommand.setPermission(commandPermssion);
+		return subCommand;
 	}
 
 	@Override
@@ -180,12 +189,12 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 		StringBuilder soFar = new StringBuilder(beginning);
 		soFar.append(" ");
 		soFar.append(this.getName());
-		if (!this._subCommands.isEmpty()) {
-			for (CommandSyntax commandSyntax : this._subCommands.values()) {
+		if (!this._subCommandMap.isEmpty()) {
+			for (CommandSyntax commandSyntax : this._subCommandMap.values()) {
 				commandSyntax.toString(commandLineList, soFar.toString());
 			}
 		} else {
-			for (IParameterSyntax parameterSyntax : this._parameterSyntaxMap) {
+			for (IParameterSyntax parameterSyntax : this._parameterSyntaxList) {
 				soFar.append(" ");			
 				soFar.append(parameterSyntax.toString());
 			}

@@ -504,4 +504,54 @@ public class EithonCommandTest {
 		Assert.assertNotNull(ec);
 		ec.execute();
 	}
+
+	@Test
+	public void tabAfterEnd() 
+	{
+		// Prepare
+		ICommandSyntax root = EithonCommand.createRootCommand("root");
+
+		// blacklist add
+		try {
+			root.parseCommandSyntax("buy <amount : INTEGER {0,1,2,3,4}>");
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+		root.getSubCommand("buy")
+		.setCommandExecutor(ec -> {
+			int amount = ec.getArgument("amount").asInteger();
+			Assert.assertEquals(3, amount);
+		});
+
+		// Do & Verify
+		EithonCommand ec = Support.createEithonCommand(root, "buy (amount) 3 ");
+		Assert.assertNotNull(ec);
+		List<String> list = ec.tabComplete();
+		Assert.assertNull(list);
+	}
+
+	@Test
+	public void tabAfterNonCommand() 
+	{
+		// Prepare
+		ICommandSyntax root = EithonCommand.createRootCommand("root");
+
+		// blacklist add
+		try {
+			root.parseCommandSyntax("buy <amount : INTEGER {0,1,2,3,4}>");
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+		root.getSubCommand("buy")
+		.setCommandExecutor(ec -> {
+			int amount = ec.getArgument("amount").asInteger();
+			Assert.assertEquals(3, amount);
+		});
+
+		// Do & Verify
+		EithonCommand ec = Support.createEithonCommand(root, "wrong ");
+		Assert.assertNotNull(ec);
+		List<String> list = ec.tabComplete();
+		Assert.assertNull(list);
+	}
 }
