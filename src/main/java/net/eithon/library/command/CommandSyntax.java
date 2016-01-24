@@ -98,7 +98,7 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 		this._permission = permission;
 	}
 
-	public CommandExecutor parseArguments(EithonCommand command, Queue<String> argumentQueue, HashMap<String, Argument> collectedArguments, String commandLineSofar) 
+	public CommandExecutor parseArguments(EithonCommand command, Queue<String> argumentQueue, HashMap<String, EithonArgument> collectedArguments, String commandLineSofar) 
 			throws CommandParseException {
 
 		if (hasSubCommands()) {
