@@ -563,7 +563,8 @@ public class EithonCommandTest {
 		EithonCommand ec = Support.createEithonCommand(root, "buy (amount) 3 ");
 		Assert.assertNotNull(ec);
 		List<String> list = ec.tabComplete();
-		Assert.assertNull(list);
+		Assert.assertNotNull(list);
+		Assert.assertTrue(list.isEmpty());
 	}
 
 	@Test
@@ -588,7 +589,8 @@ public class EithonCommandTest {
 		EithonCommand ec = Support.createEithonCommand(root, "wrong ");
 		Assert.assertNotNull(ec);
 		List<String> list = ec.tabComplete();
-		Assert.assertNull(list);
+		Assert.assertNotNull(list);
+		Assert.assertTrue(list.isEmpty());
 	}
 
 	@Test

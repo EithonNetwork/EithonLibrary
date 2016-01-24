@@ -11,8 +11,6 @@ import java.util.stream.Collectors;
 
 import net.eithon.library.command.IParameterSyntax.ParameterType;
 
-import org.apache.commons.lang.NotImplementedException;
-
 class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {	
 	private static String leftHand = "([^<:= ]+) *(:|=) *";
 	private static String parameter = "([^>]+)";

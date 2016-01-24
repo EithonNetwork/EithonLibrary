@@ -16,6 +16,7 @@ Eithon java code library for Minecraft.
 ### 3.9.1 (2016-01-24)
 
 * BUG: Did not handle ambiguous commands, such as "root <parameter>" combined with "root sub <parameter>"
+* BUG: tabComplete could return NULL which resulted in strange completions.
 
 ### 3.9 (2016-01-23)
 
