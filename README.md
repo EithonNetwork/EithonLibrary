@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 3.9.1 (2016-01-24)
+
+* BUG: Did not handle ambiguous commands, such as "root <parameter>" combined with "root sub <parameter>"
+
 ### 3.9 (2016-01-23)
 
 * NEW: Added syntax support when parsing of a user command failed.

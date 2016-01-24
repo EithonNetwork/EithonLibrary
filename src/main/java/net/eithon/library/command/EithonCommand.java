@@ -90,8 +90,12 @@ public class EithonCommand {
 	public List<String> tabComplete() {
 		Queue<String> argumentQueue = this._commandQueue;
 		List<String> list = tabComplete(this._commandSyntax, argumentQueue);
-		if ((list != null) && (list.size() == 1)) {
-			sendMessage(String.format("RETURN: %s", list.get(0)));
+		if (list == null) {
+			sendMessage("RETURN: null");
+		} else if (list.isEmpty()) {
+			sendMessage("RETURN: empty");
+		} else {
+			sendMessage(String.format("RETURN: %s", list.stream().reduce((a,b) -> String.format("%s, %s", a, b)).get()));
 		}
 		return list;
 	}

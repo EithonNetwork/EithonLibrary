@@ -612,21 +612,21 @@ public class EithonCommandTest {
 		two.setCommandExecutor(ec -> {Assert.assertNotNull(ec); setExecuteNumber(2);});
 
 		// Do
-		EithonCommand ec = Support.createEithonCommand(root, "restart 10m");
-		Assert.assertNotNull(ec);
+		EithonCommand restart = Support.createEithonCommand(root, "restart 10m");
+		Assert.assertNotNull(restart);
 
 		// Verify
 		setExecuteNumber(0);
-		Assert.assertTrue(ec.execute());
-		//Assert.assertEquals(1, getExecuteNumber());
+		Assert.assertTrue(restart.execute());
+		Assert.assertEquals(1, getExecuteNumber());
 		
 		// Do
-		ec = Support.createEithonCommand(root, "restart cancel");
-		Assert.assertNotNull(ec);
+		EithonCommand cancel = Support.createEithonCommand(root, "restart cancel");
+		Assert.assertNotNull(cancel);
 
 		// Verify
 		setExecuteNumber(0);
-		Assert.assertTrue(ec.execute());
+		Assert.assertTrue(cancel.execute());
 		Assert.assertEquals(2, getExecuteNumber());
 	}
 }

@@ -104,9 +104,10 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 			throws CommandParseException {
 
 		if (hasSubCommands()) {
-			String keyWord = argumentQueue.poll();
+			String keyWord = argumentQueue.peek();
 			CommandSyntax commandSyntax = getSubCommand(keyWord);
 			if (commandSyntax != null) {
+				argumentQueue.poll();
 				commandLineSofar = commandLineSofar + " " + this.getName();
 				return commandSyntax.parseArguments(command, argumentQueue, collectedArguments, commandLineSofar);
 			}
