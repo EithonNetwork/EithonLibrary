@@ -597,7 +597,7 @@ public class EithonCommandTest {
 	}
 
 	@Test
-	public void ambigousCommand() 
+	public void ambigousCommand1() 
 	{
 		// Prepare
 		ICommandSyntax root = EithonCommand.createRootCommand("eithonfixes");
@@ -633,6 +633,38 @@ public class EithonCommandTest {
 		setExecuteNumber(0);
 		Assert.assertTrue(cancel.execute());
 		Assert.assertEquals(2, getExecuteNumber());
+	}
+
+	@Test
+	public void ambigousCommand2() 
+	{
+		// Prepare
+		ICommandSyntax root = EithonCommand.createRootCommand("eithonfixes");
+		try {
+			root.parseCommandSyntax("restart <timespan : TIME_SPAN {10m, ...}>");
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+		try {
+			root.parseCommandSyntax("restart cancel");
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+		ICommandSyntax one = root.getSubCommand("restart");		
+		ICommandSyntax two = one.getSubCommand("cancel");		
+		one.setCommandExecutor(ec -> {Assert.assertNotNull(ec); setExecuteNumber(1);});		
+		two.setCommandExecutor(ec -> {Assert.assertNotNull(ec); setExecuteNumber(2);});
+		EithonCommand restart = Support.createEithonCommand(root, "restart ");
+		Assert.assertNotNull(restart);
+		
+		// Do
+		List<String> tabComplete = restart.tabComplete();
+		
+		// Verify
+		Assert.assertNotNull(tabComplete);
+		Assert.assertEquals(2, tabComplete.size());
+		Assert.assertEquals("cancel", tabComplete.get(0));
+		Assert.assertEquals("(timespan) 10m", tabComplete.get(0));
 	}
 
 	@Test
