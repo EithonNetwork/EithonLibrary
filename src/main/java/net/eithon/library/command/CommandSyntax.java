@@ -155,8 +155,7 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 			parseParameter(permission, matcher.group(2), matcher.group(4), matcher.group(5));
 			return this;
 		} else {
-			CommandSyntax subCommand = parseSubCommand(permission, remainingPart);
-			return subCommand;
+			return parseSubCommand(permission, remainingPart);
 		}
 	}
 
@@ -186,9 +185,13 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 		String commandPermssion = permission + "." + name;
 		CommandSyntax subCommand = getSubCommand(name);
 		if (subCommand == null) subCommand = addKeyWord(name);
-		subCommand.parseCommandSyntax(matcher.group(2), commandPermssion);
-		if (!subCommand.hasSubCommands() && (permission != null)) subCommand.setPermission(commandPermssion);
-		return subCommand;
+		CommandSyntax commandSyntax = subCommand.parseCommandSyntax(matcher.group(2), commandPermssion);
+		if (subCommand.lastKeyWordInCommand() && (permission != null)) subCommand.setPermission(commandPermssion);
+		return commandSyntax;
+	}
+
+	public boolean lastKeyWordInCommand() {
+		return hasParameters() || !hasSubCommands();
 	}
 
 	@Override
