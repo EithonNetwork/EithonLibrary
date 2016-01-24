@@ -77,7 +77,15 @@ public class EithonCommand {
 	}
 
 	public EithonArgument getArgument(String name) {
-		return this._arguments.get(name);
+		EithonArgument argument = this._arguments.get(name);
+		if (argument == null) {
+			IParameterSyntax parameterSyntax = this._commandSyntax.getParameterSyntax(name);
+			if (parameterSyntax == null) {
+				throw new IllegalArgumentException(String.format("No such parameter: <%s>", name));
+			}
+			throw new IllegalArgumentException(String.format("Could not find a value for parameter <%s>.", name));
+		}
+		return argument;
 	}
 
 	private void sendMessage(String message) {

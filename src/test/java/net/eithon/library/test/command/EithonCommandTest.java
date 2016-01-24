@@ -1,5 +1,6 @@
 package net.eithon.library.test.command;
 
+import java.util.Arrays;
 import java.util.List;
 
 import net.eithon.library.command.CommandSyntaxException;
@@ -669,5 +670,45 @@ public class EithonCommandTest {
 		EithonArgument argument = ec.getArgument("player");
 		Assert.assertNotNull(argument);
 		Assert.assertEquals("c", argument.asString());
+	}
+
+	@Test
+	public void emptyRest() 
+	{
+		ICommandSyntax root = EithonCommand.createRootCommand("root");
+		// Prepare
+
+		ICommandSyntax tempmute = null;
+		try {
+			tempmute = root.parseCommandSyntax("tempmute <player> <time-span : TIME_SPAN> <reason : REST>")
+					.setCommandExecutor(ec -> commandExecutorForEmptyRest(ec));
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+
+		tempmute
+		.getParameterSyntax("player")
+		.setMandatoryValues(ec -> Arrays.asList(new String[]{"a", "b"}));
+
+		tempmute
+		.getParameterSyntax("time-span")
+		.setDefault("10m");
+
+		// Do
+		EithonCommand ec = Support.createEithonCommand(root, "tempmute a");
+		Assert.assertNotNull(ec);
+
+		// Verify
+		setHasExecuted(false);
+		Assert.assertTrue(ec.execute());
+		Assert.assertTrue(getHasExecuted());
+	}
+	
+	private void commandExecutorForEmptyRest(EithonCommand ec) {
+		Assert.assertNotNull(ec); 
+		setHasExecuted(true);
+		EithonArgument argument = ec.getArgument("reason");
+		Assert.assertNotNull(argument);
+		Assert.assertNull(argument.asString());
 	}
 }
