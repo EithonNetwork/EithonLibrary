@@ -11,8 +11,6 @@ import java.util.stream.Collectors;
 
 import net.eithon.library.command.IParameterSyntax.ParameterType;
 
-import org.apache.commons.lang.NotImplementedException;
-
 class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {	
 	private static String leftHand = "([^<:= ]+) *(:|=) *";
 	private static String parameter = "([^>]+)";
@@ -104,9 +102,10 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 			throws CommandParseException {
 
 		if (hasSubCommands()) {
-			String keyWord = argumentQueue.poll();
+			String keyWord = argumentQueue.peek();
 			CommandSyntax commandSyntax = getSubCommand(keyWord);
 			if (commandSyntax != null) {
+				argumentQueue.poll();
 				commandLineSofar = commandLineSofar + " " + this.getName();
 				return commandSyntax.parseArguments(command, argumentQueue, collectedArguments, commandLineSofar);
 			}
@@ -156,8 +155,7 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 			parseParameter(permission, matcher.group(2), matcher.group(4), matcher.group(5));
 			return this;
 		} else {
-			CommandSyntax subCommand = parseSubCommand(permission, remainingPart);
-			return subCommand;
+			return parseSubCommand(permission, remainingPart);
 		}
 	}
 
@@ -187,9 +185,13 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 		String commandPermssion = permission + "." + name;
 		CommandSyntax subCommand = getSubCommand(name);
 		if (subCommand == null) subCommand = addKeyWord(name);
-		subCommand.parseCommandSyntax(matcher.group(2), commandPermssion);
-		if (!subCommand.hasSubCommands() && (permission != null)) subCommand.setPermission(commandPermssion);
-		return subCommand;
+		CommandSyntax commandSyntax = subCommand.parseCommandSyntax(matcher.group(2), commandPermssion);
+		if (subCommand.lastKeyWordInCommand() && (permission != null)) subCommand.setPermission(commandPermssion);
+		return commandSyntax;
+	}
+
+	public boolean lastKeyWordInCommand() {
+		return hasParameters() || !hasSubCommands();
 	}
 
 	@Override

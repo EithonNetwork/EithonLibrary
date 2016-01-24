@@ -19,7 +19,6 @@ public class EithonCommand {
 	private CommandSender _sender;
 	private Queue<String> _commandQueue;
 	private CommandSyntax _commandSyntax;
-	private String _alias;
 	private HashMap<String, Argument> _arguments;
 
 	public EithonCommand(ICommandSyntax commandSyntax, CommandSender sender, Command cmd, String alias, String[] args) {
@@ -27,7 +26,6 @@ public class EithonCommand {
 			throw new IllegalArgumentException("The argument commandSyntax could not be casted to CommandSyntax");
 		}
 		this._sender = sender;
-		this._alias = alias;
 		this._commandQueue = new LinkedList<String>();
 		this._commandQueue.addAll(Arrays.asList(args));
 		this._commandSyntax = (CommandSyntax) commandSyntax;
@@ -90,8 +88,12 @@ public class EithonCommand {
 	public List<String> tabComplete() {
 		Queue<String> argumentQueue = this._commandQueue;
 		List<String> list = tabComplete(this._commandSyntax, argumentQueue);
-		if ((list != null) && (list.size() == 1)) {
-			sendMessage(String.format("RETURN: %s", list.get(0)));
+		if (list == null) {
+			sendMessage("RETURN: null");
+		} else if (list.isEmpty()) {
+			sendMessage("RETURN: empty");
+		} else {
+			sendMessage(String.format("RETURN: %s", list.stream().reduce((a,b) -> String.format("%s, %s", a, b)).get()));
 		}
 		return list;
 	}
@@ -107,7 +109,7 @@ public class EithonCommand {
 			CommandSyntax subCommandSyntax = commandSyntax.getSubCommand(keyWord);
 			if (subCommandSyntax != null) return tabComplete(subCommandSyntax, argumentQueue);
 			sendMessage(String.format("Unexpected key word: %s", keyWord));
-			return null;
+			return new ArrayList<String>();
 		}
 
 		for (ParameterSyntax parameterSyntax : commandSyntax.getParameterSyntaxList()) {
@@ -128,7 +130,7 @@ public class EithonCommand {
 				return found;			
 			}
 		}
-		return null;
+		return new ArrayList<String>();
 	}
 
 	private List<String> getHintAsList(ParameterSyntax parameterSyntax) {

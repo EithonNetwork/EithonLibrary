@@ -76,7 +76,7 @@ class ParameterSyntax extends Syntax implements IParameterSyntaxAdvanced {
 
 	public boolean getIsOptional() { return this._isOptional; }
 	public boolean getAcceptsAnyValue() { return this._acceptsAnyValue; }
-	public String getDefault() { return this._defaultValue; }
+	public String getDefault() { return getDefault(null); }
 	public ParameterType getType() { return this._type; }
 	public String getHint() { return String.format("(%s)", this._hint); } 
 	public ParameterSyntax setHint(String hint) { this._hint = hint; return this;}
@@ -86,6 +86,11 @@ class ParameterSyntax extends Syntax implements IParameterSyntaxAdvanced {
 	public IParameterSyntax setDefaultGetter(DefaultGetter defaultGetter) {
 		this._defaultGetter = defaultGetter;
 		return this;
+	} 
+	
+	public String getDefault(EithonCommand command) {
+		if (this._defaultGetter == null) return this._defaultValue; 
+		return this._defaultGetter.getDefault(command);
 	} 
 
 

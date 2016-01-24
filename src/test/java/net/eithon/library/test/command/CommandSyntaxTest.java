@@ -143,7 +143,7 @@ public class CommandSyntaxTest {
 			Assert.fail();
 		}		
 		ICommandSyntax a = root.getSubCommand("a");
-		
+
 		// Verify
 		Assert.assertEquals("root.a", a.getRequiredPermission());
 	}
@@ -165,7 +165,7 @@ public class CommandSyntaxTest {
 		ICommandSyntax a = root.getSubCommand("a");
 		ICommandSyntax b = root.getSubCommand("b");
 		ICommandSyntax c = b.getSubCommand("c");
-		
+
 		// Verify
 		Assert.assertEquals("root.a", a.getRequiredPermission());
 		Assert.assertNull(b.getRequiredPermission());
@@ -183,10 +183,10 @@ public class CommandSyntaxTest {
 		} catch (CommandSyntaxException e) {
 			Assert.fail();
 		}
-		
+
 		ICommandSyntax buy = root.getSubCommand("buy");
 		Assert.assertEquals(commandLine, buy.toString());
-		
+
 	}
 
 	@Test
@@ -200,7 +200,7 @@ public class CommandSyntaxTest {
 		} catch (CommandSyntaxException e) {
 			Assert.fail();
 		}
-		
+
 		root.getSubCommand("buy");
 	}
 
@@ -216,9 +216,9 @@ public class CommandSyntaxTest {
 			Assert.fail();
 		}
 		IParameterSyntax parameterSyntax = sub.getParameterSyntax("parameter");
-		
+
 		Assert.assertTrue(parameterSyntax.getIsOptional());
-		
+
 	}
 
 	@Test
@@ -232,5 +232,46 @@ public class CommandSyntaxTest {
 			Assert.fail();
 		} catch (CommandSyntaxException e) {
 		}
+	}
+
+	@Test
+	public void deepestSubCommandShouldBeReturned() 
+	{
+		// Prepare
+		final ICommandSyntax root = Support.createRoot("eithonfixes");
+		ICommandSyntax restart = null;
+		ICommandSyntax cancel = null;
+		ICommandSyntax deep = null;
+		ICommandSyntax going = null;
+		try {
+			restart = root.parseCommandSyntax("restart <time : TIME_SPAN {10m, ...}>");
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+		
+		try {
+			cancel = root.parseCommandSyntax("restart cancel");
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+		
+		try {
+			deep = root.parseCommandSyntax("restart going very deep <depth>");
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+		
+		try {
+			going = root.parseCommandSyntax("restart going <where>");
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+
+		// Verify
+		Assert.assertEquals("restart", restart.getName());
+		Assert.assertEquals("cancel", cancel.getName());
+		Assert.assertEquals("deep", deep.getName());
+		Assert.assertEquals("going", going.getName());
+
 	}
 }
