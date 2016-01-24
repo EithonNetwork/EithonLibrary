@@ -21,6 +21,7 @@ import net.eithon.plugin.eithonlibrary.EithonLibraryApi;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -97,7 +98,13 @@ public class EithonPlugin extends JavaPlugin implements Listener, TabCompleter {
 		this._eventListener = eventListener;
 		if (this._eventListener == null) this._eventListener = this;
 		getServer().getPluginManager().registerEvents(this._eventListener, this);
-		getCommand(commandSyntax.getName()).setTabCompleter(this);
+		String commandName = commandSyntax.getName();
+		PluginCommand command = getCommand(commandName);
+		if (command == null) {
+			this.getEithonLogger().error("CommandSyntax name %s is not a command of this plugin", commandName);
+			return;
+		}
+		command.setTabCompleter(this);
 	}
 
 	@Override
