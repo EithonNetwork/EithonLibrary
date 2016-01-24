@@ -84,6 +84,7 @@ class ParameterSyntax extends Syntax implements IParameterSyntaxAdvanced {
 	public ParameterSyntax setDisplayHint(boolean displayHint) { return (ParameterSyntax) super.setDisplayHint(displayHint); }
 
 	public IParameterSyntax setDefaultGetter(DefaultGetter defaultGetter) {
+		this._isOptional = defaultGetter != null;
 		this._defaultGetter = defaultGetter;
 		return this;
 	} 
@@ -123,9 +124,9 @@ class ParameterSyntax extends Syntax implements IParameterSyntaxAdvanced {
 		this._validValues.addAll(values);
 	}
 
-	public void parseArguments(EithonCommand command, String argument, HashMap<String, Argument> collectedArguments) 
+	public void parseArguments(EithonCommand command, String argument, HashMap<String, EithonArgument> collectedArguments) 
 			throws ArgumentParseException {
-		Argument parameterValue = new Argument(this, argument);
+		EithonArgument parameterValue = new EithonArgument(command, this, argument);
 		if (argument == null) {
 			if (this._isOptional) {
 				if (collectedArguments != null) collectedArguments.put(getName(), parameterValue);

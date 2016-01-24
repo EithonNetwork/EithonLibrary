@@ -35,7 +35,6 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 	}
 
 	public CommandSyntax getSubCommand(String commandName) { return this._subCommandMap.get(commandName); }
-	public IParameterSyntax getParameterSyntax(String parameterName) { return this._parameterSyntaxList.stream().filter(ps -> parameterName.equals(ps.getName())).findFirst().get(); }
 	public boolean hasSubCommands() { return this._subCommandMap.size() > 0; }
 	public boolean hasParameters() { return this._parameterSyntaxList.size() > 0; }
 	public List<ParameterSyntax> getParameterSyntaxList() { return this._parameterSyntaxList.stream().collect(Collectors.toList());	}
@@ -55,7 +54,13 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 			}
 		});
 		return subCommands;
+	}	
+
+	public IParameterSyntax getParameterSyntax(String parameterName) {
+		if (this._parameterSyntaxList.isEmpty()) return null;
+		return this._parameterSyntaxList.stream().filter(ps -> parameterName.equals(ps.getName())).findFirst().get(); 
 	}
+
 
 	public CommandSyntax addKeyWord(String keyWord) {
 		CommandSyntax commandSyntax = new CommandSyntax(keyWord);
@@ -98,7 +103,7 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 		this._permission = permission;
 	}
 
-	public CommandExecutor parseArguments(EithonCommand command, Queue<String> argumentQueue, HashMap<String, Argument> collectedArguments, String commandLineSofar) 
+	public CommandExecutor parseArguments(EithonCommand command, Queue<String> argumentQueue, HashMap<String, EithonArgument> collectedArguments, String commandLineSofar) 
 			throws CommandParseException {
 
 		if (hasSubCommands()) {

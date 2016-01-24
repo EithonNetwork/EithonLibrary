@@ -13,6 +13,18 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 4.0.2 (2016-01-24)
+
+* BUG: Optional arguments did not work when adding a valuegetter as default value.
+
+### 4.0.1 (2016-01-24)
+
+* BUG: Debug printouts were left in the code.
+
+### 4.0 (2016-01-24)
+
+* NEW: Went to new major release number due to EithonCommand being a big change.
+
 ### 3.9.1 (2016-01-24)
 
 * BUG: Did not handle ambiguous commands, such as "root <parameter>" combined with "root sub <parameter>"

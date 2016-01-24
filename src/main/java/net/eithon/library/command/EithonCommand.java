@@ -19,7 +19,7 @@ public class EithonCommand {
 	private CommandSender _sender;
 	private Queue<String> _commandQueue;
 	private CommandSyntax _commandSyntax;
-	private HashMap<String, Argument> _arguments;
+	private HashMap<String, EithonArgument> _arguments;
 
 	public EithonCommand(ICommandSyntax commandSyntax, CommandSender sender, Command cmd, String alias, String[] args) {
 		if (!(commandSyntax instanceof CommandSyntax)) {
@@ -29,7 +29,7 @@ public class EithonCommand {
 		this._commandQueue = new LinkedList<String>();
 		this._commandQueue.addAll(Arrays.asList(args));
 		this._commandSyntax = (CommandSyntax) commandSyntax;
-		this._arguments = new HashMap<String, Argument>();
+		this._arguments = new HashMap<String, EithonArgument>();
 	}
 
 	public static ICommandSyntax createRootCommand(String commandName) {
@@ -76,8 +76,16 @@ public class EithonCommand {
 		return new EithonPlayer(player);
 	}
 
-	public Argument getArgument(String name) {
-		return this._arguments.get(name);
+	public EithonArgument getArgument(String name) {
+		EithonArgument argument = this._arguments.get(name);
+		if (argument == null) {
+			IParameterSyntax parameterSyntax = this._commandSyntax.getParameterSyntax(name);
+			if (parameterSyntax == null) {
+				throw new IllegalArgumentException(String.format("No such parameter: <%s>", name));
+			}
+			throw new IllegalArgumentException(String.format("Could not find a value for parameter <%s>.", name));
+		}
+		return argument;
 	}
 
 	private void sendMessage(String message) {
@@ -87,15 +95,7 @@ public class EithonCommand {
 
 	public List<String> tabComplete() {
 		Queue<String> argumentQueue = this._commandQueue;
-		List<String> list = tabComplete(this._commandSyntax, argumentQueue);
-		if (list == null) {
-			sendMessage("RETURN: null");
-		} else if (list.isEmpty()) {
-			sendMessage("RETURN: empty");
-		} else {
-			sendMessage(String.format("RETURN: %s", list.stream().reduce((a,b) -> String.format("%s, %s", a, b)).get()));
-		}
-		return list;
+		return tabComplete(this._commandSyntax, argumentQueue);
 	}
 
 	private List<String> tabComplete(CommandSyntax commandSyntax, Queue<String> argumentQueue) {

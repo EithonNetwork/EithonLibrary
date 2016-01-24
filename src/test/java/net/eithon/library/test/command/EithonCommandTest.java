@@ -1,9 +1,12 @@
 package net.eithon.library.test.command;
 
+import java.util.Arrays;
 import java.util.List;
 
 import net.eithon.library.command.CommandSyntaxException;
+import net.eithon.library.command.EithonArgument;
 import net.eithon.library.command.EithonCommand;
+import net.eithon.library.command.EithonCommandUtilities;
 import net.eithon.library.command.ICommandSyntax;
 
 import org.junit.Assert;
@@ -18,7 +21,7 @@ public class EithonCommandTest {
 
 	private void setHasExecuted(boolean hasExecuted) { this._hasExecuted = hasExecuted; }
 	private void setExecuteNumber(int executeNumber) { this._executeNumber = executeNumber; }
-	
+
 	@Test
 	public void rootOnly() 
 	{
@@ -621,7 +624,7 @@ public class EithonCommandTest {
 		setExecuteNumber(0);
 		Assert.assertTrue(restart.execute());
 		Assert.assertEquals(1, getExecuteNumber());
-		
+
 		// Do
 		EithonCommand cancel = Support.createEithonCommand(root, "restart cancel");
 		Assert.assertNotNull(cancel);
@@ -630,5 +633,82 @@ public class EithonCommandTest {
 		setExecuteNumber(0);
 		Assert.assertTrue(cancel.execute());
 		Assert.assertEquals(2, getExecuteNumber());
+	}
+
+	@Test
+	public void defaultByGetter() 
+	{
+		ICommandSyntax root = EithonCommand.createRootCommand("root");
+		// Prepare
+
+		ICommandSyntax balance = null;
+		try {
+			balance = root.parseCommandSyntax("balance <player {a,b}>")
+					.setCommandExecutor(ec -> defaultByGetterCommandExecutor(ec));
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+
+		balance
+		.getParameterSyntax("player")
+		.setExampleValues(ec -> EithonCommandUtilities.getOnlinePlayerNames(ec))
+		.setDefaultGetter(ec -> "c");
+
+		// Do
+		EithonCommand ec = Support.createEithonCommand(root, "balance");
+		Assert.assertNotNull(ec);
+
+		// Verify
+		setHasExecuted(false);
+		Assert.assertTrue(ec.execute());
+		Assert.assertTrue(getHasExecuted());
+	}
+	
+	private void defaultByGetterCommandExecutor(EithonCommand ec) {
+		Assert.assertNotNull(ec); 
+		setHasExecuted(true);
+		EithonArgument argument = ec.getArgument("player");
+		Assert.assertNotNull(argument);
+		Assert.assertEquals("c", argument.asString());
+	}
+
+	@Test
+	public void emptyRest() 
+	{
+		ICommandSyntax root = EithonCommand.createRootCommand("root");
+		// Prepare
+
+		ICommandSyntax tempmute = null;
+		try {
+			tempmute = root.parseCommandSyntax("tempmute <player> <time-span : TIME_SPAN> <reason : REST>")
+					.setCommandExecutor(ec -> commandExecutorForEmptyRest(ec));
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+
+		tempmute
+		.getParameterSyntax("player")
+		.setMandatoryValues(ec -> Arrays.asList(new String[]{"a", "b"}));
+
+		tempmute
+		.getParameterSyntax("time-span")
+		.setDefault("10m");
+
+		// Do
+		EithonCommand ec = Support.createEithonCommand(root, "tempmute a");
+		Assert.assertNotNull(ec);
+
+		// Verify
+		setHasExecuted(false);
+		Assert.assertTrue(ec.execute());
+		Assert.assertTrue(getHasExecuted());
+	}
+	
+	private void commandExecutorForEmptyRest(EithonCommand ec) {
+		Assert.assertNotNull(ec); 
+		setHasExecuted(true);
+		EithonArgument argument = ec.getArgument("reason");
+		Assert.assertNotNull(argument);
+		Assert.assertNull(argument.asString());
 	}
 }

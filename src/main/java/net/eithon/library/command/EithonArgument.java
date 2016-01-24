@@ -6,11 +6,13 @@ import net.eithon.library.time.TimeMisc;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-public class Argument {
-	private IParameterSyntax _parameterSyntax;
+public class EithonArgument {
+	private ParameterSyntax _parameterSyntax;
 	private String _value;
+	private EithonCommand _eithonCommand;
 
-	public Argument(IParameterSyntax parameterSyntax, String argument) {
+	public EithonArgument(EithonCommand command, ParameterSyntax parameterSyntax, String argument) {
+		this._eithonCommand = command;
 		this._parameterSyntax = parameterSyntax;
 		this._value = argument;
 	}
@@ -27,7 +29,7 @@ public class Argument {
 	public String asString() {
 		if (this._value != null) return this._value;
 		if (this._parameterSyntax == null) return null;
-		return this._parameterSyntax.getDefault();
+		return this._parameterSyntax.getDefault(this._eithonCommand);
 	}
 
 	public String asLowerCase() {
