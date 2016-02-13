@@ -16,6 +16,7 @@ Eithon java code library for Minecraft.
 ### 4.1 (2016-02-13)
 
 * NEW: Added ICommandSyntax.addKeyWords().
+* CHANGE: Now can tab complete the ambiguity between "restart <time>" and "restart cancel" after just writing "restart".
 
 ### 4.0.2 (2016-01-24)
 
