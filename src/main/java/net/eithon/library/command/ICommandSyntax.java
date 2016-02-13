@@ -8,6 +8,8 @@ public interface ICommandSyntax {
 	
 	public ICommandSyntaxAdvanced addKeyWord(String name);
 
+	public ICommandSyntax addKeyWords(String ... keyWords);
+
 	public ICommandSyntax parseCommandSyntax(String commandLine)
 			throws CommandSyntaxException;
 	

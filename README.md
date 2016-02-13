@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 4.1 (2016-02-13)
+
+* NEW: Added ICommandSyntax.addKeyWords().
+
 ### 4.0.2 (2016-01-24)
 
 * BUG: Optional arguments did not work when adding a valuegetter as default value.
