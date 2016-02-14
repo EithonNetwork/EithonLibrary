@@ -100,37 +100,54 @@ public class EithonCommand {
 
 	private List<String> tabComplete(CommandSyntax commandSyntax, Queue<String> argumentQueue) {
 		if (argumentQueue.isEmpty()) throw new IllegalArgumentException("argumentQueue unexpectedly was empty");
+		List<String> suggestions = new ArrayList<String>();
+		String argument = argumentQueue.poll();
 		if (commandSyntax.hasSubCommands()) {
-			String keyWord = argumentQueue.poll();
-			if (argumentQueue.isEmpty()) {
-				List<String> found = findPartialMatches(keyWord, commandSyntax.getKeyWordList());
-				return found;
+			if (!argumentQueue.isEmpty()) {
+				CommandSyntax subCommandSyntax = commandSyntax.getSubCommand(argument);
+				if (subCommandSyntax != null) return tabComplete(subCommandSyntax, argumentQueue);
+				if (!commandSyntax.hasParameters()) {
+					sendMessage(String.format("Unexpected key word: %s", argument));
+					return new ArrayList<String>();
+				}
+			} else if (argument.isEmpty()) {
+				suggestions = commandSyntax.getKeyWordList();
+			} else {
+				suggestions = findPartialMatches(argument, commandSyntax.getKeyWordList());
 			}
-			CommandSyntax subCommandSyntax = commandSyntax.getSubCommand(keyWord);
-			if (subCommandSyntax != null) return tabComplete(subCommandSyntax, argumentQueue);
-			sendMessage(String.format("Unexpected key word: %s", keyWord));
-			return new ArrayList<String>();
 		}
 
+		return tabCompleteParameter(commandSyntax, argumentQueue, argument, suggestions);
+	}
+
+	private List<String> tabCompleteParameter(
+			CommandSyntax commandSyntax,
+			Queue<String> argumentQueue,
+			String argument,
+			List<String> suggestions) {
 		for (ParameterSyntax parameterSyntax : commandSyntax.getParameterSyntaxList()) {
-			String argument = argumentQueue.poll();
 			boolean hintGiven = false;
 			String hint = parameterSyntax.getHint();
 			if ((hint != null) && hint.contains(argument)) {
 				hintGiven = true;
 				argument = argumentQueue.poll();
-				if (argument == null) return getHintAsList(parameterSyntax);
+				if (argument == null) {
+					suggestions.addAll(getHintAsList(parameterSyntax));
+					return suggestions;
+				}
 			}
 			if (argument.isEmpty()) {
-				if (parameterSyntax.getDisplayHint() && !hintGiven) return getHintAsList(parameterSyntax);
-				else return parameterSyntax.getValidValues(this);
+				if (parameterSyntax.getDisplayHint() && !hintGiven) suggestions.addAll(getHintAsList(parameterSyntax));
+				else suggestions.addAll(parameterSyntax.getValidValues(this));
+				return suggestions;
 			}
 			if (argumentQueue.isEmpty()) {
-				List<String> found = findPartialMatches(argument, parameterSyntax.getValidValues(this));
-				return found;			
+				suggestions.addAll(findPartialMatches(argument, parameterSyntax.getValidValues(this)));
+				return suggestions;			
 			}
+			argument = argumentQueue.poll();
 		}
-		return new ArrayList<String>();
+		return suggestions;
 	}
 
 	private List<String> getHintAsList(ParameterSyntax parameterSyntax) {

@@ -61,6 +61,14 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 		return this._parameterSyntaxList.stream().filter(ps -> parameterName.equals(ps.getName())).findFirst().get(); 
 	}
 
+	public ICommandSyntax addKeyWords(String... keyWords) {
+		ICommandSyntax commandSyntax = this;
+		for (String keyWord : keyWords) {
+			commandSyntax = commandSyntax.addKeyWord(keyWord);
+		}
+		return commandSyntax;
+	}
+
 
 	public CommandSyntax addKeyWord(String keyWord) {
 		CommandSyntax commandSyntax = new CommandSyntax(keyWord);
@@ -250,12 +258,10 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 		return soFar.toString();
 	}
 
-	@Override
 	public IParameterSyntax parseParameterSyntax(String leftSide, String parameter) throws CommandSyntaxException {
 		ParameterSyntax parameterSyntax = ParameterSyntax.parseSyntax(leftSide, parameter);
 		return addParameter(parameterSyntax);
 	}
 
-	@Override
 	public ICommandSyntaxAdvanced getAdvancedMethods() { return this; }
 }

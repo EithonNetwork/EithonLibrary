@@ -226,9 +226,8 @@ public class CommandSyntaxTest {
 	{
 
 		final ICommandSyntax root = Support.createRoot("eithonfixes");
-		ICommandSyntax sub = null;
 		try {
-			sub = root.parseCommandSyntax("sub <parameter : REST> <hidden>");
+			root.parseCommandSyntax("sub <parameter : REST> <hidden>");
 			Assert.fail();
 		} catch (CommandSyntaxException e) {
 		}
