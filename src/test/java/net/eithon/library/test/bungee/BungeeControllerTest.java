@@ -20,22 +20,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @PrepareForTest({EithonPlugin.class, Bukkit.class})
 public class BungeeControllerTest {
 	@Test
-	public void understandEasyMock() 
-	{
-		PlayerStatistics s1 = EasyMock.createMock(PlayerStatistics.class);
-		EasyMock.expect(s1.getTotalTimeInSeconds()).andReturn((long) 1).anyTimes();
-		EasyMock.replay(s1);
-
-		PlayerStatistics s2 = EasyMock.createMock(PlayerStatistics.class);
-		EasyMock.expect(s2.getTotalTimeInSeconds()).andReturn((long) 2).anyTimes();
-		EasyMock.replay(s2);
-
-		Assert.assertEquals(1, s1.getTotalTimeInSeconds());
-		Assert.assertEquals(2, s2.getTotalTimeInSeconds());
-		Assert.assertEquals(1, s1.getTotalTimeInSeconds());
-		Assert.assertEquals(2, s2.getTotalTimeInSeconds());		
-	}
-	@Test
 	public void testBungeeControllerConstructor() 
 	{
 		MockMinecraft mockCentralServer = new MockMinecraft("central");
@@ -125,10 +109,4 @@ public class BungeeControllerTest {
 		mockBungee.verify();
 	}
 	 */
-
-	void assertEquals(PlayerStatistics expected,
-			PlayerStatistics actual) {
-		Assert.assertEquals(expected.getBlocksCreated(), actual.getBlocksCreated());
-		Assert.assertEquals(expected.getAfkDescription(), actual.getAfkDescription());
-	}
 }

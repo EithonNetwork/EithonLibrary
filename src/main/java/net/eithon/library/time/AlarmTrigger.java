@@ -5,8 +5,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.Temporal;
+import java.time.temporal.TemporalUnit;
 import java.util.HashMap;
 import java.util.UUID;
+
+import javax.persistence.TemporalType;
 
 import net.eithon.library.extensions.EithonPlugin;
 import net.eithon.library.plugin.Logger;
@@ -109,6 +114,26 @@ public class AlarmTrigger {
 		}
 	}
 
+	public void repeatEveryHour(String name, int minute, IRepeatable task) {
+		LocalDateTime nextAlarmTime = getNextHour(minute);
+		Alarm alarm = new Alarm(name, nextAlarmTime, new Runnable() {
+			public void run() {
+				boolean repeat = task.repeat();
+				if (repeat) repeatEveryHour(name, minute, task);
+			}
+		});
+		addToAlarmQueue(alarm);
+	}
+
+	private LocalDateTime getNextHour(int minute) {
+		LocalDateTime time = LocalDateTime.now();
+		int currentMinute = time.getMinute();
+		if (currentMinute >= minute) time.plusHours(1);
+		time.truncatedTo(ChronoUnit.HOURS);
+		time.plusMinutes(minute);
+		return time;
+	}
+
 	public void repeatEveryDay(String name, LocalTime timeOfDay, IRepeatable task) {
 		LocalDateTime time = getNextTimeOnDayBasis(timeOfDay, 1);
 		Alarm alarm = new Alarm(name, time, new Runnable() {
@@ -119,7 +144,7 @@ public class AlarmTrigger {
 		});
 		addToAlarmQueue(alarm);
 	}
-
+	
 	public void repeatEveryWeek(String name, DayOfWeek dayOfWeek, LocalTime timeOfDay, IRepeatable task) {
 		LocalDateTime time = null;
 		LocalDateTime now = LocalDateTime.now();

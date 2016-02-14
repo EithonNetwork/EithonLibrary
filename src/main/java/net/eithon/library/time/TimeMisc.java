@@ -1,15 +1,25 @@
 package net.eithon.library.time;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 public class TimeMisc {
-	public static LocalDateTime toLocalDateTime(Object o) {
-		if (o == null) return null;
-		return LocalDateTime.parse((String) o);
+	public static LocalDateTime toLocalDateTime(String time) {
+		if (time == null) return null;
+		return LocalDateTime.parse(time);
+	}
+	
+	public static LocalDateTime toLocalDateTime(Timestamp time) {
+		if (time == null) return null;
+		return time.toLocalDateTime();
 	}
 	
 	public static String fromLocalDateTime(LocalDateTime time) {
 		if (time == null) return null;
+		return time.toString();
+	}
+
+	public static String toDbUtc(LocalDateTime time) {
 		return time.toString();
 	}
 	
