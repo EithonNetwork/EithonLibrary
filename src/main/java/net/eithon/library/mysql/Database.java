@@ -46,7 +46,7 @@ public abstract class Database {
 	 *             if the connection cannot be checked
 	 */
 	public boolean checkConnection() throws SQLException {
-		return connection != null && !connection.isClosed();
+		return this.connection != null && !this.connection.isClosed();
 	}
 
 	/**
@@ -55,7 +55,21 @@ public abstract class Database {
 	 * @return Connection with the database, null if none
 	 */
 	public Connection getConnection() {
-		return connection;
+		return this.connection;
+	}
+
+	/**
+	 * Gets or opens a connection with the database
+	 * 
+	 * @return Connection with the database, null if none
+	 * @throws SQLException
+	 *             if the connection can not be opened
+	 * @throws ClassNotFoundException
+	 *             if the driver cannot be found
+	 */
+	public Connection getOrOpenConnection() throws SQLException, ClassNotFoundException {
+		if (checkConnection()) return this.connection;
+		return openConnection();
 	}
 
 	/**
@@ -66,10 +80,10 @@ public abstract class Database {
 	 *             if the connection cannot be closed
 	 */
 	public boolean closeConnection() throws SQLException {
-		if (connection == null) {
+		if (this.connection == null) {
 			return false;
 		}
-		connection.close();
+		this.connection.close();
 		return true;
 	}
 
@@ -93,7 +107,7 @@ public abstract class Database {
 			openConnection();
 		}
 
-		Statement statement = connection.createStatement();
+		Statement statement = this.connection.createStatement();
 
 		ResultSet result = statement.executeQuery(query);
 
@@ -119,7 +133,7 @@ public abstract class Database {
 			openConnection();
 		}
 
-		Statement statement = connection.createStatement();
+		Statement statement = this.connection.createStatement();
 
 		int result = statement.executeUpdate(query);
 

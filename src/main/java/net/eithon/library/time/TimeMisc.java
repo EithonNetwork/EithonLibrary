@@ -20,7 +20,8 @@ public class TimeMisc {
 	}
 
 	public static String toDbUtc(LocalDateTime time) {
-		return time.toString();
+		if (time == null) return "NULL";
+		return "'" + time.toString() + "'";
 	}
 	
 	public static long secondsToTicks(double seconds)

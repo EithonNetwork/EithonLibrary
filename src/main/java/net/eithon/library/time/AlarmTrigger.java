@@ -6,12 +6,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalUnit;
 import java.util.HashMap;
 import java.util.UUID;
-
-import javax.persistence.TemporalType;
 
 import net.eithon.library.extensions.EithonPlugin;
 import net.eithon.library.plugin.Logger;
@@ -128,10 +124,8 @@ public class AlarmTrigger {
 	private LocalDateTime getNextHour(int minute) {
 		LocalDateTime time = LocalDateTime.now();
 		int currentMinute = time.getMinute();
-		if (currentMinute >= minute) time.plusHours(1);
-		time.truncatedTo(ChronoUnit.HOURS);
-		time.plusMinutes(minute);
-		return time;
+		if (currentMinute >= minute) time = time.plusHours(1);
+		return time.truncatedTo(ChronoUnit.HOURS).plusMinutes(minute);
 	}
 
 	public void repeatEveryDay(String name, LocalTime timeOfDay, IRepeatable task) {

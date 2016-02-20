@@ -13,7 +13,7 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
-### 4.2 (2016-02-??)
+### 4.2 (2016-02-20)
 
 * NEW: Added MySQL database support.
 * NEW: Added repeatEveryHour for AlarmTrigger.
