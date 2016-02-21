@@ -22,8 +22,13 @@ public class EithonCommand {
 	private HashMap<String, EithonArgument> _arguments;
 
 	public EithonCommand(ICommandSyntax commandSyntax, CommandSender sender, Command cmd, String alias, String[] args) {
+		if (commandSyntax == null) {
+			throw new IllegalArgumentException("The argument commandSyntax must not be null");
+		}
 		if (!(commandSyntax instanceof CommandSyntax)) {
-			throw new IllegalArgumentException("The argument commandSyntax could not be casted to CommandSyntax");
+			throw new IllegalArgumentException(
+					String.format("The argument commandSyntax could not be casted to CommandSyntax. Was class %s.",
+							commandSyntax.getClass().getName()));
 		}
 		this._sender = sender;
 		this._commandQueue = new LinkedList<String>();
