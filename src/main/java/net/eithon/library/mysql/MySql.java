@@ -64,18 +64,18 @@ public class MySql extends Database {
 	public Connection openConnection() throws SQLException,
 			ClassNotFoundException {
 		if (checkConnection()) {
-			return connection;
+			return this.connection;
 		}
 		
 		String connectionURL = "jdbc:mysql://"
 				+ this.hostname + ":" + this.port;
-		if (database != null) {
+		if (this.database != null) {
 			connectionURL = connectionURL + "/" + this.database;
 		}
 		
 		Class.forName("com.mysql.jdbc.Driver");
-		connection = DriverManager.getConnection(connectionURL,
+		this.connection = DriverManager.getConnection(connectionURL,
 				this.user, this.password);
-		return connection;
+		return this.connection;
 	}
 }
