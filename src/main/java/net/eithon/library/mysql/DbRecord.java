@@ -41,6 +41,10 @@ public abstract class DbRecord<T extends DbRecord & IDbRecord<T>> {
 		return list.get(0);
 	}
 	
+	public List<T> findAll()  {
+		return findByWhere("1=1");
+	}
+	
 	protected List<T> findByWhere(String where)  {
 		List<T> list = new ArrayList<T>(); 
 		ResultSet resultSet;
