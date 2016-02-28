@@ -28,28 +28,27 @@ public abstract class DbRecord<T extends DbRecord & IDbRecord<T>> {
 	protected void setDbId(long dbId) { this.id = dbId; }
 	
 	protected T getById(long dbId)  {
-		String where = String.format("id=%d", dbId);
-		return getByWhere(where);
+		return getByWhere("id=", dbId);
 	}
 	
-	protected T getByWhere(String where)  {
-		List<T> list = findByWhere(where);
+	protected T getByWhere(Object... whereParts)  {
+		List<T> list = findByWhere(whereParts);
 		if (list.size() == 0) return null;
 		if (list.size() > 1) {
-			throw new IllegalArgumentException(String.format("WHERE %s returned more than one row.", where));
+			throw new IllegalArgumentException(String.format("WHERE %s returned more than one row.", whereParts));
 		}
 		return list.get(0);
 	}
 	
 	public List<T> findAll()  {
-		return findByWhere("1=1");
+		return findByWhere("1=", 1);
 	}
 	
-	protected List<T> findByWhere(String where)  {
+	protected List<T> findByWhere(Object... whereParts)  {
 		List<T> list = new ArrayList<T>(); 
 		ResultSet resultSet;
 		try {
-			resultSet = this.dbTable.select(where);
+			resultSet = this.dbTable.select(whereParts);
 			while (resultSet.next()) {
 				T data = factory(this.dbTable, resultSet.getLong("id"));
 				data.fromDb(resultSet);
@@ -62,9 +61,8 @@ public abstract class DbRecord<T extends DbRecord & IDbRecord<T>> {
 	}
 
 	public void dbUpdate() {		
-		String where = String.format("id=%d", this.id);
 		try {
-			this.dbTable.update(getColumnValues(), where);
+			this.dbTable.update(getColumnValues(), "id=", this.id);
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 		}
