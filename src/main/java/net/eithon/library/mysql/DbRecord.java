@@ -21,7 +21,7 @@ public abstract class DbRecord<T extends DbRecord & IDbRecord<T>> {
 		this(dbTable, -1);
 	}
 
-	public DbRecord() {
+	protected DbRecord() {
 	}
 
 	public long getDbId() { return this.id; }
@@ -40,7 +40,7 @@ public abstract class DbRecord<T extends DbRecord & IDbRecord<T>> {
 		return list.get(0);
 	}
 	
-	public List<T> findAll()  {
+	protected List<T> findAll()  {
 		return findByWhere("1=", 1);
 	}
 	
@@ -59,8 +59,16 @@ public abstract class DbRecord<T extends DbRecord & IDbRecord<T>> {
 		}
 		return list;
 	}
+	
+	protected void deleteByWhere(Object... whereParts)  {
+		try {
+			this.dbTable.delete(whereParts);
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+		}
+	}
 
-	public void dbUpdate() {		
+	protected void dbUpdate() {		
 		try {
 			this.dbTable.update(getColumnValues(), "id=", this.id);
 		} catch (ClassNotFoundException | SQLException e) {
@@ -68,9 +76,17 @@ public abstract class DbRecord<T extends DbRecord & IDbRecord<T>> {
 		}
 	}
 
-	public void dbCreate() {	
+	protected void dbCreate() {	
 		try {
 			this.id = this.dbTable.create(getColumnValues());
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void delete() {
+		try {
+			this.dbTable.delete(this.id);
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 		}

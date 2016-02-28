@@ -39,6 +39,14 @@ public class DbTable {
 		return statement.executeQuery();
 	}
 
+	public void delete(Object... whereParts) throws ClassNotFoundException, SQLException {
+		String where = joinWhereParts(whereParts);
+		String sql = String.format("DELETE FROM %s WHERE %s", this.name, where);
+		PreparedStatement statement = getOrOpenConnection().prepareStatement(sql);
+		fillInBlanks(statement, stringValues(whereParts));
+		statement.executeUpdate();
+	}
+
 	private String joinWhereParts(Object... whereParts) {
 		StringBuilder result = new StringBuilder();
 		boolean firstTime = true;
@@ -96,7 +104,12 @@ public class DbTable {
 		ResultSet generatedKeys = statement.getGeneratedKeys();
 		generatedKeys.next();
 		return generatedKeys.getLong(1);
+	}
 
+	public void delete(long id) throws SQLException, ClassNotFoundException {
+		String sql = String.format("DELETE FROM %s WHERE id=%d", getName(), id);
+		Statement statement = getOrOpenConnection().createStatement();
+		statement.executeUpdate(sql);	
 	}
 
 	private void fillInBlanks(PreparedStatement statement, List<String> stringValues) throws SQLException {
