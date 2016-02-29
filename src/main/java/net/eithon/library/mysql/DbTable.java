@@ -31,66 +31,25 @@ public class DbTable {
 		return this.name;
 	}
 
-	public ResultSet select(Object... whereParts) throws ClassNotFoundException, SQLException {
-		String where = joinWhereParts(whereParts);
-		String sql = String.format("SELECT * FROM %s WHERE %s", this.name, where);
+	public ResultSet select(String whereFormat, Object... arguments) throws ClassNotFoundException, SQLException {
+		String sql = String.format("SELECT * FROM %s WHERE %s", this.name, whereFormat);
 		PreparedStatement statement = getOrOpenConnection().prepareStatement(sql);
-		fillInBlanks(statement, stringValues(whereParts));
+		fillInBlanks(statement, toStringValueList(arguments));
 		return statement.executeQuery();
 	}
 
-	public void delete(Object... whereParts) throws ClassNotFoundException, SQLException {
-		String where = joinWhereParts(whereParts);
-		String sql = String.format("DELETE FROM %s WHERE %s", this.name, where);
+	public void delete(String whereFormat, Object... arguments) throws ClassNotFoundException, SQLException {
+			String sql = String.format("DELETE FROM %s WHERE %s", this.name, whereFormat);
 		PreparedStatement statement = getOrOpenConnection().prepareStatement(sql);
-		fillInBlanks(statement, stringValues(whereParts));
+		fillInBlanks(statement, toStringValueList(arguments));
 		statement.executeUpdate();
 	}
 
-	private String joinWhereParts(Object... whereParts) {
-		StringBuilder result = new StringBuilder();
-		boolean firstTime = true;
-		for (int i = 0; i < whereParts.length; i++) {
-			if (firstTime) firstTime = false;
-			else result.append(" ");
-			Object part = whereParts[i];
-			if (!(part instanceof String)) {
-				throw new IllegalArgumentException("String expected");
-			}
-			String leftSide = (String) part;
-			result.append(leftSide);
-			i++;
-			if (i >= whereParts.length) {
-				throw new IllegalArgumentException("Expected an even number of wereParts");
-			}
-			result.append(getValueAsSqlObject(whereParts[i]));
-		}
-		return result.toString();
-	}
-
-	private List<String> stringValues(Object[] whereParts) {
-		List<String> result = new ArrayList<String>();
-		for (int i = 0; i < whereParts.length; i++) {
-			Object part = whereParts[i];
-			if (!(part instanceof String)) {
-				throw new IllegalArgumentException("String expected");
-			}
-			i++;
-			if (i >= whereParts.length) {
-				throw new IllegalArgumentException("Expected an even number of wereParts");
-			}
-			Object rightSide = whereParts[i];
-			if (rightSide instanceof String) result.add((String) rightSide);
-		}
-		return result;
-	}
-
-	public void update(HashMap<String, Object> columnValues, Object... whereParts) throws ClassNotFoundException, SQLException {
-		String where = joinWhereParts(whereParts);
-		String sql = String.format("UPDATE %s SET %s WHERE %s", getName(), joinAssignments(columnValues), where);
+	public void update(HashMap<String, Object> columnValues, String whereFormat, Object... arguments) throws ClassNotFoundException, SQLException {
+		String sql = String.format("UPDATE %s SET %s WHERE %s", getName(), joinAssignments(columnValues), whereFormat);
 		PreparedStatement statement = getOrOpenConnection().prepareStatement(sql);
 		List<String> list = stringColumnValues(columnValues);
-		list.addAll(stringValues(whereParts));
+		list.addAll(toStringValueList(arguments));
 		fillInBlanks(statement, list);
 		statement.executeUpdate();	
 	}
@@ -112,6 +71,15 @@ public class DbTable {
 		statement.executeUpdate(sql);	
 	}
 
+	private List<String> toStringValueList(Object... arguments) {
+		List<String> result = new ArrayList<String>();
+		for (int i = 0; i < arguments.length; i++) {
+			String value = arguments[i] == null ? "NULL" : arguments[i].toString();
+			result.add(value);
+		}
+		return result;
+	}
+	
 	private void fillInBlanks(PreparedStatement statement, List<String> stringValues) throws SQLException {
 		int i=1;
 		for (String stringValue : stringValues) {

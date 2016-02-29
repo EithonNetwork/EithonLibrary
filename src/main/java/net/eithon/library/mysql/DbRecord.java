@@ -28,27 +28,27 @@ public abstract class DbRecord<T extends DbRecord & IDbRecord<T>> {
 	protected void setDbId(long dbId) { this.id = dbId; }
 	
 	protected T getById(long dbId)  {
-		return getByWhere("id=", dbId);
+		return getByWhere("id=?", dbId);
 	}
 	
-	protected T getByWhere(Object... whereParts)  {
-		List<T> list = findByWhere(whereParts);
+	protected T getByWhere(String format, Object... arguments)  {
+		List<T> list = findByWhere(format, arguments);
 		if (list.size() == 0) return null;
 		if (list.size() > 1) {
-			throw new IllegalArgumentException(String.format("WHERE %s returned more than one row.", whereParts));
+			throw new IllegalArgumentException("Get returned more than one row.");
 		}
 		return list.get(0);
 	}
 	
 	protected List<T> findAll()  {
-		return findByWhere("1=", 1);
+		return findByWhere("1=1");
 	}
 	
-	protected List<T> findByWhere(Object... whereParts)  {
+	protected List<T> findByWhere(String format, Object... arguments)  {
 		List<T> list = new ArrayList<T>(); 
 		ResultSet resultSet;
 		try {
-			resultSet = this.dbTable.select(whereParts);
+			resultSet = this.dbTable.select(format, arguments);
 			while (resultSet.next()) {
 				T data = factory(this.dbTable, resultSet.getLong("id"));
 				data.fromDb(resultSet);
@@ -60,9 +60,9 @@ public abstract class DbRecord<T extends DbRecord & IDbRecord<T>> {
 		return list;
 	}
 	
-	protected void deleteByWhere(Object... whereParts)  {
+	protected void deleteByWhere(String format, Object... arguments)  {
 		try {
-			this.dbTable.delete(whereParts);
+			this.dbTable.delete(format, arguments);
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 		}
@@ -70,7 +70,7 @@ public abstract class DbRecord<T extends DbRecord & IDbRecord<T>> {
 
 	protected void dbUpdate() {		
 		try {
-			this.dbTable.update(getColumnValues(), "id=", this.id);
+			this.dbTable.update(getColumnValues(), "id=?", this.id);
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 		}
