@@ -84,6 +84,16 @@ public abstract class DbRecord<T extends DbRecord & IDbRecord<T>> {
 		}
 	}
 
+	protected Database getDatabase() {
+		// TODO Auto-generated method stub
+		return this.dbTable.getDatabase();
+	}
+
+	protected String getTableName() {
+		// TODO Auto-generated method stub
+		return this.dbTable.getName();
+	}
+
 	public void delete() {
 		try {
 			this.dbTable.delete(this.id);
