@@ -12,13 +12,13 @@ public abstract class DbRecord<T extends DbRecord & IDbRecord<T>> {
 	private long id;
 	private DbTable dbTable;
 	
-	protected DbRecord(DbTable dbTable, long id) {
-		this.dbTable = dbTable;
+	protected DbRecord(Database database, String name, long id) {
+		this.dbTable = DbTable.get(database, name);
 		this.id = id;
 	}
 	
-	protected DbRecord(DbTable dbTable) {
-		this(dbTable, -1);
+	protected DbRecord(Database database, String name) {
+		this(database, name, -1);
 	}
 
 	protected DbRecord() {
@@ -50,7 +50,7 @@ public abstract class DbRecord<T extends DbRecord & IDbRecord<T>> {
 		try {
 			resultSet = this.dbTable.select(format, arguments);
 			while (resultSet.next()) {
-				T data = factory(this.dbTable, resultSet.getLong("id"));
+				T data = factory(this.dbTable.getDatabase(), resultSet.getLong("id"));
 				data.fromDb(resultSet);
 				list.add(data);
 			}
@@ -91,6 +91,6 @@ public abstract class DbRecord<T extends DbRecord & IDbRecord<T>> {
 			e.printStackTrace();
 		}
 	}
-	public abstract T factory(DbTable table, long id);
+	public abstract T factory(Database database, long id);
 	public abstract HashMap<String, Object> getColumnValues();
 }

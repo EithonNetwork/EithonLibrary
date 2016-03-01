@@ -10,11 +10,32 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DbTable {
+class DbTable {
 	private String name;
 	private Database database;
 
-	public DbTable(Database database, String name) {
+	private static HashMap<String, DbTable> knownTables = new HashMap<String, DbTable>();
+
+	public static DbTable get(Database database, String name) {
+		String hashableString = getHashableString(database, name);
+		DbTable table = knownTables.get(hashableString);
+		if (table == null) {
+			table = new DbTable(database, name);
+			knownTables.put(hashableString, table);
+		}
+		return table;
+	}
+
+	@Override
+	public int hashCode() {
+		return getHashableString(this.database, this.name).hashCode();
+	}
+
+	private static String getHashableString(Database database, String name) {
+		return database.toString() + ":" + name;
+	}
+
+	private DbTable(Database database, String name) {
 		this.database = database;
 		this.name = name;
 	}
@@ -39,7 +60,7 @@ public class DbTable {
 	}
 
 	public void delete(String whereFormat, Object... arguments) throws ClassNotFoundException, SQLException {
-			String sql = String.format("DELETE FROM %s WHERE %s", this.name, whereFormat);
+		String sql = String.format("DELETE FROM %s WHERE %s", this.name, whereFormat);
 		PreparedStatement statement = getOrOpenConnection().prepareStatement(sql);
 		fillInBlanks(statement, toStringValueList(arguments));
 		statement.executeUpdate();
@@ -79,7 +100,7 @@ public class DbTable {
 		}
 		return result;
 	}
-	
+
 	private void fillInBlanks(PreparedStatement statement, List<String> stringValues) throws SQLException {
 		int i=1;
 		for (String stringValue : stringValues) {
@@ -107,7 +128,7 @@ public class DbTable {
 				.collect(Collectors.toList());
 		return String.join(",", valueList);
 	}
-	
+
 	private String joinAssignments(HashMap<String, Object> columnValues) {
 		List<String> assignments = 
 				columnValues.keySet().stream()
