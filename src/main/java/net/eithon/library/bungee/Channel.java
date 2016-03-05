@@ -38,7 +38,7 @@ class Channel {
 		return send(player, subChannel, (MessageOut) null, arguments);
 	}
 
-	private boolean send(Player player, String subChannel, MessageOut message, String... arguments) {
+	boolean send(Player player, String subChannel, MessageOut message, String... arguments) {
 		if (player == null) {
 			boolean success = send(subChannel, message, arguments);
 			return success;

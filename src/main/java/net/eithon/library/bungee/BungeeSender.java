@@ -22,7 +22,15 @@ class BungeeSender {
 		return forward("ALL", command, info, rejectOld);
 	}
 
+	boolean forwardToAll(String command, IJsonObject<?> info, boolean rejectOld, Player player) {
+		return forward("ALL", command, info, rejectOld, player);
+	}
+
 	boolean forward(String destinationServer, String command, IJsonObject<?> info, boolean rejectOld) {
+		return forward(destinationServer, command, info, rejectOld, null);
+	}
+
+	boolean forward(String destinationServer, String command, IJsonObject<?> info, boolean rejectOld, Player player) {
 		verbose("forward", "Enter; destinationServer=%s, command = %s", destinationServer, command);
 		String sourceServerName =  this._bungeeController.getBungeeServerName();
 		ForwardHeader header = new ForwardHeader(command, sourceServerName, rejectOld);
@@ -30,7 +38,7 @@ class BungeeSender {
 		MessageOut data = new MessageOut()
 		.add(header.toJSONString())
 		.add(info.toJsonString());
-		boolean success = this._messageChannel.send("Forward", data, destinationServer, "EithonLibraryForward");
+		boolean success = this._messageChannel.send(player, "Forward", data, destinationServer, "EithonLibraryForward");
 		verbose("forward", "Leave, success = %s", success ? "TRUE" : "FALSE");
 		return success;
 	}
