@@ -250,7 +250,6 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 			String[] parameters = this._parameterSyntaxList
 					.stream()
 					.map(p -> p.getSyntaxString())
-					.sorted()
 					.collect(Collectors.toList())
 					.toArray(new String[0]);
 			soFar.append(String.join(" ", parameters));

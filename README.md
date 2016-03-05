@@ -13,6 +13,14 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 4.3 (2016-02-27)
+
+* NEW: Better support for MySQL database table handling.
+
+### 4.2.1 (2016-02-26)
+
+* BUG: Parameter syntax could end up in the wrong order (alphabetically order).
+
 ### 4.2 (2016-02-20)
 
 * NEW: Added MySQL database support.
