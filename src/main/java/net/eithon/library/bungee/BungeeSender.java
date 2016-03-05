@@ -22,7 +22,15 @@ class BungeeSender {
 		return forward("ALL", command, info, rejectOld);
 	}
 
+	boolean forwardToAll(String command, IJsonObject<?> info, boolean rejectOld, Player player) {
+		return forward("ALL", command, info, rejectOld, player);
+	}
+
 	boolean forward(String destinationServer, String command, IJsonObject<?> info, boolean rejectOld) {
+		return forward(destinationServer, command, info, rejectOld, null);
+	}
+
+	boolean forward(String destinationServer, String command, IJsonObject<?> info, boolean rejectOld, Player player) {
 		verbose("forward", "Enter; destinationServer=%s, command = %s", destinationServer, command);
 		String sourceServerName =  this._bungeeController.getBungeeServerName();
 		ForwardHeader header = new ForwardHeader(command, sourceServerName, rejectOld);
