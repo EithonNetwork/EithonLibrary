@@ -38,7 +38,7 @@ class BungeeSender {
 		MessageOut data = new MessageOut()
 		.add(header.toJSONString())
 		.add(info.toJsonString());
-		boolean success = this._messageChannel.send("Forward", data, destinationServer, "EithonLibraryForward");
+		boolean success = this._messageChannel.send(player, "Forward", data, destinationServer, "EithonLibraryForward");
 		verbose("forward", "Leave, success = %s", success ? "TRUE" : "FALSE");
 		return success;
 	}

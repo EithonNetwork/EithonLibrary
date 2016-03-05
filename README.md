@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 4.3.1 (2016-03-05)
+
+* BUG: Last player to quit from server did not result in a Bungee Quit event being broadcasted.
+
 ### 4.3 (2016-02-27)
 
 * NEW: Better support for MySQL database table handling.

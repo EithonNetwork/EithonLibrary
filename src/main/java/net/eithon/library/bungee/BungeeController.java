@@ -90,7 +90,7 @@ public class BungeeController {
 		String serverName = getBungeeServerName();
 		verbose("joinQuitEvent", String.format("serverName=%s", serverName));
 		JoinQuitInfo info = new JoinQuitInfo(serverName, player.getUniqueId(), player.getName(), mainGroup);
-		boolean success = this._bungeeSender.forwardToAll(eventName, info, true);
+		boolean success = this._bungeeSender.forwardToAll(eventName, info, true, player);
 		verbose("joinQuitEvent", String.format("success=%s", success ? "TRUE" : "FALSE"));
 		verbose("joinQuitEvent", "Leave");
 		return success;
