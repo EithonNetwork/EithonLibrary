@@ -16,8 +16,13 @@ class Channel {
 		this._eithonPlugin = eithonPlugin;
 	}
 
-	boolean send(String subChannel) {
-		return send(subChannel, (MessageOut) null, (String[]) null);
+	boolean send(String subChannel, MessageOut data, String destinationServer, String string) {
+		return send(null, subChannel, (MessageOut) null, (String[]) null);
+	}
+
+
+	boolean send(Player player, String subChannel, MessageOut data, String destinationServer, String string) {
+		return send(player, subChannel, (MessageOut) null, (String[]) null);
 	}
 
 	boolean send(String subChannel, String... arguments) {
