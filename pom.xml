@@ -3,7 +3,7 @@
 	<groupId>net.eithon.plugin</groupId>
 	<artifactId>EithonLibrary</artifactId>
 	<name>EithonLibrary</name>
-	<version>4.3.1</version>
+	<version>4.4</version>
 	<build>
 		<plugins>
 			<plugin>
@@ -44,20 +44,20 @@
      <dependency>
              <groupId>org.bukkit</groupId>
              <artifactId>bukkit</artifactId>
-             <version>[1.8.8-R0.1-SNAPSHOT,)</version>
+             <version>[1.9-R0.1-SNAPSHOT,)</version>
              <scope>provided</scope>
      </dependency>
        <dependency>
            <groupId>org.bukkit</groupId>
            <artifactId>craftbukkit</artifactId>
-           <version>1.8.3-R0.1-SNAPSHOT</version>
+           <version>1.9-R0.1-SNAPSHOT</version>
            <type>jar</type>
            <scope>provided</scope>
        </dependency>
 		<dependency>
 			<groupId>org.bukkit</groupId>
 			<artifactId>bukkit</artifactId>
-			<version>[1.8.3,)</version>
+			<version>[1.9,)</version>
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
