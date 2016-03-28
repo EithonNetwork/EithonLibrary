@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 4.4 (2016-03-20)
+
+* Spigot 1.9
+
 ### 4.3.1 (2016-03-05)
 
 * BUG: Last player to quit from server did not result in a Bungee Quit event being broadcasted.
