@@ -13,14 +13,15 @@ import java.util.List;
 public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 	private long id;
 	private DbTable dbTable;
+	private LocalDateTime updatedAt;
 
-	protected DbRecord(Database database, String name, long id) {
-		this.dbTable = DbTable.get(database, name);
+	protected DbRecord(Database database, String tableName, long id) {
+		this.dbTable = DbTable.get(database, tableName, getUpdatedAtColumnName());
 		this.id = id;
 	}
 
-	protected DbRecord(Database database, String name) {
-		this(database, name, -1);
+	protected DbRecord(Database database, String tableName) {
+		this(database, tableName, -1);
 	}
 
 	protected DbRecord() {
@@ -28,6 +29,7 @@ public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 
 	public long getDbId() { return this.id; }
 	protected void setDbId(long dbId) { this.id = dbId; }
+	public LocalDateTime getUpdatedAt() { return this.updatedAt; }
 	
 	public LocalDateTime getDatabaseNow() {
 		Timestamp timestamp = null;
@@ -125,6 +127,18 @@ public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 			e.printStackTrace();
 		}
 	}
+	
+	@SuppressWarnings("unchecked")
+	public T fromDb(ResultSet resultSet) throws SQLException {
+		if (this.dbTable.hasUpdatedAtColumn()) {
+			this.updatedAt = null;
+			Timestamp timestamp = resultSet.getTimestamp("updated_at");
+			if (timestamp != null) this.updatedAt = timestamp.toLocalDateTime();
+		}
+		return (T) this;
+	}
+
 	public abstract T factory(Database database, long id);
 	public abstract HashMap<String, Object> getColumnValues();
+	public String getUpdatedAtColumnName() { return null; }
 }
