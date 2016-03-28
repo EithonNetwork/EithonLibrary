@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +59,14 @@ class DbTable {
 		PreparedStatement statement = getOrOpenConnection().prepareStatement(sql);
 		fillInBlanks(statement, toStringValueList(arguments));
 		return statement.executeQuery();
+	}
+
+	public Timestamp getDataBaseNow() throws ClassNotFoundException, SQLException {
+		String sql = "SELECT NOW()";
+		Statement statement = getOrOpenConnection().createStatement();
+		ResultSet resultSet = statement.executeQuery(sql);
+		if ((resultSet == null) || !resultSet.next()) return null;
+		return resultSet.getTimestamp(1);
 	}
 
 	public void delete(String whereFormat, Object... arguments) throws ClassNotFoundException, SQLException {

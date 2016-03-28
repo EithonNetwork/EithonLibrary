@@ -2,21 +2,23 @@ package net.eithon.library.mysql;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 
 @SuppressWarnings("rawtypes")
-public abstract class DbRecord<T extends DbRecord & IDbRecord<T>> {
+public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 	private long id;
 	private DbTable dbTable;
-	
+
 	protected DbRecord(Database database, String name, long id) {
 		this.dbTable = DbTable.get(database, name);
 		this.id = id;
 	}
-	
+
 	protected DbRecord(Database database, String name) {
 		this(database, name, -1);
 	}
@@ -27,10 +29,22 @@ public abstract class DbRecord<T extends DbRecord & IDbRecord<T>> {
 	public long getDbId() { return this.id; }
 	protected void setDbId(long dbId) { this.id = dbId; }
 	
+	public LocalDateTime getDatabaseNow() {
+		Timestamp timestamp = null;
+		try {
+			timestamp = this.dbTable.getDataBaseNow();
+		} catch (ClassNotFoundException | SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if (timestamp == null) return null;
+		return timestamp.toLocalDateTime();
+	}
+
 	protected T getById(long dbId)  {
 		return getByWhere("id=?", dbId);
 	}
-	
+
 	protected T getByWhere(String format, Object... arguments)  {
 		List<T> list = findByWhere(format, arguments);
 		if (list.size() == 0) return null;
@@ -39,11 +53,11 @@ public abstract class DbRecord<T extends DbRecord & IDbRecord<T>> {
 		}
 		return list.get(0);
 	}
-	
+
 	protected List<T> findAll()  {
 		return findByWhere("1=1");
 	}
-	
+
 	protected List<T> findByWhere(String format, Object... arguments)  {
 		List<T> list = new ArrayList<T>(); 
 		ResultSet resultSet;
@@ -59,7 +73,17 @@ public abstract class DbRecord<T extends DbRecord & IDbRecord<T>> {
 		}
 		return list;
 	}
-	
+
+	public void refresh()  {
+		try {
+			ResultSet resultSet = this.dbTable.select("id=?", getDbId());
+			if ((resultSet == null) || !resultSet.next()) return;
+			this.fromDb(resultSet);
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
 	protected void deleteByWhere(String format, Object... arguments)  {
 		try {
 			this.dbTable.delete(format, arguments);
