@@ -7,4 +7,5 @@ import java.util.HashMap;
 public interface IDbRecord<T> {
 	HashMap<String, Object> getColumnValues();
 	T fromDb(ResultSet resultSet) throws SQLException;
+	String getUpdatedAtColumnName();
 }

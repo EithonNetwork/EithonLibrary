@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,14 +14,15 @@ import java.util.stream.Collectors;
 class DbTable {
 	private String name;
 	private Database database;
+	private String updatedAtColumnName;
 
 	private static HashMap<String, DbTable> knownTables = new HashMap<String, DbTable>();
 
-	public static DbTable get(Database database, String name) {
+	public static DbTable get(Database database, String name, String updatedAtColumnName) {
 		String hashableString = getHashableString(database, name);
 		DbTable table = knownTables.get(hashableString);
 		if (table == null) {
-			table = new DbTable(database, name);
+			table = new DbTable(database, name, updatedAtColumnName);
 			knownTables.put(hashableString, table);
 		}
 		return table;
@@ -37,9 +37,10 @@ class DbTable {
 		return database.toString() + ":" + name;
 	}
 
-	private DbTable(Database database, String name) {
+	private DbTable(Database database, String name, String updatedAtColumnName) {
 		this.database = database;
 		this.name = name;
+		this.updatedAtColumnName = updatedAtColumnName;
 	}
 
 	public Database getDatabase() {
@@ -144,7 +145,14 @@ class DbTable {
 				columnValues.keySet().stream()
 				.map(name -> String.format("%s=%s", name, getValueAsSqlObject(columnValues.get(name))))
 				.collect(Collectors.toList());
+		if (hasUpdatedAtColumn()) {
+			assignments.add(String.format("%s=NOW()", this.updatedAtColumnName));
+		}
 		return String.join(",", assignments);
+	}
+
+	public boolean hasUpdatedAtColumn() {
+		return this.updatedAtColumnName != null;
 	}
 
 	private String getValueAsSqlObject(Object columnValue) {
