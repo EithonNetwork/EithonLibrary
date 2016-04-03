@@ -65,7 +65,10 @@ public class EithonLocation extends JsonObject<EithonLocation>{
 	@Override
 	public Object toJson() {
 		JSONObject json = new JSONObject();
-		json.put("world", getEithonWorld().toJson());
+		EithonWorld eithonWorld = getEithonWorld();
+		JSONObject tmp = null;
+		if (eithonWorld != null) tmp = (JSONObject) eithonWorld.toJson();
+		json.put("world", tmp);
 		json.put("x", this._location.getX());
 		json.put("y", this._location.getY());
 		json.put("z", this._location.getZ());
@@ -77,16 +80,15 @@ public class EithonLocation extends JsonObject<EithonLocation>{
 	@Override
 	public EithonLocation fromJson(Object json) {
 		JSONObject jsonObject = (JSONObject) json;
-		this._eithonWorld = EithonWorld.getFromJson(jsonObject.get("world"));
 		double x = (double) jsonObject.get("x");
 		double y = (double) jsonObject.get("y");
 		double z = (double) jsonObject.get("z");
 		float yaw = (float) (double) jsonObject.get("yaw");
 		float pitch = (float) (double) jsonObject.get("pitch");
+		this._eithonWorld = EithonWorld.getFromJson(jsonObject.get("world"));
 		World world = this._eithonWorld.getWorld();
 		if (world == null) {
 			Logger.libraryWarning("EithonLocation.fromJson: Could not find world %s", this._eithonWorld.getName());
-			return null;
 		}
 		this._location = new Location(world, x, y, z, yaw, pitch);
 		return this;
