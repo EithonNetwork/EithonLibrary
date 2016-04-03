@@ -37,11 +37,11 @@ public class EithonWorld extends JsonObject<EithonWorld> implements IUuidAndName
 
 	public World getWorld() { 
 		if (this._world != null) return this._world;
-		this._world = Bukkit.getWorld(this._id);
+		this._world = this._id == null ? null : Bukkit.getWorld(this._id);
 		if (this._world != null) return this._world;
-		this._world = Bukkit.getWorld(this._name);
+		if (this._name != null) this._world = Bukkit.getWorld(this._name);
 		if (this._world != null) return this._world;
-		Logger.libraryWarning("Could not find world %s (%s)", this._name, this._id.toString());
+		Logger.libraryWarning("Could not find world %s (%s)", this._name, this._id == null ? null : this._id.toString());
 		return null;
 	}	
 
@@ -65,15 +65,17 @@ public class EithonWorld extends JsonObject<EithonWorld> implements IUuidAndName
 	@Override
 	public Object toJson() {
 		JSONObject json = new JSONObject();
-		json.put("id", getUniqueId().toString());
+		json.put("id", getUniqueId() == null ? null : getUniqueId().toString());
 		json.put("name", getName());
 		return json;
 	}
 
 	@Override
 	public EithonWorld fromJson(Object json) {
+		if (json == null) return null;
 		JSONObject jsonObject = (JSONObject) json;
-		this._id = UUID.fromString((String) jsonObject.get("id"));
+		String idAsString = (String) jsonObject.get("id");
+		this._id = idAsString == null ? null :UUID.fromString(idAsString);
 		this._name = (String) jsonObject.get("name");
 		return this;
 	}

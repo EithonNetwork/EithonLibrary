@@ -16,6 +16,7 @@ Eithon java code library for Minecraft.
 ### 4.6 (2016-04-03)
 
 * NEW: Added functionality for PlayerCollection.
+* CHANGE: Safer EithonLocation.
 
 ### 4.5 (2016-03-28)
 
