@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 4.6 (2016-04-03)
+
+* NEW: Added functionality for PlayerCollection.
+
 ### 4.5 (2016-03-28)
 
 * NEW: Added functionality for DbRecord.

@@ -24,6 +24,10 @@ public class PlayerCollection<T> implements Iterable<T>, Serializable {
 	public PlayerCollection() {
 		this.playerInfo = new HashMap<UUID, T>();
 	}
+	
+	public void clear() {
+		this.playerInfo.clear();
+	}
 
 	public void put(EithonPlayer eithonPlayer, T info) {
 		UUID id = eithonPlayer.getUniqueId();
