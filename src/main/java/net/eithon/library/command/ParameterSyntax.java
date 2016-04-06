@@ -5,8 +5,11 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import net.eithon.library.time.TimeMisc;
 
@@ -19,7 +22,8 @@ class ParameterSyntax extends Syntax implements IParameterSyntaxAdvanced {
 	private ParameterType _type;
 	private boolean _isNamed;
 	private String _leftHandName;
-	private ArrayList<String> _validValues;
+	Map<String, String> _validValuesMap;
+	List<String> _validValuesOrdered;
 	private ValueGetter _valueGetter;
 	private boolean _isOptional;
 	private String _defaultValue;
@@ -71,7 +75,8 @@ class ParameterSyntax extends Syntax implements IParameterSyntaxAdvanced {
 		this._isOptional = this._isNamed || (type == ParameterType.REST);
 		this._valueGetter = null;
 		this._acceptsAnyValue = true;
-		this._validValues = new ArrayList<String>();
+		this._validValuesMap = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
+		this._validValuesOrdered = new ArrayList<String>();
 	}
 
 	public boolean getIsOptional() { return this._isOptional; }
@@ -88,7 +93,7 @@ class ParameterSyntax extends Syntax implements IParameterSyntaxAdvanced {
 		this._defaultGetter = defaultGetter;
 		return this;
 	} 
-	
+
 	public String getDefault(EithonCommand command) {
 		if (this._defaultGetter == null) return this._defaultValue; 
 		return this._defaultGetter.getDefault(command);
@@ -119,9 +124,37 @@ class ParameterSyntax extends Syntax implements IParameterSyntaxAdvanced {
 		setValues(Arrays.asList(args));
 	}
 
-	public void setValues(List<String> values) {
-		this._validValues = new ArrayList<String>();
-		this._validValues.addAll(values);
+	public void setValues(final List<String> values) {
+		setValues(null, values);
+	}
+
+	private void setValues(final String defaultValue, final List<String> values) {
+		this._validValuesMap = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
+		for (String string : values) {
+			this._validValuesMap.put(string, string);
+		}
+		this._validValuesOrdered = new ArrayList<String>();
+		this._validValuesOrdered.addAll(values);
+		if ((defaultValue != null) && !this._validValuesMap.containsKey(defaultValue)) {
+			this._validValuesMap.put(this._defaultValue, this._defaultValue);
+			this._validValuesOrdered.add(0, this._defaultValue);
+		}
+	}
+
+	private void orderValues(final String defaultValue) {
+		this._validValuesOrdered = this._validValuesOrdered
+				.stream()
+				.sorted(new Comparator<String>() {
+					@Override
+					public int compare(String o1, String o2) {
+						if (defaultValue != null) {
+							if (o1.equalsIgnoreCase(defaultValue)) return -1;
+							if (o2.equalsIgnoreCase(defaultValue)) return 1;
+						}
+						return o1.compareTo(o2);
+					}
+				})
+				.collect(Collectors.toList());
 	}
 
 	public void parseArguments(EithonCommand command, String argument, HashMap<String, EithonArgument> collectedArguments) 
@@ -135,27 +168,24 @@ class ParameterSyntax extends Syntax implements IParameterSyntaxAdvanced {
 			throw new ArgumentParseException(String.format("Expected a value for argument <%s>", getName()));
 		}
 		verifyValueIsOkAccordingToType(argument);
+		if (this._valueGetter != null) {
+			setValues(this._valueGetter.getValues(command));
+		}
+		if (this._validValuesMap != null) {
+			String foundValue = this._validValuesMap.get(argument);
+			if (foundValue != null) {
+				parameterValue = new EithonArgument(command, this, foundValue);
+				if (collectedArguments != null) collectedArguments.put(getName(), parameterValue);
+				return;
+			}
+		}
 		if (this._acceptsAnyValue) {
 			if (collectedArguments != null) collectedArguments.put(getName(), parameterValue);
 			return;
 		}
-		if (this._valueGetter != null) {
-			this._validValues = new ArrayList<String>();
-			this._validValues.addAll(this._valueGetter.getValues(command));
-		}
-		if (this._validValues != null) {
-			for (String validValue : this._validValues) {
-				if (argument.equals(validValue)) {
-					if (collectedArguments != null) collectedArguments.put(getName(), parameterValue);
-					return;
-				}
-			}
-		}
 		throw new ArgumentParseException(String.format("The value \"%s\" was not an accepted value for argument <%s>.",
 				argument, getName()));
 	}
-
-
 
 	public List<String> getValidValues() {
 		return getValidValues(null);
@@ -163,19 +193,11 @@ class ParameterSyntax extends Syntax implements IParameterSyntaxAdvanced {
 
 	public List<String> getValidValues(EithonCommand command) {
 		if ((command != null) && (this._valueGetter != null)) {
-			this._validValues = new ArrayList<String>();
-			this._validValues.addAll(this._valueGetter.getValues(command));
-			this._validValues.sort(new Comparator<String>() {
-				@Override
-				public int compare(String o1, String o2) {
-					return o1.compareTo(o2);
-				}
-			});
+			final String defaultValue = getDefault(command);
+			setValues(defaultValue, this._valueGetter.getValues(command));
+			orderValues(defaultValue);
 		}
-		if ((this._defaultValue != null) && !this._validValues.contains(this._defaultValue)) {
-			this._validValues.add(0, this._defaultValue);
-		}
-		return this._validValues;
+		return this._validValuesOrdered;
 	}
 
 	private boolean verifyValueIsOkAccordingToType(String argument) throws ArgumentParseException {
@@ -208,7 +230,7 @@ class ParameterSyntax extends Syntax implements IParameterSyntaxAdvanced {
 		if (this._isNamed) sb.append(this._leftHandName + ":");
 		sb.append(String.format("<%s", this.getName())); 
 		if (this._type != ParameterType.STRING) sb.append(String.format(" : %s", this._type.toString()));
-		if (this._validValues.size()>0) sb.append(String.format(" {%s}", validValuesAsString(true)));
+		if (this._validValuesMap.size()>0) sb.append(String.format(" {%s}", validValuesAsString(true)));
 		sb.append(">");
 		return sb.toString();
 	}
@@ -227,16 +249,15 @@ class ParameterSyntax extends Syntax implements IParameterSyntaxAdvanced {
 	}
 
 	private String validValuesAsString(boolean markDefault) {
-		String validValues;
-		if (this._defaultValue == null) validValues = String.join(", ", this._validValues);
-		else {
-			List<String> values = new ArrayList<String>();
-			for (String value : this._validValues) {
-				if (value.equals(this._defaultValue)) value = String.format("_%s_", value);
-				values.add(value);
-			}
-			validValues = String.join(", ", values);
+		final String defaultValue = getDefault();
+		List<String> values = this._validValuesOrdered;
+		if (defaultValue != null) {
+			values = this._validValuesOrdered
+					.stream()
+					.map(s -> s.equalsIgnoreCase(defaultValue) ? String.format("_%s_", s) : s)
+					.collect(Collectors.toList());
 		}
+		String validValues = String.join(", ", values);
 		if (this._acceptsAnyValue) validValues = validValues + ", ...";
 		return validValues;
 	}

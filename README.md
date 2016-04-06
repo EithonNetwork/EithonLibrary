@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 4.7 (2016-04-06)
+
+* CHANGE: Command arguments are now case insensitive when it comes to valid values.
+
 ### 4.6 (2016-04-03)
 
 * NEW: Added functionality for PlayerCollection.
