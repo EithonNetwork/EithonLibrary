@@ -770,4 +770,40 @@ public class EithonCommandTest {
 		Assert.assertNotNull(argument);
 		Assert.assertNull(argument.asString());
 	}
+
+	@Test
+	public void caseInsensitive() 
+	{
+		ICommandSyntax root = EithonCommand.createRootCommand("message");
+		// Prepare
+
+		ICommandSyntax tempmute = null;
+		try {
+			tempmute = root.parseCommandSyntax("to <player>")
+					.setCommandExecutor(ec -> commandExecutorForCaseTests(ec));
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+
+		tempmute
+		.getParameterSyntax("player")
+		.setMandatoryValues(ec -> Arrays.asList(new String[]{"Anders", "Bertil"}));
+
+		// Do
+		EithonCommand ec = Support.createEithonCommand(root, "to anders");
+		Assert.assertNotNull(ec);
+
+		// Verify
+		setHasExecuted(false);
+		Assert.assertTrue(ec.execute());
+		Assert.assertTrue(getHasExecuted());
+	}
+	
+	private void commandExecutorForCaseTests(EithonCommand ec) {
+		Assert.assertNotNull(ec); 
+		setHasExecuted(true);
+		EithonArgument argument = ec.getArgument("player");
+		Assert.assertNotNull(argument);
+		Assert.assertEquals("Anders", argument.asString());
+	}
 }
