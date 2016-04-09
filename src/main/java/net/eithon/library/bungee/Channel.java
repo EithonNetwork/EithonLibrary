@@ -25,13 +25,27 @@ class Channel {
 	}
 
 	boolean send(String subChannel, MessageOut msgOut, String... arguments) {
-		Player player = getPlayer(subChannel, msgOut, arguments);
+		Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
 		if (player == null) {
-			this._eithonPlugin.getEithonLogger().warning("No player found, will try later.");
-			return true;
+			this._eithonPlugin.getEithonLogger().warning(
+					"No player found. Postponed until a player joins the server.");
+			retryInBackgroundUntilServerHasPlayer(subChannel, msgOut, arguments);
+			return false;
 		}
 		boolean success = send(player, subChannel, msgOut, arguments);
 		return success;
+	}
+
+	void retryInBackgroundUntilServerHasPlayer(String subChannel,
+			MessageOut msgOut, String... arguments) {
+		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+		scheduler.scheduleSyncDelayedTask(this._eithonPlugin, new Runnable() {
+			public void run() {
+				Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
+				if (player != null) send(player, subChannel, msgOut, arguments);
+				else retryInBackgroundUntilServerHasPlayer(subChannel, msgOut, arguments);
+			}
+		}, TimeMisc.secondsToTicks(1));
 	}
 
 	boolean send(Player player, String subChannel, String... arguments) {
@@ -49,19 +63,5 @@ class Channel {
 		if (message != null) messageOut.add(message.toByteArray());
 		player.sendPluginMessage(this._eithonPlugin, "BungeeCord", messageOut.toByteArray());
 		return true;
-	}
-
-	private Player getPlayer(String subChannel, MessageOut msgOut, String... arguments) {
-		Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
-		if (player == null) {
-			BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-			scheduler.scheduleSyncDelayedTask(this._eithonPlugin, new Runnable() {
-				public void run() {
-					send(subChannel, msgOut, arguments);
-				}
-			}, TimeMisc.secondsToTicks(1));
-			return null;
-		}
-		return player;
 	}
 }
