@@ -3,7 +3,7 @@
 	<groupId>net.eithon.plugin</groupId>
 	<artifactId>EithonLibrary</artifactId>
 	<name>EithonLibrary</name>
-	<version>4.7</version>
+	<version>4.8</version>
 	<build>
 		<plugins>
 			<plugin>
