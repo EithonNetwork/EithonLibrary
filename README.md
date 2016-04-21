@@ -13,6 +13,14 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 4.9 (2016-04-21)
+
+* CHANGE: Now handles more than one EventListener per plugin.
+
+### 4.8 (2016-04-09)
+
+* CHANGE: Bungee servers no longer have a message per second for not having a player.
+
 ### 4.7 (2016-04-06)
 
 * CHANGE: Command arguments are now case insensitive when it comes to valid values.
