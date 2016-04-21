@@ -24,6 +24,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class EithonPlugin extends JavaPlugin implements Listener, TabCompleter {
@@ -32,7 +33,6 @@ public class EithonPlugin extends JavaPlugin implements Listener, TabCompleter {
 	private Configuration _config;
 	private ICommandHandler _commandHandlerOld;
 	private ICommandSyntax _commandSyntax;
-	private Listener _eventListener;
 	private EithonLibraryApi _eithonLibraryApi;
 
 	public EithonPlugin() {}
@@ -77,27 +77,33 @@ public class EithonPlugin extends JavaPlugin implements Listener, TabCompleter {
 		.tabComplete();
 	}
 
-	public void activate(Listener eventListener) {
+	public void activate(Listener... eventListeners) {
 		this._commandSyntax = null;
 		this._commandHandlerOld = null;
-		this._eventListener = eventListener;
-		if (this._eventListener == null) this._eventListener = this;
-		getServer().getPluginManager().registerEvents(this._eventListener, this);
+		PluginManager pluginManager = getServer().getPluginManager();
+		if (eventListeners.length == 0) {
+			pluginManager.registerEvents(this, this);
+			return;
+		}
+		for (Listener listener : eventListeners) {
+			try {
+				pluginManager.registerEvents(listener , this);				
+			} catch (Exception e) {
+				getEithonLogger().error("%s", e.getMessage());
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Deprecated
-	public void activate(ICommandHandler commandHandler, Listener eventListener) {
+	public void activate(ICommandHandler commandHandler, Listener... eventListeners) {
+		activate(eventListeners);
 		this._commandHandlerOld = commandHandler;
-		this._eventListener = eventListener;
-		if (this._eventListener == null) this._eventListener = this;
-		getServer().getPluginManager().registerEvents(this._eventListener, this);
 	}
 
-	public void activate(ICommandSyntax commandSyntax, Listener eventListener) {
+	public void activate(ICommandSyntax commandSyntax, Listener... eventListeners) {
+		activate(eventListeners);
 		this._commandSyntax = commandSyntax;
-		this._eventListener = eventListener;
-		if (this._eventListener == null) this._eventListener = this;
-		getServer().getPluginManager().registerEvents(this._eventListener, this);
 		String commandName = commandSyntax.getName();
 		PluginCommand command = getCommand(commandName);
 		if (command == null) {
@@ -111,7 +117,6 @@ public class EithonPlugin extends JavaPlugin implements Listener, TabCompleter {
 	public void onDisable() {
 		this._commandHandlerOld = null;
 		this._commandSyntax = null;
-		this._eventListener = null;
 		instances.remove(getName());
 	}
 
