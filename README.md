@@ -16,6 +16,7 @@ Eithon java code library for Minecraft.
 ### 4.10 (2016-04-27)
 
 * NEW: Supports eithonbungee in requiring explicit permissions for that specific server to teleport to another server.
+* BUG: Permissions were never checked for commands.
 
 ### 4.9 (2016-04-21)
 

@@ -42,6 +42,7 @@ public class EithonCommand {
 	}
 
 	public boolean execute() {
+		if (!hasPermissionOrInformSender()) return true; 
 		CommandExecutor executor = null;
 		try {
 			executor = this._commandSyntax.parseArguments(this, this._commandQueue, this._arguments, "syntax: ");
@@ -52,6 +53,16 @@ public class EithonCommand {
 		}
 		if (executor != null) executor.execute(this);
 		return true;
+	}
+
+	private boolean hasPermissionOrInformSender() {
+		String requiredPermission = this._commandSyntax.getRequiredPermission();
+		if (requiredPermission == null) return true;
+		Player player = getPlayer();
+		if (player == null) return true;
+		if (player.hasPermission(requiredPermission)) return true;
+		player.sendMessage(String.format("You must have permission %s to use that command.", requiredPermission));
+		return false;
 	}
 
 	public CommandSender getSender() { return this._sender; }
