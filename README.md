@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 4.10 (2016-04-27)
+
+* NEW: Supports eithonbungee in requiring explicit permissions for that specific server to teleport to another server.
+
 ### 4.9 (2016-04-21)
 
 * CHANGE: Now handles more than one EventListener per plugin.

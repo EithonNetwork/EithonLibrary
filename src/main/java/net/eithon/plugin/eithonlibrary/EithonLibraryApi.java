@@ -3,6 +3,7 @@ package net.eithon.plugin.eithonlibrary;
 import net.eithon.library.bungee.BungeeController;
 import net.eithon.library.json.IJsonObject;
 
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class EithonLibraryApi {
@@ -38,6 +39,7 @@ public class EithonLibraryApi {
 	}
 
 	public boolean teleportPlayerToServer(Player player, String serverName) {
+		if (!playerHasPermissionToAccessServer(player, serverName)) return false;
 		return this._controller.connectToServer(player, serverName);
 	}
 
@@ -51,5 +53,19 @@ public class EithonLibraryApi {
 
 	public boolean bungeeSendDataToServer(String serverName, String name, IJsonObject<?> data, boolean rejectOld) {
 		return this._controller.sendDataToServer(serverName, name, data, rejectOld);
+	}
+
+	public boolean playerHasPermissionToAccessServerOrInformSender(
+			CommandSender sender, Player player, String bungeeServerName) {
+		if (playerHasPermissionToAccessServer(player, bungeeServerName)) return true;
+		if (sender == null) return false;
+		sender.sendMessage(String.format("Player %s is not permitted to access server %s.", 
+				player.getName(), bungeeServerName));
+
+		return false;
+	}
+
+	public boolean playerHasPermissionToAccessServer(Player player, String bungeeServerName) {
+		return player.hasPermission(String.format("eithonbungee.access.server.%s", bungeeServerName));
 	}
 }
