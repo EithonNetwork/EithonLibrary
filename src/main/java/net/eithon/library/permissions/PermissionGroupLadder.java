@@ -1,7 +1,7 @@
 package net.eithon.library.permissions;
 
 import net.eithon.library.extensions.EithonPlugin;
-import net.eithon.library.facades.ZPermissionsFacade;
+import net.eithon.library.facades.PermissionsFacade;
 import net.eithon.library.plugin.Logger.DebugPrintLevel;
 
 import org.bukkit.entity.Player;
@@ -20,7 +20,7 @@ public class PermissionGroupLadder {
 		this._permissionGroups = permissionGroups;
 	}
 
-	public boolean canUpdatePermissionGroups() { return ZPermissionsFacade.isConnected(); }
+	public boolean canUpdatePermissionGroups() { return PermissionsFacade.isConnected(); }
 
 	public int getLevel(String permissionName) {
 		for (int i = 0; i < this._permissionGroups.length; i++) {
@@ -39,7 +39,7 @@ public class PermissionGroupLadder {
 		boolean anyChanged = false;
 		boolean changed = false;
 		verbose("updatePermissionGroups", "Enter player = %s, index = %d", player.getName(), levelStartAtOne);
-		String[] playerGroups = ZPermissionsFacade.getPlayerPermissionGroups(player);
+		String[] playerGroups = PermissionsFacade.getPlayerPermissionGroups(player);
 		verbose("updatePermissionGroups", "playerGroups: %s", String.join(", ", playerGroups));
 		if (this._isAccumulative) changed = addLowerLevels(player, levelStartAtOne, playerGroups);
 		anyChanged = anyChanged || changed;
@@ -99,7 +99,7 @@ public class PermissionGroupLadder {
 		String levelGroup = getPermissionGroup(levelStartAtOne);
 		if (contains(playerGroups, levelGroup)) return false;
 		verbose("maybeAddGroup", "Adding group %s for player %s.", levelGroup, player.getName());
-		ZPermissionsFacade.addPermissionGroup(player, getPermissionGroup(levelStartAtOne));
+		PermissionsFacade.addPermissionGroup(player, getPermissionGroup(levelStartAtOne));
 		return true;
 	}
 
@@ -107,13 +107,13 @@ public class PermissionGroupLadder {
 		String levelGroup = getPermissionGroup(level);
 		if (!contains(playerGroups, levelGroup)) return false;
 		verbose("maybeRemoveGroup", "Removing group %s for player %s.", levelGroup, player.getName());
-		ZPermissionsFacade.removePermissionGroup(player, getPermissionGroup(level));
+		PermissionsFacade.removePermissionGroup(player, getPermissionGroup(level));
 		return true;
 	}
 
 	public int currentLevel(Player player) {
-		if (!ZPermissionsFacade.isConnected()) return 0;
-		String[] currentGroups = ZPermissionsFacade.getPlayerPermissionGroups(player);
+		if (!PermissionsFacade.isConnected()) return 0;
+		String[] currentGroups = PermissionsFacade.getPlayerPermissionGroups(player);
 		int levelStartAtOne = 0;
 		if ((currentGroups != null) && (currentGroups.length > 0)) {
 			for (int i = 1; i <= this._permissionGroups.length; i++) {

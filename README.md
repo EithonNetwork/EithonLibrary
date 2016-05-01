@@ -13,9 +13,9 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
-### 4.10.1 (2016-05-01)
+### 4.11 (2016-05-01)
 
-* BUG: Permissions were only checked for the root command, not for the specific sub command that had been issued.
+* CHANGE: Now uses the PowerfulPerms plugin for permissions instead of zPermissions.
 
 ### 4.10 (2016-04-27)
 

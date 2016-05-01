@@ -2,7 +2,7 @@ package net.eithon.library.bungee;
 
 import net.eithon.library.core.CoreMisc;
 import net.eithon.library.extensions.EithonPlugin;
-import net.eithon.library.facades.ZPermissionsFacade;
+import net.eithon.library.facades.PermissionsFacade;
 import net.eithon.library.json.IJsonObject;
 import net.eithon.library.plugin.Logger.DebugPrintLevel;
 import net.eithon.plugin.eithonlibrary.Config;
@@ -97,7 +97,7 @@ public class BungeeController {
 	}
 
 	public static String getHighestGroup(Player player) {
-		String[] currentGroups = ZPermissionsFacade.getPlayerPermissionGroups(player);
+		String[] currentGroups = PermissionsFacade.getPlayerPermissionGroups(player);
 		for (String priorityGroup : Config.V.groupPriorities) {
 			for (String playerGroup : currentGroups) {
 				if (playerGroup.equalsIgnoreCase(priorityGroup)) {

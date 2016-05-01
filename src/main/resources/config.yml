@@ -31,17 +31,6 @@ eithon:
   #
   # Delay (ticks) for title fade out
   TitleFadeOutTicks: 20
-
-commands:
-
-  #
-  # Parameters: <player name>(%s) <group name>(%s)
-  AddGroup_2: perm player %s addgroup %s
-
-  #
-  # Parameters: <player name>(%s) <group name>(%s)
-  RemoveGroup_2: perm player %s removegroup %s
-
 #
 # General messages that are valid over all plugins
 #
