@@ -9,7 +9,7 @@ import java.util.Queue;
 
 import net.eithon.library.command.ICommandSyntax;
 import net.eithon.library.facades.EithonLibraryFacade;
-import net.eithon.library.facades.ZPermissionsFacade;
+import net.eithon.library.facades.PermissionsFacade;
 import net.eithon.library.file.FileMisc;
 import net.eithon.library.plugin.Configuration;
 import net.eithon.library.plugin.GeneralMessage;
@@ -48,7 +48,7 @@ public class EithonPlugin extends JavaPlugin implements Listener, TabCompleter {
 		instances.put(getName(), this);
 		GeneralMessage.initialize(this);
 		AlarmTrigger.get().enable(this);
-		ZPermissionsFacade.initialize(this);
+		PermissionsFacade.initialize(this);
 		this._eithonLibraryApi = new EithonLibraryFacade(this).getApi();
 	}
 

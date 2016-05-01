@@ -35,15 +35,7 @@ public class Config {
 		}
 	}
 	public static class C {
-
-		public static ConfigurableCommand addGroupCommand;
-		public static ConfigurableCommand removeGroupCommand;
-
 		static void load(Configuration config) {
-			addGroupCommand = config.getConfigurableCommand("commands.AddGroup_2", 2,
-					"perm player %s addgroup %s");
-			removeGroupCommand = config.getConfigurableCommand("commands.RemoveGroup_2", 2,
-					"perm player %s removegroup %s");
 		}
 	}
 	
