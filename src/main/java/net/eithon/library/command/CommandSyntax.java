@@ -106,12 +106,14 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 		this._commandExecutor = commandExecutor;
 		return this;
 	}
+	
+	public CommandExecutor getCommandExecutor() { return this._commandExecutor; }
 
 	public void setPermission(String permission) {
 		this._permission = permission;
 	}
 
-	public CommandExecutor parseArguments(EithonCommand command, Queue<String> argumentQueue, HashMap<String, EithonArgument> collectedArguments, String commandLineSofar) 
+	public CommandSyntax parseArguments(EithonCommand command, Queue<String> argumentQueue, HashMap<String, EithonArgument> collectedArguments, String commandLineSofar) 
 			throws CommandParseException {
 
 		if (hasSubCommands()) {
@@ -144,7 +146,7 @@ class CommandSyntax extends Syntax implements ICommandSyntaxAdvanced {
 				throw new CommandParseException(getSyntaxString(commandLineSofar), e.getMessage());
 			}
 		}
-		return this._commandExecutor;
+		return this;
 	}
 
 	public String skipHint(Queue<String> argumentQueue, ParameterSyntax parameterSyntax, String argument) {

@@ -42,21 +42,23 @@ public class EithonCommand {
 	}
 
 	public boolean execute() {
-		if (!hasPermissionOrInformSender()) return true; 
-		CommandExecutor executor = null;
+		CommandSyntax commandSyntax = null;
 		try {
-			executor = this._commandSyntax.parseArguments(this, this._commandQueue, this._arguments, "syntax: ");
+			commandSyntax = this._commandSyntax.parseArguments(this, this._commandQueue, this._arguments, "syntax: ");
 		} catch (CommandParseException e) {
 			sendMessage(e.getSyntaxDocumentation());
 			String message = e.getMessage();
 			if (message != null) sendMessage(message);
 		}
+		if (commandSyntax == null) return true;
+		if (!hasPermissionOrInformSender(commandSyntax)) return true; 
+		CommandExecutor executor = commandSyntax.getCommandExecutor();
 		if (executor != null) executor.execute(this);
 		return true;
 	}
 
-	private boolean hasPermissionOrInformSender() {
-		String requiredPermission = this._commandSyntax.getRequiredPermission();
+	private boolean hasPermissionOrInformSender(CommandSyntax commandSyntax) {
+		String requiredPermission = commandSyntax.getRequiredPermission();
 		if (requiredPermission == null) return true;
 		Player player = getPlayer();
 		if (player == null) return true;
