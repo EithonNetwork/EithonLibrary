@@ -46,11 +46,13 @@ public class EventListener implements Listener {
 		}, TimeMisc.secondsToTicks(2));
 	}
 
+	// EithonBungeeFixes now takes care of informing about quitting players.
+	
 	// Inform everyone that a player has left the server
-	@EventHandler
-	public void onPlayerQuitEvent(PlayerQuitEvent event) {
-		Player player = event.getPlayer();
-		if (player == null) return;
-		this._eithonPlugin.getApi().bungeeQuitEvent(player);
-	}
+//	@EventHandler
+//	public void onPlayerQuitEvent(PlayerQuitEvent event) {
+//		Player player = event.getPlayer();
+//		if (player == null) return;
+//		this._eithonPlugin.getApi().bungeeQuitEvent(player);
+//	}
 }
