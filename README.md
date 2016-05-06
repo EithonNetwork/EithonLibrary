@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 4.12 (2016-05-06)
+
+* CHANGE: Permissions now handles OfflinePlayer.
+
 ### 4.11 (2016-05-01)
 
 * CHANGE: Now uses the PowerfulPerms plugin for permissions instead of zPermissions.
