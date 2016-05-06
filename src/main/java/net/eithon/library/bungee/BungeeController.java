@@ -96,7 +96,7 @@ public class BungeeController {
 		return success;
 	}
 
-	public static String getHighestGroup(Player player) {
+	private static String getHighestGroup(Player player) {
 		String[] currentGroups = PermissionsFacade.getPlayerPermissionGroups(player);
 		for (String priorityGroup : Config.V.groupPriorities) {
 			for (String playerGroup : currentGroups) {

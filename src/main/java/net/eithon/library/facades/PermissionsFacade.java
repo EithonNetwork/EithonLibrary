@@ -7,6 +7,7 @@ import net.eithon.library.extensions.EithonPlugin;
 import net.eithon.library.plugin.Logger.DebugPrintLevel;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import com.github.cheesesoftware.PowerfulPermsAPI.PermissionManager;
@@ -33,7 +34,7 @@ public class PermissionsFacade {
 		return permissionManager != null;
 	}
 
-	public static void addPermissionGroup(Player player, String groupName) {
+	public static void addPermissionGroup(OfflinePlayer player, String groupName) {
 		if (!isConnectedOrError()) return;
 		verbose("addPermissionGroup", "Adding player %s to group %s", player.getName(), groupName);
 		permissionManager.addPlayerGroup(player.getUniqueId(), groupName, new ResponseRunnable() {
@@ -44,7 +45,7 @@ public class PermissionsFacade {
 		});
 	}
 
-	public static void removePermissionGroup(Player player, String groupName) {
+	public static void removePermissionGroup(OfflinePlayer player, String groupName) {
 		if (!isConnectedOrError()) return;
 		verbose("removePermissionGroup", "Removeing player %s from group %s", player.getName(), groupName);
 		permissionManager.removePlayerGroup(player.getUniqueId(), groupName, new ResponseRunnable() {
@@ -55,22 +56,20 @@ public class PermissionsFacade {
 		});
 	}
 
-	public static String[] getPlayerPermissionGroups(Player player) {
+	public static String[] getPlayerPermissionGroups(OfflinePlayer player) {
 		if (!isConnectedOrError()) return new String[0];
 		PermissionPlayer permissionPlayer = permissionManager.getPermissionPlayer(player.getUniqueId());
+		if (permissionPlayer == null) return new String[0];
 		List<String> groupNames = permissionPlayer
 				.getGroups()
 				.stream()
 				.map(group -> group.getName())
 				.collect(Collectors.toList());
-
-		verbose("getPlayerPermissionGroups", "Groups for player %s: %s", 
-				player.getName(), String.join(", ", groupNames));
 		return groupNames
 				.toArray(new String[0]);
 	}
 
-	public static boolean hasPermissionGroup(Player player, String groupName) {
+	public static boolean hasPermissionGroup(OfflinePlayer player, String groupName) {
 		if (!isConnectedOrError()) return false;
 		return contains(getPlayerPermissionGroups(player), groupName);
 	}
