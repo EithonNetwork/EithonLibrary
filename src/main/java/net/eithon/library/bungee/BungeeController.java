@@ -7,6 +7,7 @@ import net.eithon.library.json.IJsonObject;
 import net.eithon.library.plugin.Logger.DebugPrintLevel;
 import net.eithon.plugin.eithonlibrary.Config;
 
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.json.simple.JSONObject;
 
@@ -96,8 +97,8 @@ public class BungeeController {
 		return success;
 	}
 
-	private static String getHighestGroup(Player player) {
-		String[] currentGroups = PermissionsFacade.getPlayerPermissionGroups(player);
+	public static String getHighestGroup(OfflinePlayer offlinePlayer) {
+		String[] currentGroups = PermissionsFacade.getPlayerPermissionGroups(offlinePlayer);
 		for (String priorityGroup : Config.V.groupPriorities) {
 			for (String playerGroup : currentGroups) {
 				if (playerGroup.equalsIgnoreCase(priorityGroup)) {

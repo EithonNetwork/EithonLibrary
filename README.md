@@ -15,7 +15,8 @@ Eithon java code library for Minecraft.
 
 ### 4.12 (2016-05-06)
 
-* CHANGE: Permissions now handles OfflinePlayer.
+* CHANGE: Permissions now uses OfflinePlayer.
+* CHANGE: EithonBungeeFixes (and EithonBungee) has taken over to send out event about player quitting.
 
 ### 4.11 (2016-05-01)
 
