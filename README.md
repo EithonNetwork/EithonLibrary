@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 4.13 (2016-05-08)
+
+* NEW: Now supports common and server specific config file.
+
 ### 4.12 (2016-05-06)
 
 * CHANGE: Permissions now uses OfflinePlayer.

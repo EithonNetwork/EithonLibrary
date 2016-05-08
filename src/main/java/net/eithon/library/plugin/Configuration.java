@@ -23,8 +23,10 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Configuration {
-	private File _configFile;
-	private FileConfiguration _config;
+	private File _serverSpecificConfigFile;
+	private File _commonConfigFile;
+	private FileConfiguration _serverSpecificConfig;
+	private FileConfiguration _commonConfig;
 	private EithonPlugin _plugin;
 
 	public Configuration(EithonPlugin plugin)
@@ -33,8 +35,10 @@ public class Configuration {
 	}
 
 	public void enable() {
-		this._configFile = initializeConfigFile(this._plugin, "config.yml");
-		this._config = new YamlConfiguration();
+		this._commonConfigFile = initializeConfigFile(this._plugin, "config.yml");
+		this._commonConfig = new YamlConfiguration();
+		this._serverSpecificConfigFile = initializeConfigFile(this._plugin, "server_specific_config.yml");
+		this._serverSpecificConfig = new YamlConfiguration();
 		load();
 	}
 
@@ -52,10 +56,13 @@ public class Configuration {
 
 	public Map<String, Object> getMap(String path, boolean returnNestedMaps)
 	{
-		ConfigurationSection section = this._config.getConfigurationSection(path);
+		ConfigurationSection section = this._serverSpecificConfig.getConfigurationSection(path);
 		if (section == null) {
-			this._plugin.getEithonLogger().warning("Configuration \"%s\" was null", path);
-			return null;
+			section = this._commonConfig.getConfigurationSection(path);
+			if (section == null) {
+				this._plugin.getEithonLogger().warning("Configuration \"%s\" was null", path);
+				return null;
+			}
 		}
 		Map<String, Object> values = section.getValues(returnNestedMaps);	
 		this._plugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" is a map with %d values" , path, values.size());
@@ -67,7 +74,7 @@ public class Configuration {
 	{
 		Object result;
 		try {
-			result = this._config.get(path, defaultValue);
+			result = this._serverSpecificConfig.get(path, defaultValue);
 		} catch (Exception ex) {
 			this._plugin.getEithonLogger().warning("Failed to read configuration \"%s\", will use default value (%s).",
 					path, defaultValue == null ? "null" : defaultValue.toString());
@@ -90,31 +97,42 @@ public class Configuration {
 	}
 
 	public void setObject(String path, ConfigurationSerializable object) {
-		ConfigurationSection section = this._config.getConfigurationSection(path);
-		if (section == null) section = this._config.createSection(path);
-		this._config.set(path, object);
+		ConfigurationSection section = this._serverSpecificConfig.getConfigurationSection(path);
+		if (section == null) section = this._serverSpecificConfig.createSection(path);
+		this._serverSpecificConfig.set(path, object);
 	}
 
 	public String getString(String path, String defaultValue)
 	{
-		String result;
+		String result = getStringInternal(path, defaultValue);
+		this._plugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = %s" , path, result);
+		return result;
+	}
+
+	private String getStringInternal(String path, String defaultValue) {
 		try {
-			result = this._config.getString(path, defaultValue);
+			if (this._serverSpecificConfig.contains(path)) {
+				return this._serverSpecificConfig.getString(path, defaultValue);
+			} else {
+				return this._commonConfig.getString(path, defaultValue);
+			}
 		} catch (Exception ex) {
 			this._plugin.getEithonLogger().warning("Failed to read configuration \"%s\", will use default value (%s).",
 					path, defaultValue);
 			this._plugin.getEithonLogger().debug(DebugPrintLevel.MAJOR, "Exception: %s", ex.getMessage());
-			result = defaultValue;
+			return defaultValue;
 		}
-		this._plugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = %s" , path, result);
-		return result;
 	}
 
 	public double getDouble(String path, double defaultValue)
 	{
 		double value;
 		try {
-			value = this._config.getDouble(path, defaultValue);
+			if (this._serverSpecificConfig.contains(path)) {
+				value = this._serverSpecificConfig.getDouble(path, defaultValue);
+			} else {
+				value = this._commonConfig.getDouble(path, defaultValue);
+			}
 		} catch (Exception ex) {
 			this._plugin.getEithonLogger().warning("Failed to read configuration \"%s\", will use default value (%.2f).",
 					path, defaultValue);
@@ -129,7 +147,11 @@ public class Configuration {
 	{
 		boolean value;
 		try {
-			value = this._config.getBoolean(path, defaultValue);
+			if (this._serverSpecificConfig.contains(path)) {
+				value = this._serverSpecificConfig.getBoolean(path, defaultValue);
+			} else {
+				value = this._commonConfig.getBoolean(path, defaultValue);
+			}
 		} catch (Exception ex) {
 			this._plugin.getEithonLogger().warning("Failed to read configuration \"%s\", will use default value (%s).",
 					path, defaultValue?"true":"false");
@@ -144,7 +166,11 @@ public class Configuration {
 	{
 		int value;
 		try {
-			value = this._config.getInt(path, defaultValue);
+			if (this._serverSpecificConfig.contains(path)) {
+				value = this._serverSpecificConfig.getInt(path, defaultValue);
+			} else {
+				value = this._commonConfig.getInt(path, defaultValue);
+			}
 		} catch (Exception ex) {
 			this._plugin.getEithonLogger().warning("Failed to read configuration \"%s\", will use default value (%d).",
 					path, defaultValue);
@@ -157,41 +183,24 @@ public class Configuration {
 
 	public long getSeconds(String path, long defaultValue)
 	{
-		long value;
-		try {
-			String valueAsString = this._config.getString(path, String.format("%d", defaultValue));
-			value = TimeMisc.stringToSeconds(valueAsString);
-		} catch (Exception ex) {
-			this._plugin.getEithonLogger().warning("Failed to read configuration \"%s\", will use default value (%d).",
-					path, defaultValue);
-			this._plugin.getEithonLogger().debug(DebugPrintLevel.MAJOR, "Exception: %s", ex.getMessage());
-			value = defaultValue;
-		}
+		String valueAsString = getStringInternal(path, String.format("%d", defaultValue));
+		long value = TimeMisc.stringToSeconds(valueAsString);
 		this._plugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = %d seconds" , path, value);
 		return value;
 	}
 
 	public long getSeconds(String path, String defaultValue)
 	{
-		long value;
-		String valueAsString = this._config.getString(path, defaultValue);
-		value = TimeMisc.stringToSeconds(valueAsString);
+		String valueAsString = getStringInternal(path, defaultValue);
+		long value = TimeMisc.stringToSeconds(valueAsString);
 		this._plugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = %d seconds" , path, value);
 		return value;
 	}
 
 	public long getTicks(String path, long defaultValue)
 	{
-		long value;
-		try {
-			String valueAsString = this._config.getString(path, String.format("%d", defaultValue));
-			value = TimeMisc.stringToTicks(valueAsString);
-		} catch (Exception ex) {
-			this._plugin.getEithonLogger().warning("Failed to read configuration \"%s\", will use default value (%d).",
-					path, defaultValue);
-			this._plugin.getEithonLogger().debug(DebugPrintLevel.MAJOR, "Exception: %s", ex.getMessage());
-			value = defaultValue;
-		}
+		String valueAsString = getStringInternal(path, String.format("%d", defaultValue));
+		long value = TimeMisc.stringToTicks(valueAsString);
 		this._plugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = %d ticks" , path, value);
 		return value;
 	}
@@ -199,25 +208,15 @@ public class Configuration {
 	public long getTicks(String path, String defaultValue)
 	{
 		long value;
-		String valueAsString = this._config.getString(path, defaultValue);
+		String valueAsString = this._serverSpecificConfig.getString(path, defaultValue);
 		value = TimeMisc.stringToTicks(valueAsString);
 		this._plugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = %d ticks" , path, value);
 		return value;
 	}
 
 	public LocalTime getLocalTime(String path, LocalTime defaultValue) {
-		String string;
-		LocalTime value;
-		try {
-			string = this._config.getString(path);
-			if (string == null) return defaultValue;
-			value = LocalTime.parse(string);
-		} catch (Exception ex) {
-			this._plugin.getEithonLogger().warning("Failed to read configuration \"%s\", will use default value (%s).",
-					path, defaultValue.toString());
-			this._plugin.getEithonLogger().debug(DebugPrintLevel.MAJOR, "Exception: %s", ex.getMessage());
-			value = defaultValue;
-		}
+		String valueAsString = getStringInternal(path,defaultValue.toString());
+		LocalTime value = LocalTime.parse(valueAsString);
 		this._plugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Configuration \"%s\" = %s" , path, value.toString());
 		return value;
 	}
@@ -226,7 +225,11 @@ public class Configuration {
 	{
 		List<Integer> result = null;
 		try {
-			result = this._config.getIntegerList(path);
+			if (this._serverSpecificConfig.contains(path)) {
+				result = this._serverSpecificConfig.getIntegerList(path);
+			} else {
+				result = this._commonConfig.getIntegerList(path);
+			}
 		} catch (Exception ex) {
 			this._plugin.getEithonLogger().warning("Failed to read configuration \"%s\".", path);
 			this._plugin.getEithonLogger().debug(DebugPrintLevel.MAJOR, "Exception: %s", ex.getMessage());
@@ -250,7 +253,11 @@ public class Configuration {
 	{
 		List<String> strings = null;
 		try {
-			strings = this._config.getStringList(path);
+			if (this._serverSpecificConfig.contains(path)) {
+				strings = this._serverSpecificConfig.getStringList(path);
+			} else {
+				strings = this._commonConfig.getStringList(path);
+			}
 		} catch (Exception ex) {
 			this._plugin.getEithonLogger().warning("Failed to read configuration \"%s\".", path);
 			this._plugin.getEithonLogger().debug(DebugPrintLevel.MAJOR, "Exception: %s", ex.getMessage());
@@ -279,7 +286,11 @@ public class Configuration {
 	{
 		List<String> result = null;
 		try {
-			result = this._config.getStringList(path);
+			if (this._serverSpecificConfig.contains(path)) {
+				result = this._serverSpecificConfig.getStringList(path);
+			} else {
+				result = this._commonConfig.getStringList(path);
+			}
 		} catch (Exception ex) {
 			this._plugin.getEithonLogger().warning("Failed to read configuration \"%s\".", path);
 			this._plugin.getEithonLogger().debug(DebugPrintLevel.MAJOR, "Exception: %s", ex.getMessage());
@@ -303,7 +314,8 @@ public class Configuration {
 		File file = new File(plugin.getDataFolder(), fileName);
 		FileMisc.makeSureParentDirectoryExists(file);
 		if(!file.exists()) {
-			copy(plugin.getResource(fileName), file);
+			InputStream resource = plugin.getResource(fileName);
+			if (resource != null) copy(resource, file);
 		}
 
 		return file;
@@ -327,16 +339,21 @@ public class Configuration {
 	private void load()
 	{
 		try {
-			this._config.load(this._configFile);
+			this._commonConfig.load(this._commonConfigFile);
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		try {
+			this._serverSpecificConfig.load(this._serverSpecificConfigFile);
+		} catch (Exception e) {
+			this._plugin.getEithonLogger().info("No server specific configuration file was loaded.");
 		}
 	}
 
 	public void save()
 	{
 		try {
-			this._config.save(this._configFile);
+			this._serverSpecificConfig.save(this._serverSpecificConfigFile);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
