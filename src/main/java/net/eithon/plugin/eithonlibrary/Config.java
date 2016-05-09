@@ -3,7 +3,6 @@ package net.eithon.plugin.eithonlibrary;
 import java.util.List;
 
 import net.eithon.library.extensions.EithonPlugin;
-import net.eithon.library.plugin.ConfigurableCommand;
 import net.eithon.library.plugin.ConfigurableMessage;
 import net.eithon.library.plugin.Configuration;
 
