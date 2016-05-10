@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Queue;
 
 import net.eithon.library.command.ICommandSyntax;
-import net.eithon.library.facades.EithonLibraryFacade;
 import net.eithon.library.facades.PermissionsFacade;
 import net.eithon.library.file.FileMisc;
 import net.eithon.library.plugin.Configuration;
@@ -17,7 +16,6 @@ import net.eithon.library.plugin.ICommandHandler;
 import net.eithon.library.plugin.Logger;
 import net.eithon.library.plugin.PermissionBasedMultiplier;
 import net.eithon.library.time.AlarmTrigger;
-import net.eithon.plugin.eithonlibrary.EithonLibraryApi;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -33,7 +31,6 @@ public class EithonPlugin extends JavaPlugin implements Listener, TabCompleter {
 	private Configuration _config;
 	private ICommandHandler _commandHandlerOld;
 	private ICommandSyntax _commandSyntax;
-	private EithonLibraryApi _eithonLibraryApi;
 
 	public EithonPlugin() {}
 
@@ -49,10 +46,7 @@ public class EithonPlugin extends JavaPlugin implements Listener, TabCompleter {
 		GeneralMessage.initialize(this);
 		AlarmTrigger.get().enable(this);
 		PermissionsFacade.initialize(this);
-		this._eithonLibraryApi = new EithonLibraryFacade(this).getApi();
 	}
-
-	public EithonLibraryApi getApi() { return this._eithonLibraryApi;	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {

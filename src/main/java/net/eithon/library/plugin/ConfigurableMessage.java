@@ -34,6 +34,8 @@ public class ConfigurableMessage extends ConfigurableFormat{
 		this._useWrapping = config.getInt("eithon.UseWrappingForMessages", 0) > 0;
 	}
 
+	public boolean getUseTitle() { return this._useTitle;}
+
 	public boolean sendMessage(CommandSender sender, Object... args) {
 		if (sender == null) return false;
 		String message = getMessageWithColorCoding(args);
@@ -83,12 +85,5 @@ public class ConfigurableMessage extends ConfigurableFormat{
 		} else {
 			this._eithonPlugin.getServer().broadcastMessage(message);
 		}
-	}
-
-	public boolean broadcastMessageToAllServers(Object... args) {
-		String message = getMessageWithColorCoding(args);
-		if (message == null) return false;
-		broadcastToThisServer(message);
-		return this._eithonPlugin.getApi().bungeeBroadcastMessage(message, this._useTitle);
 	}
 }

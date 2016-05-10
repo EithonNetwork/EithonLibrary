@@ -368,13 +368,12 @@ public class EithonCommandTest {
 		final String commandName = "buy";
 		final String commandSyntax = "buy <player> <item> <price : REAL> <amount : INTEGER {1, ...}>";
 		ICommandSyntax root = EithonCommand.createRootCommand("eithonfixes");
-		ICommandSyntax sub = null;
 		try {
 			root.parseCommandSyntax(commandSyntax);
 		} catch (CommandSyntaxException e) {
 			Assert.fail();
 		}
-		sub = root.getSubCommand(commandName);
+		root.getSubCommand(commandName);
 
 		// Do
 		EithonCommand ec = Support.createEithonCommand(root, "buy Eithon");
@@ -392,13 +391,12 @@ public class EithonCommandTest {
 		final String commandName = "buy";
 		final String commandSyntax = "buy <player> <item> <price : REAL> <amount : INTEGER {1, ...}>";
 		ICommandSyntax root = EithonCommand.createRootCommand("eithonfixes");
-		ICommandSyntax sub = null;
 		try {
 			root.parseCommandSyntax(commandSyntax);
 		} catch (CommandSyntaxException e) {
 			Assert.fail();
 		}
-		sub = root.getSubCommand(commandName);
+		root.getSubCommand(commandName);
 
 		// Do
 		EithonCommand ec = Support.createEithonCommand(root, "buy Eithon ");
@@ -417,13 +415,12 @@ public class EithonCommandTest {
 		final String commandName = "buy";
 		final String commandSyntax = "buy <player> <item> <price : REAL> <amount : INTEGER {1, ...}>";
 		ICommandSyntax root = EithonCommand.createRootCommand("eithonfixes");
-		ICommandSyntax sub = null;
 		try {
 			root.parseCommandSyntax(commandSyntax);
 		} catch (CommandSyntaxException e) {
 			Assert.fail();
 		}
-		sub = root.getSubCommand(commandName);
+		root.getSubCommand(commandName);
 
 		// Do
 		EithonCommand ec = Support.createEithonCommand(root, "buy Eithon gold ");

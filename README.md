@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 5.0 (2016-05-10)
+
+* CHANGE: Moved all Bungee related code to BungeePlugin.
+
 ### 4.13 (2016-05-08)
 
 * NEW: Now supports common and server specific config file.
