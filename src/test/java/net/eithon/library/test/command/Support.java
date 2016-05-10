@@ -2,16 +2,15 @@ package net.eithon.library.test.command;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import net.eithon.library.command.CommandSyntaxException;
 import net.eithon.library.command.EithonCommand;
-import net.eithon.library.command.ICommandSyntaxAdvanced;
-import net.eithon.library.command.IParameterSyntaxAdvanced;
 import net.eithon.library.command.ICommandSyntax;
+import net.eithon.library.command.ICommandSyntaxAdvanced;
 import net.eithon.library.command.IParameterSyntax;
 import net.eithon.library.command.IParameterSyntax.ParameterType;
+import net.eithon.library.command.IParameterSyntaxAdvanced;
 
 import org.junit.Assert;
 

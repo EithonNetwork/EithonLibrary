@@ -21,7 +21,6 @@ public class Config {
 		public static int titleStayTicks;
 		public static int titleFadeOutTicks;
 		public static List<String> groupPriorities;
-		public static String primaryBungeeServer;
 		
 
 		static void load(Configuration config) {
@@ -30,7 +29,6 @@ public class Config {
 			titleStayTicks = config.getInt("eithon.TitleStayTicks", 60);
 			titleFadeOutTicks = config.getInt("eithon.TitleFadeOutTicks", 20);
 			groupPriorities = config.getStringList("GroupPriorities");
-			primaryBungeeServer = config.getString("PrimaryBungeeServer", "Main");
 		}
 	}
 	public static class C {
