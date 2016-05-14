@@ -1,6 +1,7 @@
 package net.eithon.library.facades;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import net.eithon.library.extensions.EithonPlugin;
@@ -56,8 +57,12 @@ public class PermissionsFacade {
 	}
 
 	public static String[] getPlayerPermissionGroups(OfflinePlayer player) {
+		return getPlayerPermissionGroups(player.getUniqueId());
+	}
+
+	public static String[] getPlayerPermissionGroups(UUID playerId) {
 		if (!isConnectedOrError()) return new String[0];
-		PermissionPlayer permissionPlayer = permissionManager.getPermissionPlayer(player.getUniqueId());
+		PermissionPlayer permissionPlayer = permissionManager.getPermissionPlayer(playerId);
 		if (permissionPlayer == null) return new String[0];
 		List<String> groupNames = permissionPlayer
 				.getGroups()
