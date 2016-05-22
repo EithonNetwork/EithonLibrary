@@ -3,28 +3,28 @@
 	<groupId>net.eithon.plugin</groupId>
 	<artifactId>EithonLibrary</artifactId>
 	<name>EithonLibrary</name>
-	<version>5.0</version>
-    <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    	<powermock.version>1.6.3</powermock.version>
-  </properties>
+	<version>5.1</version>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<powermock.version>1.6.3</powermock.version>
+	</properties>
 	<build>
-      <resources>
-		  <resource>
-			<directory>src/main/resources</directory>
-			<filtering>true</filtering>
-			<includes>
-			  <include>plugin.yml</include>
-			</includes>
-		  </resource>
-		  <resource>
-			<directory>src/main/resources</directory>
-			<filtering>false</filtering>
-			<excludes>
-			  <exclude>plugin.yml</exclude>
-			</excludes>
-		  </resource>
-    </resources>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>plugin.yml</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+				<excludes>
+					<exclude>plugin.yml</exclude>
+				</excludes>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -38,18 +38,18 @@
 		</plugins>
 	</build>
 	<repositories>
-       <repository>
-           <id>bukkit-repo</id>
-           <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
-       </repository>
-       <repository>
-         <id>spigot-repo</id>
-         <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-     </repository>
-    <repository>
-            <id>vault-repo</id>
-            <url>http://nexus.theyeticave.net/content/repositories/pub_releases</url>
-        </repository>
+		<repository>
+			<id>bukkit-repo</id>
+			<url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+		</repository>
+		<repository>
+			<id>spigot-repo</id>
+			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+		</repository>
+		<repository>
+			<id>vault-repo</id>
+			<url>http://nexus.theyeticave.net/content/repositories/pub_releases</url>
+		</repository>
 		<!--
 		<repository>
 			<id>tyrannyofheaven.org</id>
@@ -58,19 +58,19 @@
 		-->
 	</repositories>
 	<dependencies>
-     <dependency>
-             <groupId>org.bukkit</groupId>
-             <artifactId>bukkit</artifactId>
-             <version>[1.9-R0.1-SNAPSHOT,)</version>
-             <scope>provided</scope>
-     </dependency>
-       <dependency>
-           <groupId>org.bukkit</groupId>
-           <artifactId>craftbukkit</artifactId>
-           <version>1.9-R0.1-SNAPSHOT</version>
-           <type>jar</type>
-           <scope>provided</scope>
-       </dependency>
+		<dependency>
+			<groupId>org.bukkit</groupId>
+			<artifactId>bukkit</artifactId>
+			<version>[1.9-R0.1-SNAPSHOT,)</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bukkit</groupId>
+			<artifactId>craftbukkit</artifactId>
+			<version>1.9-R0.1-SNAPSHOT</version>
+			<type>jar</type>
+			<scope>provided</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.bukkit</groupId>
 			<artifactId>bukkit</artifactId>
@@ -97,29 +97,29 @@
 			<scope>system</scope>
 			<systemPath>${project.basedir}/dependencies/PowerfulPerms-3.0.3.jar</systemPath>
 		</dependency>
-        <dependency>
-            <groupId>net.milkbowl.vault</groupId>
-            <artifactId>VaultAPI</artifactId>
-            <version>1.4</version>
-            <scope>provided</scope>
-        </dependency>
-   		<dependency>
-      		<groupId>org.powermock</groupId>
-     		<artifactId>powermock-module-junit4</artifactId>
-      		<version>${powermock.version}</version>
-      		<scope>test</scope>
-   		</dependency>
-   		<dependency>
-      		<groupId>org.powermock</groupId>
-      		<artifactId>powermock-api-easymock</artifactId>
-      		<version>${powermock.version}</version>
-      		<scope>test</scope>
-   		</dependency> 
-   		<dependency>
-  			<groupId>org.easymock</groupId>
- 			<artifactId>easymock</artifactId>
-  			<version>3.4</version>
-  			<scope>test</scope>
+		<dependency>
+			<groupId>net.milkbowl.vault</groupId>
+			<artifactId>VaultAPI</artifactId>
+			<version>1.4</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-module-junit4</artifactId>
+			<version>${powermock.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-api-easymock</artifactId>
+			<version>${powermock.version}</version>
+			<scope>test</scope>
+		</dependency> 
+		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymock</artifactId>
+			<version>3.4</version>
+			<scope>test</scope>
 		</dependency> 
 	</dependencies>
 </project>

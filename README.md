@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 5.1 (2016-05-22)
+
+* NEW: Added new methods to PermissionsFacade.
+
 ### 5.0 (2016-05-10)
 
 * CHANGE: Moved all Bungee related code to BungeePlugin.
