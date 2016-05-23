@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 5.1.1 (2016-05-23)
+
+* BUG: Connection to database was never closed, so we finally ran out of connections.
+
 ### 5.1 (2016-05-22)
 
 * NEW: Added new methods to PermissionsFacade.

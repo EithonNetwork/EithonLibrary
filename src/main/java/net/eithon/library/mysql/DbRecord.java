@@ -66,14 +66,25 @@ public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 		try {
 			resultSet = this.dbTable.select(format, arguments);
 			while (resultSet.next()) {
-				T data = factory(this.dbTable.getDatabase(), resultSet.getLong("id"));
+				T data = factory(getDatabase(), resultSet.getLong("id"));
 				data.fromDb(resultSet);
 				list.add(data);
 			}
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
+		} finally {
+			closeConnection();
 		}
 		return list;
+	}
+
+	private void closeConnection() {
+		try {
+			this.dbTable.getDatabase().closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void refresh()  {
@@ -83,6 +94,8 @@ public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 			this.fromDb(resultSet);
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
+		} finally {
+			closeConnection();
 		}
 	}
 
@@ -91,6 +104,8 @@ public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 			this.dbTable.delete(format, arguments);
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
+		} finally {
+			closeConnection();
 		}
 	}
 
@@ -99,6 +114,8 @@ public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 			this.dbTable.update(getColumnValues(), "id=?", this.id);
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
+		} finally {
+			closeConnection();
 		}
 	}
 
@@ -107,6 +124,8 @@ public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 			this.id = this.dbTable.create(getColumnValues());
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
+		} finally {
+			closeConnection();
 		}
 	}
 

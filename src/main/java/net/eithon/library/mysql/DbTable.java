@@ -51,6 +51,10 @@ class DbTable {
 		return this.database.getOrOpenConnection();
 	}
 
+	public void closeConnection() throws SQLException {
+		this.database.closeConnection();
+	}
+
 	public String getName() {
 		return this.name;
 	}
@@ -100,7 +104,7 @@ class DbTable {
 	public void delete(long id) throws SQLException, ClassNotFoundException {
 		String sql = String.format("DELETE FROM %s WHERE id=%d", getName(), id);
 		Statement statement = getOrOpenConnection().createStatement();
-		statement.executeUpdate(sql);	
+		statement.executeUpdate(sql);
 	}
 
 	private List<String> toStringValueList(Object... arguments) {
