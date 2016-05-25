@@ -68,17 +68,29 @@ class DbTable {
 
 	public Timestamp getDataBaseNow() throws ClassNotFoundException, SQLException {
 		String sql = "SELECT NOW()";
-		Statement statement = getOrOpenConnection().createStatement();
-		ResultSet resultSet = statement.executeQuery(sql);
-		if ((resultSet == null) || !resultSet.next()) return null;
-		return resultSet.getTimestamp(1);
+		Statement statement = null;
+		try {
+			statement = getOrOpenConnection().createStatement();
+			ResultSet resultSet = statement.executeQuery(sql);
+			if ((resultSet == null) || !resultSet.next()) return null;
+			return resultSet.getTimestamp(1);
+		} finally {
+			if (statement != null) statement.close();
+			closeConnection();
+		}
 	}
 
 	public void delete(String whereFormat, Object... arguments) throws ClassNotFoundException, SQLException {
 		String sql = String.format("DELETE FROM %s WHERE %s", this.name, whereFormat);
-		PreparedStatement statement = getOrOpenConnection().prepareStatement(sql);
-		fillInBlanks(statement, toStringValueList(arguments));
-		statement.executeUpdate();
+		PreparedStatement statement = null;
+		try {
+			statement = getOrOpenConnection().prepareStatement(sql);
+			fillInBlanks(statement, toStringValueList(arguments));
+			statement.executeUpdate();
+		} finally {
+			if (statement != null) statement.close();
+			closeConnection();
+		}
 	}
 
 	public void update(HashMap<String, Object> columnValues, String whereFormat, Object... arguments) throws ClassNotFoundException, SQLException {

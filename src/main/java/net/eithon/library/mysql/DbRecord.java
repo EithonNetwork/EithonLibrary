@@ -14,7 +14,6 @@ public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 	private long id;
 	private DbTable dbTable;
 	private LocalDateTime updatedAt;
-	private static Object lock = new Object();
 
 	protected DbRecord(Database database, String tableName, long id) {
 		this.dbTable = DbTable.get(database, tableName, getUpdatedAtColumnName());
@@ -34,11 +33,12 @@ public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 
 	public LocalDateTime getDatabaseNow() {
 		Timestamp timestamp = null;
-		try {
-			timestamp = this.dbTable.getDataBaseNow();
-		} catch (ClassNotFoundException | SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		synchronized (this.dbTable) {
+			try {
+				timestamp = this.dbTable.getDataBaseNow();
+			} catch (ClassNotFoundException | SQLException e) {
+				e.printStackTrace();
+			}
 		}
 		if (timestamp == null) return null;
 		return timestamp.toLocalDateTime();
@@ -63,7 +63,7 @@ public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 
 	protected List<T> findByWhere(String format, Object... arguments)  {
 		List<T> list = new ArrayList<T>(); 
-		synchronized (lock) {
+		synchronized (this.dbTable) {
 			try {
 				ResultSet resultSet = this.dbTable.select(format, arguments);
 				while (resultSet.next()) {
@@ -85,13 +85,12 @@ public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 		try {
 			this.dbTable.closeConnection();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
 	public void refresh()  {
-		synchronized (lock) {
+		synchronized (this.dbTable) {
 			try {
 				ResultSet resultSet = this.dbTable.select("id=?", getDbId());
 				if ((resultSet == null) || !resultSet.next()) return;
@@ -104,20 +103,19 @@ public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 		}
 	}
 
+	// TODO: All methods should try to put the closeConnection down into dbTable like this one?
 	protected void deleteByWhere(String format, Object... arguments)  {
-		synchronized (lock) {
+		synchronized (this.dbTable) {
 			try {
 				this.dbTable.delete(format, arguments);
 			} catch (ClassNotFoundException | SQLException e) {
 				e.printStackTrace();
-			} finally {
-				closeConnection();
 			}
 		}
 	}
 
 	protected void dbUpdate() {	
-		synchronized (lock) {	
+		synchronized (this.dbTable) {	
 			try {
 				this.dbTable.update(getColumnValues(), "id=?", this.id);
 			} catch (ClassNotFoundException | SQLException e) {
@@ -129,7 +127,7 @@ public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 	}
 
 	protected void dbCreate() {	
-		synchronized (lock) {
+		synchronized (this.dbTable) {
 			try {
 				this.id = this.dbTable.create(getColumnValues());
 			} catch (ClassNotFoundException | SQLException e) {
@@ -141,20 +139,20 @@ public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 	}
 
 	protected Database getDatabase() {
-		// TODO Auto-generated method stub
 		return this.dbTable.getDatabase();
 	}
 
 	protected String getTableName() {
-		// TODO Auto-generated method stub
 		return this.dbTable.getName();
 	}
 
 	public void delete() {
-		try {
-			this.dbTable.delete(this.id);
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
+		synchronized (this.dbTable) {
+			try {
+				this.dbTable.delete(this.id);
+			} catch (ClassNotFoundException | SQLException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
