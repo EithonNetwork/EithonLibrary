@@ -14,6 +14,7 @@ public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 	private long id;
 	private DbTable dbTable;
 	private LocalDateTime updatedAt;
+	private static Object lock = new Object();
 
 	protected DbRecord(Database database, String tableName, long id) {
 		this.dbTable = DbTable.get(database, tableName, getUpdatedAtColumnName());
@@ -30,7 +31,7 @@ public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 	public long getDbId() { return this.id; }
 	protected void setDbId(long dbId) { this.id = dbId; }
 	public LocalDateTime getUpdatedAt() { return this.updatedAt; }
-	
+
 	public LocalDateTime getDatabaseNow() {
 		Timestamp timestamp = null;
 		try {
@@ -62,25 +63,27 @@ public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 
 	protected List<T> findByWhere(String format, Object... arguments)  {
 		List<T> list = new ArrayList<T>(); 
-		ResultSet resultSet;
-		try {
-			resultSet = this.dbTable.select(format, arguments);
-			while (resultSet.next()) {
-				T data = factory(getDatabase(), resultSet.getLong("id"));
-				data.fromDb(resultSet);
-				list.add(data);
+		synchronized (lock) {
+			try {
+				ResultSet resultSet = this.dbTable.select(format, arguments);
+				while (resultSet.next()) {
+					T data = factory(getDatabase(), resultSet.getLong("id"));
+					data.fromDb(resultSet);
+					list.add(data);
+				}
+			} catch (ClassNotFoundException | SQLException e) {
+				e.printStackTrace();
+			} finally {
+				closeConnection();
 			}
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			closeConnection();
+
 		}
 		return list;
 	}
 
 	private void closeConnection() {
 		try {
-			this.dbTable.getDatabase().closeConnection();
+			this.dbTable.closeConnection();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -88,44 +91,52 @@ public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 	}
 
 	public void refresh()  {
-		try {
-			ResultSet resultSet = this.dbTable.select("id=?", getDbId());
-			if ((resultSet == null) || !resultSet.next()) return;
-			this.fromDb(resultSet);
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			closeConnection();
+		synchronized (lock) {
+			try {
+				ResultSet resultSet = this.dbTable.select("id=?", getDbId());
+				if ((resultSet == null) || !resultSet.next()) return;
+				this.fromDb(resultSet);
+			} catch (ClassNotFoundException | SQLException e) {
+				e.printStackTrace();
+			} finally {
+				closeConnection();
+			}
 		}
 	}
 
 	protected void deleteByWhere(String format, Object... arguments)  {
-		try {
-			this.dbTable.delete(format, arguments);
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			closeConnection();
+		synchronized (lock) {
+			try {
+				this.dbTable.delete(format, arguments);
+			} catch (ClassNotFoundException | SQLException e) {
+				e.printStackTrace();
+			} finally {
+				closeConnection();
+			}
 		}
 	}
 
-	protected void dbUpdate() {		
-		try {
-			this.dbTable.update(getColumnValues(), "id=?", this.id);
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			closeConnection();
+	protected void dbUpdate() {	
+		synchronized (lock) {	
+			try {
+				this.dbTable.update(getColumnValues(), "id=?", this.id);
+			} catch (ClassNotFoundException | SQLException e) {
+				e.printStackTrace();
+			} finally {
+				closeConnection();
+			}
 		}
 	}
 
 	protected void dbCreate() {	
-		try {
-			this.id = this.dbTable.create(getColumnValues());
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			closeConnection();
+		synchronized (lock) {
+			try {
+				this.id = this.dbTable.create(getColumnValues());
+			} catch (ClassNotFoundException | SQLException e) {
+				e.printStackTrace();
+			} finally {
+				closeConnection();
+			}
 		}
 	}
 
@@ -146,7 +157,7 @@ public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public T fromDb(ResultSet resultSet) throws SQLException {
 		if (this.dbTable.hasUpdatedAtColumn()) {
