@@ -95,22 +95,34 @@ class DbTable {
 
 	public void update(HashMap<String, Object> columnValues, String whereFormat, Object... arguments) throws ClassNotFoundException, SQLException {
 		String sql = String.format("UPDATE %s SET %s WHERE %s", getName(), joinAssignments(columnValues), whereFormat);
-		PreparedStatement statement = getOrOpenConnection().prepareStatement(sql);
-		List<String> list = stringColumnValues(columnValues);
-		list.addAll(toStringValueList(arguments));
-		fillInBlanks(statement, list);
-		statement.executeUpdate();	
+		PreparedStatement statement = null;
+		try {
+			statement = getOrOpenConnection().prepareStatement(sql);
+			List<String> list = stringColumnValues(columnValues);
+			list.addAll(toStringValueList(arguments));
+			fillInBlanks(statement, list);
+			statement.executeUpdate();	
+		} finally {
+			if (statement != null) statement.close();
+			closeConnection();
+		}
 	}
 
 	public long create(HashMap<String, Object> columnValues) throws SQLException, ClassNotFoundException {
 		String sql = String.format("INSERT INTO %s (%s) VALUES (%s)",
 				getName(), joinColumnNames(columnValues), joinColumnValues(columnValues));
-		PreparedStatement statement = getOrOpenConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-		fillInBlanks(statement, stringColumnValues(columnValues));
-		statement.executeUpdate();
-		ResultSet generatedKeys = statement.getGeneratedKeys();
-		generatedKeys.next();
-		return generatedKeys.getLong(1);
+		PreparedStatement statement = null;
+		try {
+			statement = getOrOpenConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+			fillInBlanks(statement, stringColumnValues(columnValues));
+			statement.executeUpdate();
+			ResultSet generatedKeys = statement.getGeneratedKeys();
+			generatedKeys.next();
+			return generatedKeys.getLong(1);
+		} finally {
+			if (statement != null) statement.close();
+			closeConnection();
+		}
 	}
 
 	public void delete(long id) throws SQLException, ClassNotFoundException {

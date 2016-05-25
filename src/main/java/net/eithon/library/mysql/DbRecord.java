@@ -61,6 +61,7 @@ public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 		return findByWhere("1=1");
 	}
 
+	// TODO: All methods should try to put the closeConnection down into dbTable like dbUpdate?
 	protected List<T> findByWhere(String format, Object... arguments)  {
 		List<T> list = new ArrayList<T>(); 
 		synchronized (this.dbTable) {
@@ -89,6 +90,7 @@ public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 		}
 	}
 
+	// TODO: All methods should try to put the closeConnection down into dbTable like dbUpdate?
 	public void refresh()  {
 		synchronized (this.dbTable) {
 			try {
@@ -103,7 +105,6 @@ public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 		}
 	}
 
-	// TODO: All methods should try to put the closeConnection down into dbTable like this one?
 	protected void deleteByWhere(String format, Object... arguments)  {
 		synchronized (this.dbTable) {
 			try {
@@ -120,8 +121,6 @@ public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 				this.dbTable.update(getColumnValues(), "id=?", this.id);
 			} catch (ClassNotFoundException | SQLException e) {
 				e.printStackTrace();
-			} finally {
-				closeConnection();
 			}
 		}
 	}
@@ -132,8 +131,6 @@ public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 				this.id = this.dbTable.create(getColumnValues());
 			} catch (ClassNotFoundException | SQLException e) {
 				e.printStackTrace();
-			} finally {
-				closeConnection();
 			}
 		}
 	}
