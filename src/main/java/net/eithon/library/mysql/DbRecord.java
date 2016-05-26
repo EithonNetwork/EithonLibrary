@@ -8,15 +8,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.lang.NotImplementedException;
 
-@SuppressWarnings("rawtypes")
-public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
+
+// TODO: Change to DbRecord<T extends IDbRecord<T>> implements IDbRecord<T>
+// Probably need to rebuild all database Plugins after that.
+public abstract class DbRecord<T extends DbRecord<T>> implements IDbRecord<T> {
 	private long id;
-	private DbTable dbTable;
+	private DbTable<T> dbTable;
 	private LocalDateTime updatedAt;
 
+	@SuppressWarnings("unchecked")
 	protected DbRecord(Database database, String tableName, long id) {
-		this.dbTable = DbTable.get(database, tableName, getUpdatedAtColumnName());
+		this.dbTable = (DbTable<T>) DbTable.get(database, tableName, getUpdatedAtColumnName());
 		this.id = id;
 	}
 
@@ -30,13 +34,12 @@ public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 	public long getDbId() { return this.id; }
 	protected void setDbId(long dbId) { this.id = dbId; }
 	public LocalDateTime getUpdatedAt() { return this.updatedAt; }
-	
+
 	public LocalDateTime getDatabaseNow() {
 		Timestamp timestamp = null;
 		try {
 			timestamp = this.dbTable.getDataBaseNow();
 		} catch (ClassNotFoundException | SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		if (timestamp == null) return null;
@@ -61,41 +64,21 @@ public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 	}
 
 	protected List<T> findByWhere(String format, Object... arguments)  {
-		List<T> list = new ArrayList<T>(); 
-		ResultSet resultSet;
 		try {
-			resultSet = this.dbTable.select(format, arguments);
-			while (resultSet.next()) {
-				T data = factory(getDatabase(), resultSet.getLong("id"));
-				data.fromDb(resultSet);
-				list.add(data);
-			}
+			return this.dbTable.select(this, format, arguments);
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
-		} finally {
-			closeConnection();
-		}
-		return list;
-	}
-
-	private void closeConnection() {
-		try {
-			this.dbTable.getDatabase().closeConnection();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return new ArrayList<T>() ;
 		}
 	}
 
 	public void refresh()  {
 		try {
-			ResultSet resultSet = this.dbTable.select("id=?", getDbId());
-			if ((resultSet == null) || !resultSet.next()) return;
-			this.fromDb(resultSet);
+			if (this.dbTable.selectInto(this, "id=?", getDbId())) return;
+			throw new NotImplementedException(String.format("Could not refresh id %d in table %s.",
+					getDbId(), this.dbTable.toString()));
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
-		} finally {
-			closeConnection();
 		}
 	}
 
@@ -104,18 +87,14 @@ public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 			this.dbTable.delete(format, arguments);
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
-		} finally {
-			closeConnection();
 		}
 	}
 
-	protected void dbUpdate() {		
+	protected void dbUpdate() {	
 		try {
 			this.dbTable.update(getColumnValues(), "id=?", this.id);
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
-		} finally {
-			closeConnection();
 		}
 	}
 
@@ -124,18 +103,14 @@ public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 			this.id = this.dbTable.create(getColumnValues());
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
-		} finally {
-			closeConnection();
 		}
 	}
 
 	protected Database getDatabase() {
-		// TODO Auto-generated method stub
 		return this.dbTable.getDatabase();
 	}
 
 	protected String getTableName() {
-		// TODO Auto-generated method stub
 		return this.dbTable.getName();
 	}
 
@@ -146,7 +121,7 @@ public abstract class DbRecord<T extends DbRecord> implements IDbRecord<T> {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public T fromDb(ResultSet resultSet) throws SQLException {
 		if (this.dbTable.hasUpdatedAtColumn()) {

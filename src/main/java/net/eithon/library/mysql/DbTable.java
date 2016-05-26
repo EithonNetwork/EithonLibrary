@@ -11,18 +11,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-class DbTable {
+class DbTable<T extends DbRecord<T>> {
 	private String name;
 	private Database database;
 	private String updatedAtColumnName;
 
-	private static HashMap<String, DbTable> knownTables = new HashMap<String, DbTable>();
+	private static HashMap<String, DbTable<?>> knownTables = new HashMap<String, DbTable<?>>();
 
-	public static DbTable get(Database database, String name, String updatedAtColumnName) {
+	public static DbTable<?> get(Database database, String name, String updatedAtColumnName) {
 		String hashableString = getHashableString(database, name);
-		DbTable table = knownTables.get(hashableString);
+		DbTable<?> table = knownTables.get(hashableString);
 		if (table == null) {
-			table = new DbTable(database, name, updatedAtColumnName);
+			table = (DbTable<?>) new DbTable(database, name, updatedAtColumnName);
 			knownTables.put(hashableString, table);
 		}
 		return table;
@@ -59,52 +59,133 @@ class DbTable {
 		return this.name;
 	}
 
-	public ResultSet select(String whereFormat, Object... arguments) throws ClassNotFoundException, SQLException {
+	public List<T> select(DbRecord<T> dbRecord, String whereFormat, Object... arguments) throws ClassNotFoundException, SQLException {
+		ResultSet resultSet = null;
+		PreparedStatement statement = null;
+		synchronized (this.database) {
+			try {
+				statement = prepareStatement(whereFormat, arguments);
+				resultSet = statement.executeQuery();
+				List<T> list = new ArrayList<T>(); 
+				while (resultSet.next()) {
+					T data = dbRecord.factory(this.database, resultSet.getLong("id"));
+					data.fromDb(resultSet);
+					list.add(data);
+				}
+				return list;
+			} finally {
+				closeQuitely(resultSet);
+				closeQuitely(statement);
+				closeQuitely();
+			}	
+		}
+	}
+
+	public boolean selectInto(DbRecord<T> dbRecord, String whereFormat, long l) throws ClassNotFoundException, SQLException {
+		ResultSet resultSet = null;
+		PreparedStatement statement = null;
+		synchronized (this.database) {
+			try {
+				statement = prepareStatement(whereFormat, l);
+				resultSet = statement.executeQuery();
+				if (!resultSet.next()) return false;
+				dbRecord.fromDb(resultSet);
+				if (!resultSet.next()) return true;
+				throw new IllegalArgumentException(String.format("SELECT statement with WHERE \"%s\" unexpectedly returned more than one row."));
+			} finally {
+				closeQuitely(resultSet);
+				closeQuitely(statement);
+				closeQuitely();
+			}
+		}
+	}
+
+	private PreparedStatement prepareStatement(String whereFormat, Object... arguments) throws ClassNotFoundException, SQLException {
 		String sql = String.format("SELECT * FROM %s WHERE %s", this.name, whereFormat);
 		PreparedStatement statement = getOrOpenConnection().prepareStatement(sql);
 		fillInBlanks(statement, toStringValueList(arguments));
-		return statement.executeQuery();
+		return statement;
 	}
 
 	public Timestamp getDataBaseNow() throws ClassNotFoundException, SQLException {
 		String sql = "SELECT NOW()";
-		Statement statement = getOrOpenConnection().createStatement();
-		ResultSet resultSet = statement.executeQuery(sql);
-		if ((resultSet == null) || !resultSet.next()) return null;
-		return resultSet.getTimestamp(1);
+		Statement statement = null;
+		synchronized (this.database) {
+			try {
+				statement = getOrOpenConnection().createStatement();
+				ResultSet resultSet = statement.executeQuery(sql);
+				if ((resultSet == null) || !resultSet.next()) return null;
+				return resultSet.getTimestamp(1);
+			} finally {
+				closeQuitely(statement);
+				closeQuitely();
+			}
+		}
 	}
 
 	public void delete(String whereFormat, Object... arguments) throws ClassNotFoundException, SQLException {
 		String sql = String.format("DELETE FROM %s WHERE %s", this.name, whereFormat);
-		PreparedStatement statement = getOrOpenConnection().prepareStatement(sql);
-		fillInBlanks(statement, toStringValueList(arguments));
-		statement.executeUpdate();
+		PreparedStatement statement = null;
+		synchronized (this.database) {
+			try {
+				statement = getOrOpenConnection().prepareStatement(sql);
+				fillInBlanks(statement, toStringValueList(arguments));
+				statement.executeUpdate();
+			} finally {
+				closeQuitely(statement);
+				closeQuitely();
+			}
+		}
 	}
 
 	public void update(HashMap<String, Object> columnValues, String whereFormat, Object... arguments) throws ClassNotFoundException, SQLException {
 		String sql = String.format("UPDATE %s SET %s WHERE %s", getName(), joinAssignments(columnValues), whereFormat);
-		PreparedStatement statement = getOrOpenConnection().prepareStatement(sql);
-		List<String> list = stringColumnValues(columnValues);
-		list.addAll(toStringValueList(arguments));
-		fillInBlanks(statement, list);
-		statement.executeUpdate();	
+		PreparedStatement statement = null;
+		synchronized (this.database) {
+			try {
+				statement = getOrOpenConnection().prepareStatement(sql);
+				List<String> list = stringColumnValues(columnValues);
+				list.addAll(toStringValueList(arguments));
+				fillInBlanks(statement, list);
+				statement.executeUpdate();	
+			} finally {
+				closeQuitely(statement);
+				closeQuitely();
+			}
+		}
 	}
 
 	public long create(HashMap<String, Object> columnValues) throws SQLException, ClassNotFoundException {
 		String sql = String.format("INSERT INTO %s (%s) VALUES (%s)",
 				getName(), joinColumnNames(columnValues), joinColumnValues(columnValues));
-		PreparedStatement statement = getOrOpenConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-		fillInBlanks(statement, stringColumnValues(columnValues));
-		statement.executeUpdate();
-		ResultSet generatedKeys = statement.getGeneratedKeys();
-		generatedKeys.next();
-		return generatedKeys.getLong(1);
+		PreparedStatement statement = null;
+		synchronized (this.database) {
+			try {
+				statement = getOrOpenConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+				fillInBlanks(statement, stringColumnValues(columnValues));
+				statement.executeUpdate();
+				ResultSet generatedKeys = statement.getGeneratedKeys();
+				generatedKeys.next();
+				return generatedKeys.getLong(1);
+			} finally {
+				closeQuitely(statement);
+				closeQuitely();
+			}
+		}
 	}
 
 	public void delete(long id) throws SQLException, ClassNotFoundException {
 		String sql = String.format("DELETE FROM %s WHERE id=%d", getName(), id);
-		Statement statement = getOrOpenConnection().createStatement();
-		statement.executeUpdate(sql);
+		Statement statement = null;
+		synchronized (this.database) {
+			try {
+				statement = getOrOpenConnection().createStatement();
+				statement.executeUpdate(sql);
+			} finally {
+				closeQuitely(statement);
+				closeQuitely();
+			}
+		}
 	}
 
 	private List<String> toStringValueList(Object... arguments) {
@@ -153,6 +234,18 @@ class DbTable {
 			assignments.add(String.format("%s=NOW()", this.updatedAtColumnName));
 		}
 		return String.join(",", assignments);
+	}
+
+	private void closeQuitely(Statement x) {
+		try { x.close(); } catch (Exception e) { /* ignored */ }
+	}
+
+	private void closeQuitely(ResultSet x) {
+		try { x.close(); } catch (Exception e) { /* ignored */ }
+	}
+
+	private void closeQuitely() {
+		try { closeConnection(); } catch (Exception e) { /* ignored */ }
 	}
 
 	public boolean hasUpdatedAtColumn() {

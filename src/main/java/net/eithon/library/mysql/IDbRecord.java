@@ -6,6 +6,7 @@ import java.util.HashMap;
 
 public interface IDbRecord<T> {
 	HashMap<String, Object> getColumnValues();
-	T fromDb(ResultSet resultSet) throws SQLException;
+	T fromDb(ResultSet resultSet) throws SQLException;	
+	T factory(Database database, long id);
 	String getUpdatedAtColumnName();
 }
