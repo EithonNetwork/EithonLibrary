@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 5.1.3 (2016-06-04)
+
+* BUG: Did some one-time initialization for every plugin by mistake. Now moved to EithonLibraryPlugin.
+
 ### 5.1.2 (2016-05-25)
 
 * BUG: Connection to database could not handle threads.
