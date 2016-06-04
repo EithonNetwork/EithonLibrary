@@ -30,6 +30,7 @@ class ParameterSyntax extends Syntax implements IParameterSyntaxAdvanced {
 	private boolean _acceptsAnyValue;
 	private DefaultGetter _defaultGetter;
 	private String _hint;
+	private Object lock = new Object();
 
 	public static ParameterSyntax parseSyntax(String leftSide, String parameter) throws CommandSyntaxException {
 		Matcher matcher = insideParameterPattern.matcher(parameter);
@@ -129,32 +130,37 @@ class ParameterSyntax extends Syntax implements IParameterSyntaxAdvanced {
 	}
 
 	private void setValues(final String defaultValue, final List<String> values) {
-		this._validValuesMap = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
-		for (String string : values) {
-			this._validValuesMap.put(string, string);
-		}
-		this._validValuesOrdered = new ArrayList<String>();
-		this._validValuesOrdered.addAll(values);
-		if ((defaultValue != null) && !this._validValuesMap.containsKey(defaultValue)) {
-			this._validValuesMap.put(this._defaultValue, this._defaultValue);
-			this._validValuesOrdered.add(0, this._defaultValue);
+		synchronized (this.lock ) {
+			this._validValuesMap = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
+			this._validValuesOrdered = new ArrayList<String>();
+			if (values == null) return;
+			for (String string : values) {
+				this._validValuesMap.put(string, string);
+			}
+			this._validValuesOrdered.addAll(values);
+			if ((defaultValue != null) && !this._validValuesMap.containsKey(defaultValue)) {
+				this._validValuesMap.put(this._defaultValue, this._defaultValue);
+				this._validValuesOrdered.add(0, this._defaultValue);
+			}
 		}
 	}
 
 	private void orderValues(final String defaultValue) {
-		this._validValuesOrdered = this._validValuesOrdered
-				.stream()
-				.sorted(new Comparator<String>() {
-					@Override
-					public int compare(String o1, String o2) {
-						if (defaultValue != null) {
-							if (o1.equalsIgnoreCase(defaultValue)) return -1;
-							if (o2.equalsIgnoreCase(defaultValue)) return 1;
+		synchronized (this.lock) {
+			this._validValuesOrdered = this._validValuesOrdered
+					.stream()
+					.sorted(new Comparator<String>() {
+						@Override
+						public int compare(String o1, String o2) {
+							if (defaultValue != null) {
+								if (o1.equalsIgnoreCase(defaultValue)) return -1;
+								if (o2.equalsIgnoreCase(defaultValue)) return 1;
+							}
+							return o1.compareTo(o2);
 						}
-						return o1.compareTo(o2);
-					}
-				})
-				.collect(Collectors.toList());
+					})
+					.collect(Collectors.toList());
+		}
 	}
 
 	public void parseArguments(EithonCommand command, String argument, HashMap<String, EithonArgument> collectedArguments) 
@@ -171,12 +177,14 @@ class ParameterSyntax extends Syntax implements IParameterSyntaxAdvanced {
 		if (this._valueGetter != null) {
 			setValues(this._valueGetter.getValues(command));
 		}
-		if (this._validValuesMap != null) {
-			String foundValue = this._validValuesMap.get(argument);
-			if (foundValue != null) {
-				parameterValue = new EithonArgument(command, this, foundValue);
-				if (collectedArguments != null) collectedArguments.put(getName(), parameterValue);
-				return;
+		synchronized (this.lock) {
+			if (this._validValuesMap != null) {
+				String foundValue = this._validValuesMap.get(argument);
+				if (foundValue != null) {
+					parameterValue = new EithonArgument(command, this, foundValue);
+					if (collectedArguments != null) collectedArguments.put(getName(), parameterValue);
+					return;
+				}
 			}
 		}
 		if (this._acceptsAnyValue) {
@@ -192,12 +200,14 @@ class ParameterSyntax extends Syntax implements IParameterSyntaxAdvanced {
 	}
 
 	public List<String> getValidValues(EithonCommand command) {
-		if ((command != null) && (this._valueGetter != null)) {
-			final String defaultValue = getDefault(command);
-			setValues(defaultValue, this._valueGetter.getValues(command));
-			orderValues(defaultValue);
+		synchronized (this.lock) {
+			if ((command != null) && (this._valueGetter != null)) {
+				final String defaultValue = getDefault(command);
+				setValues(defaultValue, this._valueGetter.getValues(command));
+				orderValues(defaultValue);
+			}
+			return this._validValuesOrdered;
 		}
-		return this._validValuesOrdered;
 	}
 
 	private boolean verifyValueIsOkAccordingToType(String argument) throws ArgumentParseException {
@@ -230,7 +240,9 @@ class ParameterSyntax extends Syntax implements IParameterSyntaxAdvanced {
 		if (this._isNamed) sb.append(this._leftHandName + ":");
 		sb.append(String.format("<%s", this.getName())); 
 		if (this._type != ParameterType.STRING) sb.append(String.format(" : %s", this._type.toString()));
-		if (this._validValuesMap.size()>0) sb.append(String.format(" {%s}", validValuesAsString(true)));
+		synchronized (this.lock) {
+			if (this._validValuesMap.size()>0) sb.append(String.format(" {%s}", validValuesAsString(true)));
+		}
 		sb.append(">");
 		return sb.toString();
 	}
@@ -250,12 +262,15 @@ class ParameterSyntax extends Syntax implements IParameterSyntaxAdvanced {
 
 	private String validValuesAsString(boolean markDefault) {
 		final String defaultValue = getDefault();
-		List<String> values = this._validValuesOrdered;
-		if (defaultValue != null) {
-			values = this._validValuesOrdered
-					.stream()
-					.map(s -> s.equalsIgnoreCase(defaultValue) ? String.format("_%s_", s) : s)
-					.collect(Collectors.toList());
+		List<String> values = null;
+		synchronized (this.lock) {
+			values = this._validValuesOrdered;
+			if (defaultValue != null) {
+				values = this._validValuesOrdered
+						.stream()
+						.map(s -> s.equalsIgnoreCase(defaultValue) ? String.format("_%s_", s) : s)
+						.collect(Collectors.toList());
+			}
 		}
 		String validValues = String.join(", ", values);
 		if (this._acceptsAnyValue) validValues = validValues + ", ...";
