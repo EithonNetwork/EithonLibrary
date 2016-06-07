@@ -795,6 +795,96 @@ public class EithonCommandTest {
 		Assert.assertTrue(ec.execute());
 		Assert.assertTrue(getHasExecuted());
 	}
+
+	@Test
+	public void mandatoryParameterCompletion() 
+	{
+		// Prepare
+		final String commandName = "sub";
+		final String commandSyntax = "sub <parameter {113, 4477}>";
+		final String command = "sub 44";
+		ICommandSyntax root = EithonCommand.createRootCommand("root");
+		ICommandSyntax sub = null;
+		try {
+			root.parseCommandSyntax(commandSyntax);
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+		sub = root.getSubCommand(commandName);
+
+		// Do
+		sub.setCommandExecutor(ec -> {
+			Assert.assertNotNull(ec);
+			Assert.assertEquals(4477, ec.getArgument("parameter").asInteger());
+			setHasExecuted(true);
+		});
+		EithonCommand ec = Support.createEithonCommand(root, command);
+
+		// Verify
+		setHasExecuted(false);
+		Assert.assertTrue(ec.execute());
+		Assert.assertTrue(getHasExecuted());
+	}
+
+	@Test
+	public void mandatoryParameterAmbigousCompletion() 
+	{
+		// Prepare
+		final String commandName = "sub";
+		final String commandSyntax = "sub <parameter {113, 4477, 4489}>";
+		final String command = "sub 44";
+		ICommandSyntax root = EithonCommand.createRootCommand("root");
+		ICommandSyntax sub = null;
+		try {
+			root.parseCommandSyntax(commandSyntax);
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+		sub = root.getSubCommand(commandName);
+
+		// Do
+		sub.setCommandExecutor(ec -> {
+			Assert.assertNotNull(ec);
+			Assert.assertEquals(4477, ec.getArgument("parameter").asInteger());
+			setHasExecuted(true);
+		});
+		EithonCommand ec = Support.createEithonCommand(root, command);
+
+		// Verify
+		setHasExecuted(false);
+		Assert.assertTrue(ec.execute());
+		Assert.assertFalse(getHasExecuted());
+	}
+
+	@Test
+	public void optionalParameterHasNoCompletion() 
+	{
+		// Prepare
+		final String commandName = "sub";
+		final String commandSyntax = "sub <parameter {113, 4477, ...}>";
+		final String command = "sub 44";
+		ICommandSyntax root = EithonCommand.createRootCommand("root");
+		ICommandSyntax sub = null;
+		try {
+			root.parseCommandSyntax(commandSyntax);
+		} catch (CommandSyntaxException e) {
+			Assert.fail();
+		}
+		sub = root.getSubCommand(commandName);
+
+		// Do
+		sub.setCommandExecutor(ec -> {
+			Assert.assertNotNull(ec);
+			Assert.assertEquals(44, ec.getArgument("parameter").asInteger());
+			setHasExecuted(true);
+		});
+		EithonCommand ec = Support.createEithonCommand(root, command);
+
+		// Verify
+		setHasExecuted(false);
+		Assert.assertTrue(ec.execute());
+		Assert.assertTrue(getHasExecuted());
+	}
 	
 	private void commandExecutorForCaseTests(EithonCommand ec) {
 		Assert.assertNotNull(ec); 

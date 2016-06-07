@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 5.2 (2016-06-07)
+
+* BUG: Commands with mandatory parameters can complete value based on entered characters.
+
 ### 5.1.3 (2016-06-04)
 
 * BUG: Did some one-time initialization for every plugin by mistake. Now moved to EithonLibraryPlugin.
