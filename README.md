@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 5.3 (2016-06-19)
+
+* CHANGE: Now handles server wide broadcasts via an event.
+
 ### 5.2 (2016-06-07)
 
 * BUG: Commands with mandatory parameters can complete value based on entered characters.
