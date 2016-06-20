@@ -6,6 +6,8 @@ import net.eithon.library.plugin.Logger.DebugPrintLevel;
 import net.eithon.library.title.Title;
 import net.eithon.plugin.eithonlibrary.Config;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -58,7 +60,7 @@ public class ConfigurableMessage extends ConfigurableFormat{
 		return format.startsWith("[title/]") || format.startsWith("[subtitle/]") || format.startsWith("[actionbar/]");
 	}
 
-	private void sendTitle(Player player, String message) {
+	private static void sendTitle(Player player, String message) {
 		String[] lines = message.split("\\n");
 		String title = lines[0];
 		String subTitle = lines.length > 1 ? lines[1] : "";
@@ -67,23 +69,41 @@ public class ConfigurableMessage extends ConfigurableFormat{
 		if (!actionBar.equals("")) Title.get().sendActionbarMessage(player, actionBar);
 	}
 
-	private void sendTitle(String message) {
+	private static void sendTitle(String message) {
 		sendTitle(null, message);
 	}
 
+	@Deprecated
 	public boolean broadcastMessage(Object... args) {
+		return broadcastToThisServer(args);
+	}
+
+	public boolean broadcastToThisServer(Object... args) {
 		String message = getMessageWithColorCoding(args);
 		if (message == null) return false;
-		broadcastToThisServer(message);
+		ConfigurableMessage.broadcastToThisServer(message, this._useTitle);
 		return true;
 	}
 
-	public void broadcastToThisServer(String message) {
-		if (message == null) return;
+	public static void broadcastToThisServer(String message, boolean useTitle) {
+		if (useTitle) {
+			sendTitle(message);
+		} else {
+			Server server = Bukkit.getServer();
+			if (server == null) return;
+			server.broadcastMessage(message);
+		}
+	}
+	public boolean broadcastToAllServers(Object... args) {
+		String message = getMessageWithColorCoding(args);
+		if (message == null) return false;
+		EithonPublicMessageEvent e = new EithonPublicMessageEvent(message, this._useTitle);
+
 		if (this._useTitle) {
 			sendTitle(message);
 		} else {
 			this._eithonPlugin.getServer().broadcastMessage(message);
 		}
+		return true;
 	}
 }
