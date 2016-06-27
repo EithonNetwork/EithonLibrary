@@ -27,7 +27,7 @@ public class PermissionsFacade {
 			permissionManager = permissionPlugin.getPermissionManager();
 		}
 		catch (NoClassDefFoundError e) {
-			plugin.getEithonLogger().warning("EithonLibrary could not connect to the PowerfulPerms plugin when enabling the %s plugin.", plugin.getName());
+			plugin.logWarn("EithonLibrary could not connect to the PowerfulPerms plugin when enabling the %s plugin.", plugin.getName());
 		}
 		emptyResponseRunnable = new ResponseRunnable() {
 			public void run() {}
@@ -91,7 +91,7 @@ public class PermissionsFacade {
 			final String permission, 
 			final ResponseRunnable response) {
 		if (!isConnectedOrError()) return;
-		eithonPlugin.getEithonLogger().info("PermissionsFacade: Adding permission %s to player %s", permission, playerName);
+		eithonPlugin.logInfo("PermissionsFacade: Adding permission %s to player %s", permission, playerName);
 		permissionManager.addPlayerPermission(playerId, playerName, permission, response);
 	}
 
@@ -101,7 +101,7 @@ public class PermissionsFacade {
 			final String permission, 
 			final ResponseRunnable response) {
 		if (!isConnectedOrError()) return;
-		eithonPlugin.getEithonLogger().info("PermissionsFacade: Removing permission %s from player %s", permission, playerName);
+		eithonPlugin.logInfo("PermissionsFacade: Removing permission %s from player %s", permission, playerName);
 		permissionManager.removePlayerPermission(playerId, permission, response);
 	}
 
@@ -126,6 +126,6 @@ public class PermissionsFacade {
 
 	static void verbose(String method, String format, Object... args) {
 		String message = String.format(format, args);
-		eithonPlugin.getEithonLogger().debug(DebugPrintLevel.MAJOR, "%s: %s", method, message);
+		eithonPlugin.dbgMajor( "%s: %s", method, message);
 	}
 }

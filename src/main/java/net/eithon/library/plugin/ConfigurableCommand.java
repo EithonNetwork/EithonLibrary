@@ -14,7 +14,7 @@ public class ConfigurableCommand extends ConfigurableFormat{
 	}
 	
 	private void executeCommandAs(String command, CommandSender sender) {
-		this._eithonPlugin.getEithonLogger().debug(DebugPrintLevel.MAJOR, "/%s", command);
+		this._eithonPlugin.dbgMajor( "/%s", command);
 		this._eithonPlugin.getServer().dispatchCommand(sender, command);
 	}
 	

@@ -8,11 +8,13 @@ import java.util.List;
 import java.util.Queue;
 
 import net.eithon.library.command.ICommandSyntax;
+import net.eithon.library.core.CoreMisc;
 import net.eithon.library.file.FileMisc;
 import net.eithon.library.plugin.Configuration;
 import net.eithon.library.plugin.ICommandHandler;
 import net.eithon.library.plugin.Logger;
 import net.eithon.library.plugin.PermissionBasedMultiplier;
+import net.eithon.library.plugin.Logger.DebugPrintLevel;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -53,7 +55,7 @@ public class EithonPlugin extends JavaPlugin implements Listener, TabCompleter {
 			.execute();
 		}
 		return new net.eithon.library.command.EithonCommand(this._commandSyntax, sender, cmd, label, args)
-			.execute();
+		.execute();
 	}
 
 	@Override
@@ -77,7 +79,7 @@ public class EithonPlugin extends JavaPlugin implements Listener, TabCompleter {
 			try {
 				pluginManager.registerEvents(listener , this);				
 			} catch (Exception e) {
-				getEithonLogger().error("%s", e.getMessage());
+				logError("%s", e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -95,7 +97,7 @@ public class EithonPlugin extends JavaPlugin implements Listener, TabCompleter {
 		String commandName = commandSyntax.getName();
 		PluginCommand command = getCommand(commandName);
 		if (command == null) {
-			this.getEithonLogger().error("CommandSyntax name %s is not a command of this plugin", commandName);
+			this.logError("CommandSyntax name %s is not a command of this plugin", commandName);
 			return;
 		}
 		command.setTabCompleter(this);
@@ -114,7 +116,19 @@ public class EithonPlugin extends JavaPlugin implements Listener, TabCompleter {
 
 	public Configuration getConfiguration() { return this._config; }
 
+	@Deprecated
 	public Logger getEithonLogger() { return this._logger; }
+
+	public void setDebugLevel(int level) { this._logger.setDebugLevel(level); }
+	public void logError(String format, Object... args) { this._logger.error(format, args); }
+	public void logWarn(String format, Object... args) { this._logger.warning(format, args); }
+	public void logInfo(String format, Object... args) { this._logger.info(format, args); }
+	public void dbgMajor(String format, Object... args) { this._logger.debug(DebugPrintLevel.MAJOR, format, args); }
+	public void dbgMinor(String format, Object... args) { this._logger.debug(DebugPrintLevel.MINOR, format, args); }
+	public void dbgVerbose(String className, String method, String format, Object... args) {
+		String message = CoreMisc.safeFormat(format, args);
+		this._logger.debug(DebugPrintLevel.VERBOSE, "%s.%s: %s", className, method, message);
+	}
 
 	public File getDataFile(String fileName) {
 		return FileMisc.getPluginDataFile(this, fileName);

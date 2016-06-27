@@ -18,7 +18,7 @@ public class VaultFacade {
 			this._vaultEconomy = Bukkit.getServicesManager().load(Economy.class);
 		}
 		catch (NoClassDefFoundError e) {
-			plugin.getEithonLogger().warning("EithonLibrary could not connect to the Vault plugin when enabling the %s plugin.", plugin.getName());
+			plugin.logWarn("EithonLibrary could not connect to the Vault plugin when enabling the %s plugin.", plugin.getName());
 		}
 	}
 	
@@ -28,7 +28,7 @@ public class VaultFacade {
 
 	private boolean isConnectedOrLog() {
 		if (isConnected()) return true;
-		this._eithonPlugin.getEithonLogger().warning("EithonLibrary is not connected to the Vault plugin. VaultFacade fails.");
+		this._eithonPlugin.logWarn("EithonLibrary is not connected to the Vault plugin. VaultFacade fails.");
 		return false;
 	}
 
