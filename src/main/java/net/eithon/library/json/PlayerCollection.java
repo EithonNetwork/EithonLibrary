@@ -136,9 +136,9 @@ Serializable
 		if (this._deltaFolder == null) return;
 		File[] files = FileMisc.getFilesOrderByLastModified(this._deltaFolder, ".json", false);
 		if (files != null) {
-			eithonPlugin.getEithonLogger().debug(DebugPrintLevel.MAJOR, "Loading %d files", files.length);
+			eithonPlugin.dbgMajor( "Loading %d files", files.length);
 			for (File file : files) {
-				eithonPlugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Loading file \"%s\".", file.getName());
+				eithonPlugin.dbgMinor( "Loading file \"%s\".", file.getName());
 				PlayerCollection<T> delta = loadDeltaFile(file);
 				aggregateDelta(delta);
 				file.delete();
@@ -171,7 +171,7 @@ Serializable
 
 	void saveNow(EithonPlugin plugin, String fileName, String title)
 	{
-		plugin.getEithonLogger().debug(DebugPrintLevel.MINOR, "Saving %d items.", this.playerInfo.size());
+		plugin.dbgMinor( "Saving %d items.", this.playerInfo.size());
 		File jsonFile = new File(plugin.getDataFolder(), fileName);
 		FileContent fileContent = new FileContent(title, 1, toJson());
 		fileContent.save(jsonFile);
@@ -190,7 +190,7 @@ Serializable
 		File file = new File(plugin.getDataFolder(), fileName);
 		FileContent fileContent = FileContent.loadFromFile(file);
 		if (fileContent == null) {
-			plugin.getEithonLogger().debug(DebugPrintLevel.MAJOR, "The file %s was empty.", fileName);
+			plugin.dbgMajor( "The file %s was empty.", fileName);
 			return;			
 		}
 		fromJson(fileContent.getPayload());
