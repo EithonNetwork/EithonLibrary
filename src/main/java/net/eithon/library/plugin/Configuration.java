@@ -66,7 +66,7 @@ public class Configuration {
 		}
 		Map<String, Object> values = section.getValues(returnNestedMaps);	
 		this._plugin.dbgMinor( "Configuration \"%s\" is a map with %d values" , path, values.size());
-		if (this._plugin.getEithonLogger().shouldDebug(DebugPrintLevel.VERBOSE)) debugVerboseMap(values, "  ");
+		if (this._plugin.shouldDebug(DebugPrintLevel.VERBOSE)) debugVerboseMap(values, "  ");
 		return values;
 	}
 
@@ -91,7 +91,7 @@ public class Configuration {
 		for (Entry<String, Object> entry : values.entrySet()) {
 			Object value = entry.getValue();
 			String asString = value == null ? "null" : value.toString();
-			this._plugin.getEithonLogger().debug(DebugPrintLevel.VERBOSE, "%s%s = %s" , indentation, entry.getKey(), asString);
+			verbose("debugVerboseMap", "%s%s = %s" , indentation, entry.getKey(), asString);
 			if (value instanceof Map<?, ?>) debugVerboseMap((Map<String, Object>)value, String.format("%s  ", indentation));
 		}
 	}
@@ -236,7 +236,7 @@ public class Configuration {
 			result = new ArrayList<Integer>();
 		}
 
-		if (this._plugin.getEithonLogger().shouldDebug(DebugPrintLevel.MINOR)) {
+		if (this._plugin.shouldDebug(DebugPrintLevel.MINOR)) {
 			String s = "";
 			boolean first = true;
 			for (Integer integer : result) {
@@ -269,7 +269,7 @@ public class Configuration {
 			long value = TimeMisc.stringToSeconds(string);
 			result.add(value);
 		}
-		if (this._plugin.getEithonLogger().shouldDebug(DebugPrintLevel.MINOR)) {
+		if (this._plugin.shouldDebug(DebugPrintLevel.MINOR)) {
 			String s = "";
 			boolean first = true;
 			for (Long value : result) {
@@ -297,7 +297,7 @@ public class Configuration {
 			result = new ArrayList<String>();
 		}
 
-		if (this._plugin.getEithonLogger().shouldDebug(DebugPrintLevel.MINOR)) {
+		if (this._plugin.shouldDebug(DebugPrintLevel.MINOR)) {
 			String s = "";
 			boolean first = true;
 			for (String string : result) {
@@ -357,5 +357,9 @@ public class Configuration {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void verbose(String method, String format, Object... args) {
+		this._plugin.dbgVerbose("Configuration", method, format, args);	
 	}
 }

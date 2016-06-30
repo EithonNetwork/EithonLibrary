@@ -116,10 +116,10 @@ public class EithonPlugin extends JavaPlugin implements Listener, TabCompleter {
 
 	public Configuration getConfiguration() { return this._config; }
 
-	@Deprecated
 	public Logger getEithonLogger() { return this._logger; }
 
 	public void setDebugLevel(int level) { this._logger.setDebugLevel(level); }
+	public boolean shouldDebug(DebugPrintLevel level) { return this._logger.shouldDebug(level); }
 	public void logError(String format, Object... args) { this._logger.error(format, args); }
 	public void logWarn(String format, Object... args) { this._logger.warning(format, args); }
 	public void logInfo(String format, Object... args) { this._logger.info(format, args); }
