@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 5.5 (2016-06-30)
+
+* CHANGE: Minecraft 1.10
+
 ### 5.4 (2016-06-27)
 
 * NEW: Shortcut to logging and debug printouts.
