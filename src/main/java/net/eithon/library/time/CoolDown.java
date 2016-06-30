@@ -75,26 +75,6 @@ public class CoolDown {
 		this._players.remove(player);
 	}
 	
-	@Deprecated
-	public void addPlayer(Player player) {
-		addPlayer(player, this._defaultCoolDownPeriodInSeconds, this._defaultAllowedNumberOfTimes);
-	}
-	
-	@Deprecated
-	public void addPlayer(Player player, long coolDownPeriodInSeconds) {
-		addPlayer(player, coolDownPeriodInSeconds, 1);
-	}
-	
-	@Deprecated
-	public void addPlayer(Player player, long coolDownPeriodInSeconds, int allowedNumberOfTimes) {
-		CoolDownInfo coolDownInfo = this._players.get(player);
-		if (coolDownInfo == null) {
-			coolDownInfo = new CoolDownInfo(coolDownPeriodInSeconds, allowedNumberOfTimes);
-			this._players.put(player, coolDownInfo);
-		}
-		coolDownInfo.addIncidentIfAllowed();
-	}
-	
 	public List<Player> getPlayers() {
 		Server server = Bukkit.getServer();
 		return this._players.getPlayers().stream().map(id->server.getPlayer(id)).collect(Collectors.toList());
