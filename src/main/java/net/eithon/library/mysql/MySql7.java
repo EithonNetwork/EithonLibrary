@@ -13,7 +13,7 @@ import java.sql.SQLException;
  * @author -_Husky_-
  * @author tips48
  */
-public class MySql extends Database {
+public class MySql7 extends Database7 {
 	private final String user;
 	private final String database;
 	private final String password;
@@ -32,7 +32,7 @@ public class MySql extends Database {
 	 * @param password
 	 *            Password
 	 */
-	public MySql(String hostname, String port, String username,
+	public MySql7(String hostname, String port, String username,
 			String password) {
 		this(hostname, port, null, username, password);
 	}

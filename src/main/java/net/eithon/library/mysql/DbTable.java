@@ -1,6 +1,7 @@
 package net.eithon.library.mysql;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,6 +10,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 class DbTable<T extends DbRecord<T>> {
@@ -48,78 +50,46 @@ class DbTable<T extends DbRecord<T>> {
 		return this.database;
 	}
 
-	public Connection getOrOpenConnection() throws ClassNotFoundException, SQLException {
-		return this.database.getOrOpenConnection();
+	protected Connection getConnection() {
+		Class.forName("com.mysql.jdbc.Driver");
+		return DriverManager.getConnection(_connectionString,
+				this.user, this.password);
 	}
 
-	public void closeConnection() throws SQLException {
-		this.database.closeConnection();
-	}
 
 	public String getName() {
 		return this.name;
 	}
 
 	public List<T> select(DbRecord<T> dbRecord, String whereFormat, Object... arguments) throws ClassNotFoundException, SQLException {
-		ResultSet resultSet = null;
-		PreparedStatement statement = null;
-		synchronized (this.database) {
-			try {
-				statement = prepareStatement(whereFormat, arguments);
-				resultSet = statement.executeQuery();
-				List<T> list = new ArrayList<T>(); 
-				while (resultSet.next()) {
-					T data = dbRecord.factory(this.database, resultSet.getLong("id"));
-					data.fromDb(resultSet);
-					list.add(data);
-				}
-				return list;
-			} finally {
-				closeQuitely(resultSet);
-				closeQuitely(statement);
-				closeQuitely();
-			}	
-		}
-	}
-
-	public boolean selectInto(DbRecord<T> dbRecord, String whereFormat, long l) throws ClassNotFoundException, SQLException {
-		ResultSet resultSet = null;
-		PreparedStatement statement = null;
-		synchronized (this.database) {
-			try {
-				statement = prepareStatement(whereFormat, l);
-				resultSet = statement.executeQuery();
-				if (!resultSet.next()) return false;
-				dbRecord.fromDb(resultSet);
-				if (!resultSet.next()) return true;
-				throw new IllegalArgumentException(String.format("SELECT statement with WHERE \"%s\" unexpectedly returned more than one row."));
-			} finally {
-				closeQuitely(resultSet);
-				closeQuitely(statement);
-				closeQuitely();
+		try (Connection c = getConnection()) {
+			String sql = String.format("SELECT * FROM %s WHERE %s", this.name, whereFormat);
+			try (PreparedStatement statement = c.prepareStatement(sql)) {
+				fillInBlanks(statement, toStringValueList(arguments));
+				try (ResultSet resultSet = statement.executeQuery()) { 
+					List<T> list = new ArrayList<T>(); 
+					while (resultSet.next()) {
+						T data = dbRecord.factory(this.database, resultSet.getLong("id"));
+						data.fromDb(resultSet);
+						list.add(data);
+					}
+					return list;
+				} 
 			}
 		}
 	}
 
-	private PreparedStatement prepareStatement(String whereFormat, Object... arguments) throws ClassNotFoundException, SQLException {
-		String sql = String.format("SELECT * FROM %s WHERE %s", this.name, whereFormat);
-		PreparedStatement statement = getOrOpenConnection().prepareStatement(sql);
-		fillInBlanks(statement, toStringValueList(arguments));
-		return statement;
-	}
-
-	public Timestamp getDataBaseNow() throws ClassNotFoundException, SQLException {
-		String sql = "SELECT NOW()";
-		Statement statement = null;
-		synchronized (this.database) {
-			try {
-				statement = getOrOpenConnection().createStatement();
-				ResultSet resultSet = statement.executeQuery(sql);
-				if ((resultSet == null) || !resultSet.next()) return null;
-				return resultSet.getTimestamp(1);
-			} finally {
-				closeQuitely(statement);
-				closeQuitely();
+	public boolean selectInto(DbRecord<T> dbRecord, String whereFormat, long l) throws ClassNotFoundException, SQLException {
+		try (Connection c = getConnection()) {
+			String sql = String.format("SELECT * FROM %s WHERE %s", this.name, whereFormat);
+			try (PreparedStatement statement = c.prepareStatement(sql)) {
+				fillInBlanks(statement, toStringValueList(l));
+				try (ResultSet resultSet = statement.executeQuery()) { 
+					if (!resultSet.next()) return false;
+					dbRecord.fromDb(resultSet);
+					if (!resultSet.next()) return true;
+					throw new IllegalArgumentException(String.format("SELECT statement with WHERE \"%s\" unexpectedly returned more than one row."));
+				}
 			}
 		}
 	}
@@ -156,7 +126,7 @@ class DbTable<T extends DbRecord<T>> {
 		}
 	}
 
-	public long create(HashMap<String, Object> columnValues) throws SQLException, ClassNotFoundException {
+	public long create(Map<String, Object> columnValues) throws SQLException, ClassNotFoundException {
 		String sql = String.format("INSERT INTO %s (%s) VALUES (%s)",
 				getName(), joinColumnNames(columnValues), joinColumnValues(columnValues));
 		PreparedStatement statement = null;
@@ -205,7 +175,7 @@ class DbTable<T extends DbRecord<T>> {
 		}
 	}
 
-	private List<String> stringColumnValues(HashMap<String, Object> columnValues) {
+	private List<String> stringColumnValues(Map<String, Object> columnValues) {
 		return 
 				columnValues.values().stream()
 				.filter(o -> o instanceof String)
@@ -213,12 +183,12 @@ class DbTable<T extends DbRecord<T>> {
 				.collect(Collectors.toList());
 	}
 
-	private String joinColumnNames(HashMap<String, Object> columnValues) {
+	private String joinColumnNames(Map<String, Object> columnValues) {
 		return String.join(",", columnValues.keySet());
 	}
 
 
-	private String joinColumnValues(HashMap<String, Object> columnValues) {
+	private String joinColumnValues(Map<String, Object> columnValues) {
 		List<String> valueList = 
 				columnValues.values().stream()
 				.map(v -> getValueAsSqlObject(v))
@@ -226,7 +196,7 @@ class DbTable<T extends DbRecord<T>> {
 		return String.join(",", valueList);
 	}
 
-	private String joinAssignments(HashMap<String, Object> columnValues) {
+	private String joinAssignments(Map<String, Object> columnValues) {
 		List<String> assignments = 
 				columnValues.keySet().stream()
 				.map(name -> String.format("%s=%s", name, getValueAsSqlObject(columnValues.get(name))))

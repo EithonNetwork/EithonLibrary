@@ -1,5 +1,4 @@
 package net.eithon.library.mysql;
 
-public class Database {
-
+public interface ITable {
 }
