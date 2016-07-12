@@ -2,7 +2,6 @@ package net.eithon.library.plugin;
 
 import net.eithon.library.chat.LineWrapper;
 import net.eithon.library.extensions.EithonPlugin;
-import net.eithon.library.plugin.Logger.DebugPrintLevel;
 import net.eithon.library.title.Title;
 import net.eithon.plugin.eithonlibrary.Config;
 
@@ -31,7 +30,7 @@ public class ConfigurableMessage extends ConfigurableFormat{
 			} else {
 				this._formatValue = this._formatValue.replace("[actionbar/]", "\n\n");
 			}
-			eithonPlugin.getEithonLogger().debug(DebugPrintLevel.VERBOSE, "FormatValue: \"%s\"", this._formatValue);
+			verbose("ConfigurableMessage", "FormatValue: \"%s\"", this._formatValue);
 		}
 		this._useWrapping = config.getInt("eithon.UseWrappingForMessages", 0) > 0;
 	}
@@ -72,12 +71,7 @@ public class ConfigurableMessage extends ConfigurableFormat{
 	private static void sendTitle(String message) {
 		sendTitle(null, message);
 	}
-
-	@Deprecated
-	public boolean broadcastMessage(Object... args) {
-		return broadcastToThisServer(args);
-	}
-
+	
 	public boolean broadcastToThisServer(Object... args) {
 		String message = getMessageWithColorCoding(args);
 		if (message == null) return false;
@@ -98,12 +92,11 @@ public class ConfigurableMessage extends ConfigurableFormat{
 		String message = getMessageWithColorCoding(args);
 		if (message == null) return false;
 		EithonPublicMessageEvent e = new EithonPublicMessageEvent(message, this._useTitle);
-
-		if (this._useTitle) {
-			sendTitle(message);
-		} else {
-			this._eithonPlugin.getServer().broadcastMessage(message);
-		}
+		this._eithonPlugin.getServer().getPluginManager().callEvent(e);
 		return true;
+	}
+
+	private void verbose(String method, String format, Object... args) {
+		super.verboseLog("ConfigurableMessage", method, format, args);	
 	}
 }

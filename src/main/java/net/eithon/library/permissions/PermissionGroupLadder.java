@@ -2,7 +2,6 @@ package net.eithon.library.permissions;
 
 import net.eithon.library.extensions.EithonPlugin;
 import net.eithon.library.facades.PermissionsFacade;
-import net.eithon.library.plugin.Logger.DebugPrintLevel;
 
 import org.bukkit.entity.Player;
 
@@ -133,9 +132,9 @@ public class PermissionGroupLadder {
 		}
 		return false;
 	}
-
-	private void verbose(String method, String format, Object... args) {
-		String message = String.format(format, args);
-		this._eithonPlugin.getEithonLogger().debug(DebugPrintLevel.VERBOSE, "%s: %s", method, message);
+	
+	private void verbose(String method, String format, Object... args)
+	{
+		this._eithonPlugin.dbgVerbose("PermissionGroupLadder", method, format, args);
 	}
 }

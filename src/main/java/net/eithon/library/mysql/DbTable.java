@@ -18,6 +18,7 @@ class DbTable<T extends DbRecord<T>> {
 
 	private static HashMap<String, DbTable<?>> knownTables = new HashMap<String, DbTable<?>>();
 
+	@SuppressWarnings("rawtypes")
 	public static DbTable<?> get(Database database, String name, String updatedAtColumnName) {
 		String hashableString = getHashableString(database, name);
 		DbTable<?> table = knownTables.get(hashableString);

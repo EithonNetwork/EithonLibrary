@@ -90,4 +90,8 @@ abstract class ConfigurableFormat {
 			sender.sendMessage(message);
 		}
 	}
+
+	protected void verboseLog(String className, String method, String format, Object... args) {
+		this._eithonPlugin.dbgVerbose(className, method, format, args);	
+	}
 }

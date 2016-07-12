@@ -111,7 +111,7 @@ Serializable
 		File file = getFile(this._nextDelta);
 		JSONArray jsonDelta = (JSONArray) toJsonDelta(saveAll);
 		if ((jsonDelta.size() == 0) || (jsonDelta.get(0) == null)) {
-			eithonPlugin.getEithonLogger().debug(DebugPrintLevel.VERBOSE,
+			eithonPlugin.dbgVerbose("PlayerCollection", "saveDelta",
 					"File \"%s\" is not saved, due to no data to save for %s.", 
 					file.getName(), name);
 			return;

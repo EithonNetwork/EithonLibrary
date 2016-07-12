@@ -33,7 +33,6 @@ public class MoveEventHandler {
 	}
 
 	// Use EithonPlayerMoveOneBlockEvent instead
-	@Deprecated
 	public static void addBlockMover(Player player, IBlockMoverFollower follower) {
 		BlockMover mover = _playerSubscriptions.get(player);
 		if (mover == null) {
@@ -44,7 +43,6 @@ public class MoveEventHandler {
 	}
 
 	// Use EithonPlayerMoveOneBlockEvent instead
-	@Deprecated
 	public static void removeBlockMover(Player player, IBlockMoverFollower follower) {
 		BlockMover mover = _playerSubscriptions.get(player);
 		if (mover == null) return;

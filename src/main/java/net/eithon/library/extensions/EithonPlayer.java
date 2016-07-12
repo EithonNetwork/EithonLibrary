@@ -46,12 +46,6 @@ public class EithonPlayer extends JsonObject<EithonPlayer> implements CommandSen
 		}
 	}
 
-	@Deprecated
-	public EithonPlayer(UUID id, String name) { 
-		this._id = id;
-		verifyPlayerIsOnline();
-	}
-
 	public EithonPlayer(UUID id) { 
 		this._id = id;
 		verifyPlayerIsOnline();
@@ -162,11 +156,6 @@ public class EithonPlayer extends JsonObject<EithonPlayer> implements CommandSen
 		this._id = UUID.fromString((String) jsonObject.get("id"));
 		this.verifyPlayerIsOnline();
 		return this;
-	}
-
-	@Deprecated // Misspelled; Use getFromJson
-	public static EithonPlayer getFromJSon(Object json) {
-		return new EithonPlayer().fromJson(json);
 	}
 
 	public static EithonPlayer getFromJson(Object json) {
