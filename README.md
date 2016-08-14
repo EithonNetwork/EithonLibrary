@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 6.0 (2016-08-13)
+
+* NEW: Complete rewrite of the DB library.
+
 ### 5.5.1 (2016-06-30)
 
 * BUG: AFK messages was not sent to other servers.

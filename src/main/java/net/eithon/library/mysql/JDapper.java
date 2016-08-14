@@ -8,17 +8,21 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import net.eithon.library.exceptions.FatalException;
 import net.eithon.library.exceptions.ProgrammersErrorException;
 import net.eithon.library.exceptions.TryAgainException;
 
-public class JDapper<T> {
+public class JDapper<T extends ITable> {
 	private final Database database;
 	private final Class<T> type;
 	private final Field[] fields;
 	private Constructor<T> constructor;
+	private final T example;
 
 	public JDapper(Class<T> type, Database database) throws FatalException{
 		this.type = type;
@@ -29,13 +33,37 @@ public class JDapper<T> {
 		} catch (NoSuchMethodException | SecurityException e) {
 			throw new ProgrammersErrorException(e);
 		}
+		try {
+			this.example = this.constructor.newInstance();
+		} catch (InstantiationException | IllegalAccessException
+				| IllegalArgumentException | InvocationTargetException e) {
+			throw new ProgrammersErrorException("Could not instantiate the JDapper<> parameter class.", e);
+		}
 	}
 
-	public List<T> readSome(String sql, Object ... objects) throws FatalException, TryAgainException {
+	public long createOne(T data) throws FatalException, TryAgainException {
+		StringBuilder sql = new StringBuilder();
+		sql.append(String.format("INSERT INTO %s (", this.example.getTableName()));
+		final String[] notNullFieldNames = getNotNullFieldName(data, false);
+		sql.append(String.join(", ", notNullFieldNames));
+		sql.append(") VALUES (");
+		sql.append(String.join(", ", Stream.of(notNullFieldNames)
+				.map(n -> "?")
+				.collect(Collectors.toList())));
+		sql.append(")");
+		return this.database.executeInsert(sql.toString(), getNotNullFieldValues(data, false));
+	}
+
+	public List<T> readSomeWhere(String where, Object ... objects) throws FatalException, TryAgainException {
+		String sql = String.format("SELECT * FROM %s WHERE %s", this.example.getTableName(), where);
+		return readSome2(sql, objects);
+	}
+
+	public List<T> readSome2(String sql, Object ... objects) throws FatalException, TryAgainException {
 		List<T> results = new ArrayList<T>();
 		try (Connection connection = this.database.getConnection()) {
 			try (PreparedStatement statement = connection.prepareStatement(sql)){
-				setParameters(statement, objects);
+				Database.setParameters(statement, objects);
 				try (ResultSet resultSet = statement.executeQuery()) {
 					while (resultSet.next()) {
 						results.add(resultSetToObject(resultSet));
@@ -48,10 +76,15 @@ public class JDapper<T> {
 		}
 	}
 
+	public T readFirstWhere(String where, Object ... objects) throws FatalException, TryAgainException {
+		String sql = String.format("SELECT * FROM %s WHERE %s", this.example.getTableName(), where);
+		return readFirst(sql, objects);
+	}
+
 	public T readFirst(String sql, Object ... objects) throws FatalException, TryAgainException {
 		try (Connection connection = this.database.getConnection()) {
 			try (PreparedStatement statement = connection.prepareStatement(sql)){
-				setParameters(statement, objects);
+				Database.setParameters(statement, objects);
 				try (ResultSet resultSet = statement.executeQuery()) {
 					if (!resultSet.next()) return null;
 					return resultSetToObject(resultSet);
@@ -62,10 +95,19 @@ public class JDapper<T> {
 		}
 	}
 
+	public T read(long id) throws FatalException, TryAgainException {
+		return readTheOnlyOneWhere("id=?", id);
+	}
+
+	public T readTheOnlyOneWhere(String where, Object ... objects) throws FatalException, TryAgainException {
+		String sql = String.format("SELECT * FROM %s WHERE %s", this.example.getTableName(), where);
+		return readTheOnlyOne(sql, objects);
+	}
+
 	public T readTheOnlyOne(String sql, Object ... objects) throws FatalException, TryAgainException {
 		try (Connection connection = this.database.getConnection()) {
 			try (PreparedStatement statement = connection.prepareStatement(sql)){
-				setParameters(statement, objects);
+				Database.setParameters(statement, objects);
 				try (ResultSet resultSet = statement.executeQuery()) {
 					if (!resultSet.next()) return null;
 					T object = resultSetToObject(resultSet);
@@ -81,80 +123,44 @@ public class JDapper<T> {
 		}
 	}
 
-	public void update(String sql, Object ... objects) throws FatalException, TryAgainException {
-		try (Connection connection = this.database.getConnection()) {
-			try (PreparedStatement statement = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)){
-				setParameters(statement, objects);
-
-				int affectedRows = statement.executeUpdate();
-
-				if (affectedRows == 0) {
-					throw new ProgrammersErrorException("Saving review failed!");
-				}else if (affectedRows > 1) {
-					throw new ProgrammersErrorException("Unexpected result. Database returned multiple rows");
-				}
-			}
-		} catch (SQLException e) {
-			throw new FatalException(e);
-		}
+	public int updateWhere(T data, String where, Object... objects) throws FatalException, TryAgainException {
+		String sql = String.format(
+				"UPDATE %s SET %s WHERE %s", 
+				this.example.getTableName(), getUpdateSet(data), where);
+		ArrayList<Object> list = new ArrayList<Object>();
+		list.addAll(Arrays.asList(getNotNullFieldValues(data, false)));
+		list.addAll(Arrays.asList(objects));
+		return this.database.executeUpdate(sql, list.toArray(new Object[]{}));
 	}
 
-	public void update(String tableName, T data, String where, Object... objects) throws FatalException, TryAgainException {
-		StringBuilder sql = new StringBuilder();
-		sql.append(String.format("UPDATE %s SET ", tableName));
-		sql.append(String.join("= ?, ", getFieldNames()));
-		sql.append(" WHERE ");
-		sql.append(where);
-		update(sql.toString(), getFieldValues(data), objects);
-	}
-
-	public int insert(String sql, Object ... objects) throws FatalException, TryAgainException {
-		try (Connection connection = this.database.getConnection()) {
-			try (PreparedStatement statement = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)){
-				setParameters(statement, objects);
-
-				int affectedRows = statement.executeUpdate();
-
-				if (affectedRows == 0) {
-					throw new ProgrammersErrorException("Saving review failed!");
-				}else if (affectedRows > 1) {
-					throw new ProgrammersErrorException("Unexpected result. Database returned multiple rows");
-				}
-
-				try (ResultSet resultSet = statement.getGeneratedKeys()){
-					boolean found = resultSet.next();
-					if (!found){
-						throw new ProgrammersErrorException("Something is very wrong. Check to see if pigs are flying");
-					}
-					int newID = resultSet.getInt(1);
-					return newID;
-				}
-			}
-		} catch (SQLException e) {
-			throw new FatalException(e);
-		}
-	}
-
-	public int delete(String sql, Object ... objects) throws FatalException, TryAgainException {
-		try (Connection connection = this.database.getConnection()) {
-			try (PreparedStatement statement = connection.prepareStatement(sql)){
-				setParameters(statement, objects);
-				return statement.executeUpdate();
-			}
-		} catch (SQLException e) {
-			throw new FatalException(e);
-		}
-	}
-
-	private void setParameters(PreparedStatement statement, Object... objects) throws FatalException {
-		int parameterIndex = 1;
-		for (Object object : objects) {
+	private String getUpdateSet(T data) {
+		ArrayList<String> list = new ArrayList<String>();
+		for (Field field : this.fields) {
+			final String fieldName = field.getName();
+			if (fieldName.equals("id")) continue;
 			try {
-				statement.setObject(parameterIndex++, object);
-			} catch (SQLException e) {
-				throw new FatalException(e);
+				final Object value = field.get(data);
+				String setColumn = null;
+				if (value == null) {
+					setColumn = fieldName + " = NULL";
+				} else {
+					setColumn = fieldName + " = ?";
+				}
+				list.add(setColumn);
+			} catch (Exception e) {
+				// Ignore fields with problems
 			}
 		}
+		return String.join(", ", list);
+	}
+
+	public int delete(long id) throws FatalException, TryAgainException {
+		return deleteWhere("id = ?", id);
+	}
+
+	public int deleteWhere(String where, Object ... objects) throws FatalException, TryAgainException {
+		String sql = String.format("DELETE FROM %s WHERE %s", this.example.getTableName(), where);
+		return this.database.executeUpdate(sql, objects);
 	}
 
 	private T resultSetToObject(ResultSet resultSet) throws FatalException, SQLException {
@@ -184,24 +190,62 @@ public class JDapper<T> {
 		return object;
 	}
 
-	private String[] getFieldNames() {
+	private String[] getFieldNames(boolean includeId) {
 		ArrayList<String> list = new ArrayList<String>();
 		for (Field field : this.fields) {
-			list.add(field.getName());
+			final String fieldName = field.getName();
+			if (!includeId && fieldName.equals("id")) continue;
+			list.add(fieldName);
 		}
-		return (String[]) list.toArray();
+		return list.toArray(new String[] {});
 	}
 
-	private Object[] getFieldValues(T object) throws FatalException {
+	private String[] getNotNullFieldName(Object object, boolean includeId) {
+		ArrayList<String> list = new ArrayList<String>();
+		for (Field field : this.fields) {
+			try {
+				if (field.get(object) != null) {
+					final String fieldName = field.getName();
+					if (!includeId && fieldName.equals("id")) continue;
+					list.add(fieldName);
+				}
+			} catch (Exception e) {
+				// We will ignore fields with errors.
+			}
+		}
+		return list.toArray(new String[] {});
+	}
+
+	private Object[] getFieldValues(T object, boolean includeId) throws FatalException {
 		ArrayList<Object> list = new ArrayList<Object>();
 		try {
 			for (Field field : this.fields) {
-
+				final String fieldName = field.getName();
+				if (!includeId && fieldName.equals("id")) continue;
 				list.add(field.get(object));
 			}
 		} catch (IllegalArgumentException | IllegalAccessException e) {
 			throw new ProgrammersErrorException(e);
 		}
-		return (String[]) list.toArray();
+		return list.toArray(new Object[] {});
+	}
+
+	private Object[] getNotNullFieldValues(T object, boolean includeId) throws FatalException {
+		ArrayList<Object> list = new ArrayList<Object>();
+		try {
+			for (Field field : this.fields) {
+				try {
+					final String fieldName = field.getName();
+					if (!includeId && fieldName.equals("id")) continue;
+					final Object fieldValue = field.get(object);
+					if (fieldValue != null) list.add(fieldValue);
+				} catch (Exception e) {
+					// We will ignore fields with errors.
+				}
+			}
+		} catch (IllegalArgumentException e) {
+			throw new ProgrammersErrorException(e);
+		}
+		return list.toArray(new Object[] {});
 	}
 }
