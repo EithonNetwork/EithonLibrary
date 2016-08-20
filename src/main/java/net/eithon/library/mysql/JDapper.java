@@ -56,10 +56,10 @@ public class JDapper<T extends IRow> {
 
 	public List<T> readSomeWhere(String where, Object ... objects) throws FatalException, TryAgainException {
 		String sql = String.format("SELECT * FROM %s WHERE %s", this.example.getTableName(), where);
-		return readSome2(sql, objects);
+		return readSome(sql, objects);
 	}
 
-	public List<T> readSome2(String sql, Object ... objects) throws FatalException, TryAgainException {
+	public List<T> readSome(String sql, Object ... objects) throws FatalException, TryAgainException {
 		List<T> results = new ArrayList<T>();
 		try (Connection connection = this.database.getConnection()) {
 			try (PreparedStatement statement = connection.prepareStatement(sql)){
@@ -190,16 +190,6 @@ public class JDapper<T extends IRow> {
 		return object;
 	}
 
-	private String[] getFieldNames(boolean includeId) {
-		ArrayList<String> list = new ArrayList<String>();
-		for (Field field : this.fields) {
-			final String fieldName = field.getName();
-			if (!includeId && fieldName.equals("id")) continue;
-			list.add(fieldName);
-		}
-		return list.toArray(new String[] {});
-	}
-
 	private String[] getNotNullFieldName(Object object, boolean includeId) {
 		ArrayList<String> list = new ArrayList<String>();
 		for (Field field : this.fields) {
@@ -214,20 +204,6 @@ public class JDapper<T extends IRow> {
 			}
 		}
 		return list.toArray(new String[] {});
-	}
-
-	private Object[] getFieldValues(T object, boolean includeId) throws FatalException {
-		ArrayList<Object> list = new ArrayList<Object>();
-		try {
-			for (Field field : this.fields) {
-				final String fieldName = field.getName();
-				if (!includeId && fieldName.equals("id")) continue;
-				list.add(field.get(object));
-			}
-		} catch (IllegalArgumentException | IllegalAccessException e) {
-			throw new ProgrammersErrorException(e);
-		}
-		return list.toArray(new Object[] {});
 	}
 
 	private Object[] getNotNullFieldValues(T object, boolean includeId) throws FatalException {
