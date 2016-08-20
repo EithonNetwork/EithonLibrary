@@ -5,10 +5,10 @@ import java.util.List;
 import net.eithon.library.exceptions.FatalException;
 import net.eithon.library.exceptions.TryAgainException;
 
-public abstract class DbLogic<T extends ITable> {
+public abstract class DbTable<T extends IRow> {
 	protected JDapper<T> jDapper;	
 	
-	public DbLogic(Class<T> type, final Database database) throws FatalException {
+	public DbTable(Class<T> type, final Database database) throws FatalException {
 		this.jDapper = new JDapper<T>(type, database);
 	}
 

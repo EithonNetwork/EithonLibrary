@@ -17,7 +17,7 @@ import net.eithon.library.exceptions.FatalException;
 import net.eithon.library.exceptions.ProgrammersErrorException;
 import net.eithon.library.exceptions.TryAgainException;
 
-public class JDapper<T extends ITable> {
+public class JDapper<T extends IRow> {
 	private final Database database;
 	private final Class<T> type;
 	private final Field[] fields;

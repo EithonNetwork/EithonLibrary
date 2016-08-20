@@ -1,10 +1,10 @@
 package net.eithon.library.mysql;
 
-public class Table implements ITable {
+public class Row implements IRow {
 	public long id;
 	private String tableName;
 	
-	public Table(String tableName){
+	public Row(String tableName){
 		this.tableName = tableName;
 	}
 	@Override
