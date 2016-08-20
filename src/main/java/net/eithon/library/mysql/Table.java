@@ -10,7 +10,7 @@ public class Table implements ITable {
 	@Override
 	public long getId() {
 		// TODO Auto-generated method stub
-		return id;
+		return this.id;
 	}
 
 	@Override

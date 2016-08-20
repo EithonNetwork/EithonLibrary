@@ -53,7 +53,13 @@ public class EithonCommand {
 		if (commandSyntax == null) return true;
 		if (!hasPermissionOrInformSender(commandSyntax)) return true; 
 		CommandExecutor executor = commandSyntax.getCommandExecutor();
-		if (executor != null) executor.execute(this);
+		if (executor != null) {
+			net.eithon.library.exceptions.TryHandler.handleExceptions(this._sender,
+					() ->
+			{
+				executor.execute(this);
+			});
+		}
 		return true;
 	}
 
