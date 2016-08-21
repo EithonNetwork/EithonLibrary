@@ -33,12 +33,13 @@ public class Database {
 			throw new FatalException(e);
 		}
 		try {
-			
 			Connection connection = DriverManager.getConnection(this.connectionUrl, this.connectionUser, this.connectionPassword);
 			return connection;
 
 		} catch (SQLException e) {
-			throw new TryAgainException("Failed to connect to database", e);
+			throw new TryAgainException(String.format(
+					"Failed to connect to database %s@(%s)", this.connectionUser, this.connectionUrl),
+					e);
 		}
 	}
 
