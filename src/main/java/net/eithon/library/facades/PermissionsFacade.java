@@ -47,7 +47,7 @@ public class PermissionsFacade {
 
 	public static void addPermissionGroup(OfflinePlayer player, Group group) {
 		if (!isConnectedOrError()) return;
-		verbose("addPermissionGroup", "Adding player %s to group %s", player.getName(), group);
+		verbose("addPermissionGroup", "Adding player %s to group %s", player.getName(), group.getName());
 		permissionManager.addPlayerGroup(player.getUniqueId(), group.getId(), new ResponseRunnable() {
 			@Override
 			public void run() {

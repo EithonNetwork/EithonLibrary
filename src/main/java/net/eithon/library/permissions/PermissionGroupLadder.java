@@ -118,16 +118,16 @@ public class PermissionGroupLadder {
 	private boolean maybeAddGroup(Player player, int levelStartAtOne, HashMap<Integer, Group> playerGroups) {
 		Group levelGroup = getPermissionGroup(levelStartAtOne);
 		if (playerGroups.containsKey(levelGroup.getId())) return false;
-		verbose("maybeAddGroup", "Adding group %s for player %s.", levelGroup, player.getName());
-		PermissionsFacade.addPermissionGroup(player, getPermissionGroup(levelStartAtOne));
+		verbose("maybeAddGroup", "Adding group %s for player %s.", levelGroup.getName(), player.getName());
+		PermissionsFacade.addPermissionGroup(player, levelGroup);
 		return true;
 	}
 
 	private boolean maybeRemoveGroup(Player player, int level, HashMap<Integer, Group> playerGroups) {
 		Group levelGroup = getPermissionGroup(level);
 		if (!playerGroups.containsKey(levelGroup.getId())) return false;
-		verbose("maybeRemoveGroup", "Removing group %s for player %s.", levelGroup, player.getName());
-		PermissionsFacade.removePermissionGroup(player, getPermissionGroup(level));
+		verbose("maybeRemoveGroup", "Removing group %s for player %s.", levelGroup.getName(), player.getName());
+		PermissionsFacade.removePermissionGroup(player, levelGroup);
 		return true;
 	}
 
