@@ -3,7 +3,7 @@
 	<groupId>net.eithon.plugin</groupId>
 	<artifactId>EithonLibrary</artifactId>
 	<name>EithonLibrary</name>
-	<version>5.5.1</version>
+	<version>5.6</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<powermock.version>1.6.3</powermock.version>
@@ -87,9 +87,9 @@
 		<dependency>
 			<groupId>com.github.cheesesoftware</groupId>
 			<artifactId>PowerfulPermsAPI</artifactId>
-			<version>1.0</version>
+			<version>4.0.3</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/dependencies/PowerfulPerms-3.0.3.jar</systemPath>
+			<systemPath>${project.basedir}/dependencies/PowerfulPerms-4.0.3.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>net.milkbowl.vault</groupId>

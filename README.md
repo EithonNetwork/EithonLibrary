@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 5.6 (2016-08-23)
+
+* CHANGE: PowerfulPerms has a new contract.
+
 ### 5.5.1 (2016-06-30)
 
 * BUG: AFK messages was not sent to other servers.

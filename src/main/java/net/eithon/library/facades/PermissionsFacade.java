@@ -1,5 +1,6 @@
 package net.eithon.library.facades;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -9,6 +10,7 @@ import net.eithon.library.extensions.EithonPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
+import com.github.cheesesoftware.PowerfulPermsAPI.Group;
 import com.github.cheesesoftware.PowerfulPermsAPI.PermissionManager;
 import com.github.cheesesoftware.PowerfulPermsAPI.PermissionPlayer;
 import com.github.cheesesoftware.PowerfulPermsAPI.PowerfulPermsPlugin;
@@ -39,8 +41,14 @@ public class PermissionsFacade {
 
 	public static void addPermissionGroup(OfflinePlayer player, String groupName) {
 		if (!isConnectedOrError()) return;
-		verbose("addPermissionGroup", "Adding player %s to group %s", player.getName(), groupName);
-		permissionManager.addPlayerGroup(player.getUniqueId(), groupName, new ResponseRunnable() {
+		Group group = permissionManager.getGroup(groupName);
+		addPermissionGroup(player, group);
+	}
+
+	public static void addPermissionGroup(OfflinePlayer player, Group group) {
+		if (!isConnectedOrError()) return;
+		verbose("addPermissionGroup", "Adding player %s to group %s", player.getName(), group);
+		permissionManager.addPlayerGroup(player.getUniqueId(), group.getId(), new ResponseRunnable() {
 			@Override
 			public void run() {
 				verbose("addPermissionGroup", "Response");
@@ -48,10 +56,10 @@ public class PermissionsFacade {
 		});
 	}
 
-	public static void removePermissionGroup(OfflinePlayer player, String groupName) {
+	public static void removePermissionGroup(OfflinePlayer player, Group group) {
 		if (!isConnectedOrError()) return;
-		verbose("removePermissionGroup", "Removing player %s from group %s", player.getName(), groupName);
-		permissionManager.removePlayerGroup(player.getUniqueId(), groupName, new ResponseRunnable() {
+		verbose("removePermissionGroup", "Removing player %s from group %s", player.getName(), group);
+		permissionManager.removePlayerGroup(player.getUniqueId(), group.getId(), new ResponseRunnable() {
 			@Override
 			public void run() {
 				verbose("removePermissionGroup", "Response");
@@ -59,21 +67,25 @@ public class PermissionsFacade {
 		});
 	}
 
-	public static String[] getPlayerPermissionGroups(OfflinePlayer player) {
-		return getPlayerPermissionGroups(player.getUniqueId());
+	public static String[] getPlayerPermissionGroupNames(OfflinePlayer player) {
+		return getPlayerPermissionGroupNames(player.getUniqueId());
 	}
 
-	public static String[] getPlayerPermissionGroups(UUID playerId) {
-		if (!isConnectedOrError()) return new String[0];
-		PermissionPlayer permissionPlayer = permissionManager.getPermissionPlayer(playerId);
-		if (permissionPlayer == null) return new String[0];
-		List<String> groupNames = permissionPlayer
-				.getGroups()
+	public static String[] getPlayerPermissionGroupNames(UUID playerId) {
+		List<String> groupNames = getPlayerPermissionGroups(playerId)
 				.stream()
 				.map(group -> group.getName())
 				.collect(Collectors.toList());
 		return groupNames
 				.toArray(new String[0]);
+	}
+
+	public static List<Group> getPlayerPermissionGroups(UUID playerId) {
+		ArrayList<Group> emptyList = new ArrayList<Group>();
+		if (!isConnectedOrError()) return emptyList;
+		PermissionPlayer permissionPlayer = permissionManager.getPermissionPlayer(playerId);
+		if (permissionPlayer == null) return emptyList;
+		return permissionPlayer.getGroups();
 	}
 
 	public static void addPlayerPermissionAsync(final OfflinePlayer player, final String permission) {
@@ -106,7 +118,7 @@ public class PermissionsFacade {
 
 	public static boolean hasPermissionGroup(OfflinePlayer player, String groupName) {
 		if (!isConnectedOrError()) return false;
-		return contains(getPlayerPermissionGroups(player), groupName);
+		return contains(getPlayerPermissionGroupNames(player), groupName);
 	}
 
 	private static boolean isConnectedOrError() {
@@ -126,5 +138,9 @@ public class PermissionsFacade {
 	static void verbose(String method, String format, Object... args) {
 		String message = String.format(format, args);
 		eithonPlugin.dbgMajor( "%s: %s", method, message);
+	}
+
+	public static Group getGroup(String name) {
+		return permissionManager.getGroup(name);
 	}
 }
