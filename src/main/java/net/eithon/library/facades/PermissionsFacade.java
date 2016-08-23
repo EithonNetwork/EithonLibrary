@@ -51,7 +51,7 @@ public class PermissionsFacade {
 		permissionManager.addPlayerGroup(player.getUniqueId(), group.getId(), new ResponseRunnable() {
 			@Override
 			public void run() {
-				verbose("addPermissionGroup", "Response");
+				verbose("addPermissionGroup", this.getResponse());
 			}
 		});
 	}
@@ -62,7 +62,7 @@ public class PermissionsFacade {
 		permissionManager.removePlayerGroup(player.getUniqueId(), group.getId(), new ResponseRunnable() {
 			@Override
 			public void run() {
-				verbose("removePermissionGroup", "Response");
+				verbose("removePermissionGroup", this.getResponse());
 			}
 		});
 	}
