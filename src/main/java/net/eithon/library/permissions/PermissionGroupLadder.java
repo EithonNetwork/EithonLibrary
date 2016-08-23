@@ -1,6 +1,7 @@
 package net.eithon.library.permissions;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,12 +54,8 @@ public class PermissionGroupLadder {
 		boolean anyChanged = false;
 		boolean changed = false;
 		verbose("updatePermissionGroups", "Enter player = %s, index = %d", player.getName(), levelStartAtOne);
-		List<Group> playerGroups = PermissionsFacade.getPlayerPermissionGroups(player.getUniqueId());
-		verbose("updatePermissionGroups", "playerGroups: %s", String.join(", ",
-				playerGroups
-				.stream()
-				.map(group -> group.getName())
-				.collect(Collectors.toList())));
+		HashMap<Integer, Group> playerGroups = PermissionsFacade.getPlayerPermissionGroups(player.getUniqueId());
+		verbose("updatePermissionGroups", "playerGroups: %s", String.join(", ", getGroupNames(playerGroups)));
 		if (this._isAccumulative) changed = addLowerLevels(player, levelStartAtOne, playerGroups);
 		anyChanged = anyChanged || changed;
 		verbose("updatePermissionGroups", "Add group for level %d", levelStartAtOne);
@@ -72,8 +69,15 @@ public class PermissionGroupLadder {
 		return anyChanged;
 	}
 
+	private List<String> getGroupNames(HashMap<Integer, Group> playerGroups) {
+		return playerGroups.values()
+		.stream()
+		.map(group -> group.getName())
+		.collect(Collectors.toList());
+	}
+
 	private boolean removeHigherLevels(Player player, int levelStartAtOne,
-			List<Group> playerGroups) {
+			HashMap<Integer, Group> playerGroups) {
 		boolean anyChanged = false;
 		if (levelStartAtOne < this._permissionGroups.length) {
 			verbose("updatePermissionGroups", "Remove groups: %d-%d", levelStartAtOne+1, this._permissionGroups.length);
@@ -85,7 +89,7 @@ public class PermissionGroupLadder {
 		return anyChanged;
 	}
 
-	private boolean addLowerLevels(Player player, int levelStartAtOne, List<Group> playerGroups) {
+	private boolean addLowerLevels(Player player, int levelStartAtOne, HashMap<Integer, Group> playerGroups) {
 		if (levelStartAtOne <= 1) return false;
 		boolean anyChanged = false;
 		verbose("updatePermissionGroups", "Add groups: %d-%d", 1, levelStartAtOne-1);
@@ -96,7 +100,7 @@ public class PermissionGroupLadder {
 		return anyChanged;	
 	}
 
-	private boolean removeLowerLevels(Player player, int levelStartAtOne, List<Group> playerGroups) {
+	private boolean removeLowerLevels(Player player, int levelStartAtOne, HashMap<Integer, Group> playerGroups) {
 		if (levelStartAtOne <= 1) return false;
 		boolean anyChanged = false;
 		verbose("updatePermissionGroups", "Remove groups: %d-%d", 1, levelStartAtOne-1);
@@ -111,17 +115,17 @@ public class PermissionGroupLadder {
 		return updatePermissionGroups(player, 0);
 	}
 
-	private boolean maybeAddGroup(Player player, int levelStartAtOne, List<Group> playerGroups) {
+	private boolean maybeAddGroup(Player player, int levelStartAtOne, HashMap<Integer, Group> playerGroups) {
 		Group levelGroup = getPermissionGroup(levelStartAtOne);
-		if (playerGroups.contains(levelGroup)) return false;
+		if (playerGroups.containsKey(levelGroup.getId())) return false;
 		verbose("maybeAddGroup", "Adding group %s for player %s.", levelGroup, player.getName());
 		PermissionsFacade.addPermissionGroup(player, getPermissionGroup(levelStartAtOne));
 		return true;
 	}
 
-	private boolean maybeRemoveGroup(Player player, int level, List<Group> playerGroups) {
+	private boolean maybeRemoveGroup(Player player, int level, HashMap<Integer, Group> playerGroups) {
 		Group levelGroup = getPermissionGroup(level);
-		if (!playerGroups.contains(levelGroup)) return false;
+		if (!playerGroups.containsKey(levelGroup.getId())) return false;
 		verbose("maybeRemoveGroup", "Removing group %s for player %s.", levelGroup, player.getName());
 		PermissionsFacade.removePermissionGroup(player, getPermissionGroup(level));
 		return true;
@@ -129,12 +133,12 @@ public class PermissionGroupLadder {
 
 	public int currentLevel(Player player) {
 		if (!PermissionsFacade.isConnected()) return 0;
-		List<Group> currentGroups = PermissionsFacade.getPlayerPermissionGroups(player.getUniqueId());
+		HashMap<Integer, Group> currentGroups = PermissionsFacade.getPlayerPermissionGroups(player.getUniqueId());
 		int levelStartAtOne = 0;
 		if ((currentGroups != null) && (currentGroups.size() > 0)) {
 			for (int i = 1; i <= this._permissionGroups.length; i++) {
 				Group group = getPermissionGroup(i);
-				if (currentGroups.contains(group)) {
+				if (currentGroups.containsKey(group.getId())) {
 					levelStartAtOne = i;	
 				}
 			}

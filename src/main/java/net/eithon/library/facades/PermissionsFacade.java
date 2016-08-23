@@ -1,6 +1,6 @@
 package net.eithon.library.facades;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -73,6 +73,7 @@ public class PermissionsFacade {
 
 	public static String[] getPlayerPermissionGroupNames(UUID playerId) {
 		List<String> groupNames = getPlayerPermissionGroups(playerId)
+				.values()
 				.stream()
 				.map(group -> group.getName())
 				.collect(Collectors.toList());
@@ -80,12 +81,15 @@ public class PermissionsFacade {
 				.toArray(new String[0]);
 	}
 
-	public static List<Group> getPlayerPermissionGroups(UUID playerId) {
-		ArrayList<Group> emptyList = new ArrayList<Group>();
-		if (!isConnectedOrError()) return emptyList;
+	public static HashMap<Integer, Group> getPlayerPermissionGroups(UUID playerId) {
+		HashMap<Integer, Group> result = new HashMap<Integer, Group>();
+		if (!isConnectedOrError()) return result;
 		PermissionPlayer permissionPlayer = permissionManager.getPermissionPlayer(playerId);
-		if (permissionPlayer == null) return emptyList;
-		return permissionPlayer.getGroups();
+		if (permissionPlayer == null) return result;
+		for (Group group : permissionPlayer.getGroups()) {
+			result.put(group.getId(), group);
+		}
+		return result;
 	}
 
 	public static void addPlayerPermissionAsync(final OfflinePlayer player, final String permission) {
