@@ -87,9 +87,9 @@
 		<dependency>
 			<groupId>com.github.cheesesoftware</groupId>
 			<artifactId>PowerfulPermsAPI</artifactId>
-			<version>1.0</version>
+			<version>4.0.3</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/dependencies/PowerfulPerms-3.0.3.jar</systemPath>
+			<systemPath>${project.basedir}/dependencies/PowerfulPerms-4.0.3.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>net.milkbowl.vault</groupId>
