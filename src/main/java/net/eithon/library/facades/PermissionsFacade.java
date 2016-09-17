@@ -1,5 +1,6 @@
 package net.eithon.library.facades;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -9,6 +10,7 @@ import net.eithon.library.extensions.EithonPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
+import com.github.cheesesoftware.PowerfulPermsAPI.Group;
 import com.github.cheesesoftware.PowerfulPermsAPI.PermissionManager;
 import com.github.cheesesoftware.PowerfulPermsAPI.PermissionPlayer;
 import com.github.cheesesoftware.PowerfulPermsAPI.PowerfulPermsPlugin;
@@ -39,41 +41,55 @@ public class PermissionsFacade {
 
 	public static void addPermissionGroup(OfflinePlayer player, String groupName) {
 		if (!isConnectedOrError()) return;
-		verbose("addPermissionGroup", "Adding player %s to group %s", player.getName(), groupName);
-		permissionManager.addPlayerGroup(player.getUniqueId(), groupName, new ResponseRunnable() {
-			@Override
-			public void run() {
-				verbose("addPermissionGroup", "Response");
-			}
-		});
+		Group group = permissionManager.getGroup(groupName);
+		addPermissionGroup(player, group);
 	}
 
-	public static void removePermissionGroup(OfflinePlayer player, String groupName) {
+	public static void addPermissionGroup(OfflinePlayer player, Group group) {
 		if (!isConnectedOrError()) return;
-		verbose("removePermissionGroup", "Removing player %s from group %s", player.getName(), groupName);
-		permissionManager.removePlayerGroup(player.getUniqueId(), groupName, new ResponseRunnable() {
+		verbose("addPermissionGroup", "Adding player %s to group %s", player.getName(), group.getName());
+		permissionManager.addPlayerGroup(player.getUniqueId(), group.getId(), new ResponseRunnable() {
 			@Override
 			public void run() {
-				verbose("removePermissionGroup", "Response");
+				verbose("addPermissionGroup", this.getResponse());
 			}
 		});
 	}
 
-	public static String[] getPlayerPermissionGroups(OfflinePlayer player) {
-		return getPlayerPermissionGroups(player.getUniqueId());
+	public static void removePermissionGroup(OfflinePlayer player, Group group) {
+		if (!isConnectedOrError()) return;
+		verbose("removePermissionGroup", "Removing player %s from group %s", player.getName(), group);
+		permissionManager.removePlayerGroup(player.getUniqueId(), group.getId(), new ResponseRunnable() {
+			@Override
+			public void run() {
+				verbose("removePermissionGroup", this.getResponse());
+			}
+		});
 	}
 
-	public static String[] getPlayerPermissionGroups(UUID playerId) {
-		if (!isConnectedOrError()) return new String[0];
-		PermissionPlayer permissionPlayer = permissionManager.getPermissionPlayer(playerId);
-		if (permissionPlayer == null) return new String[0];
-		List<String> groupNames = permissionPlayer
-				.getGroups()
+	public static String[] getPlayerPermissionGroupNames(OfflinePlayer player) {
+		return getPlayerPermissionGroupNames(player.getUniqueId());
+	}
+
+	public static String[] getPlayerPermissionGroupNames(UUID playerId) {
+		List<String> groupNames = getPlayerPermissionGroups(playerId)
+				.values()
 				.stream()
 				.map(group -> group.getName())
 				.collect(Collectors.toList());
 		return groupNames
 				.toArray(new String[0]);
+	}
+
+	public static HashMap<Integer, Group> getPlayerPermissionGroups(UUID playerId) {
+		HashMap<Integer, Group> result = new HashMap<Integer, Group>();
+		if (!isConnectedOrError()) return result;
+		PermissionPlayer permissionPlayer = permissionManager.getPermissionPlayer(playerId);
+		if (permissionPlayer == null) return result;
+		for (Group group : permissionPlayer.getGroups()) {
+			result.put(group.getId(), group);
+		}
+		return result;
 	}
 
 	public static void addPlayerPermissionAsync(final OfflinePlayer player, final String permission) {
@@ -106,7 +122,7 @@ public class PermissionsFacade {
 
 	public static boolean hasPermissionGroup(OfflinePlayer player, String groupName) {
 		if (!isConnectedOrError()) return false;
-		return contains(getPlayerPermissionGroups(player), groupName);
+		return contains(getPlayerPermissionGroupNames(player), groupName);
 	}
 
 	private static boolean isConnectedOrError() {
@@ -126,5 +142,9 @@ public class PermissionsFacade {
 	static void verbose(String method, String format, Object... args) {
 		String message = String.format(format, args);
 		eithonPlugin.dbgMajor( "%s: %s", method, message);
+	}
+
+	public static Group getGroup(String name) {
+		return permissionManager.getGroup(name);
 	}
 }
