@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import net.eithon.library.exceptions.FatalException;
 import net.eithon.library.exceptions.ProgrammersErrorException;
 import net.eithon.library.exceptions.TryAgainException;
+import net.eithon.library.plugin.Logger;
 
 public class JDapper<T extends IRow> {
 	private final Database database;
@@ -72,7 +73,12 @@ public class JDapper<T extends IRow> {
 				}
 			}
 		} catch (SQLException e) {
+			Logger.libraryError("JDapper.readSome(\"%s\"): %s", sql, e.getMessage());
+			e.printStackTrace();
 			throw new FatalException(e);
+		} catch (Exception e) {
+			Logger.libraryError("JDapper.readSome(\"%s\"): %s", sql, e.getMessage());
+			throw e;
 		}
 	}
 
@@ -91,7 +97,12 @@ public class JDapper<T extends IRow> {
 				}
 			}
 		} catch (SQLException e) {
+			Logger.libraryError("JDapper.readFirst(\"%s\"): %s", sql, e.getMessage());
+			e.printStackTrace();
 			throw new FatalException(e);
+		} catch (Exception e) {
+			Logger.libraryError("JDapper.readFirst(\"%s\"): %s", sql, e.getMessage());
+			throw e;
 		}
 	}
 
@@ -119,7 +130,12 @@ public class JDapper<T extends IRow> {
 				}
 			}
 		} catch (SQLException e) {
+			Logger.libraryError("JDapper.readTheOnlyOne(\"%s\"): %s", sql, e.getMessage());
+			e.printStackTrace();
 			throw new FatalException(e);
+		} catch (Exception e) {
+			Logger.libraryError("JDapper.readTheOnlyOne(\"%s\"): %s", sql, e.getMessage());
+			throw e;
 		}
 	}
 
