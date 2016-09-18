@@ -1,9 +1,11 @@
 package net.eithon.library.command;
 
+import net.eithon.library.exceptions.EithonException;
+
 public interface ICommandSyntax {
 
 	public interface CommandExecutor {
-		public void execute(EithonCommand command);
+		public void execute(EithonCommand command) throws EithonException;
 	}
 	
 	public ICommandSyntaxAdvanced addKeyWord(String name);

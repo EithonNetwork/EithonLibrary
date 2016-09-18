@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 6.0 (2016-09-17)
+
+* NEW: Complete rewrite of the DB library.
+
 ### 5.6 (2016-08-23)
 
 * CHANGE: PowerfulPerms has a new contract.

@@ -8,6 +8,8 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class EithonLocation extends JsonObject<EithonLocation>{
 
@@ -55,6 +57,8 @@ public class EithonLocation extends JsonObject<EithonLocation>{
 
 		return null;
 	}
+	
+	
 
 	@Override
 	public EithonLocation factory() {
@@ -96,6 +100,18 @@ public class EithonLocation extends JsonObject<EithonLocation>{
 	
 	public static EithonLocation getFromJson(Object json) {
 		return new EithonLocation().fromJson(json);
+	}
+
+	public static EithonLocation getFromJsonString(String location) {
+		JSONParser parser = new JSONParser();
+		JSONObject json;
+		try {
+			json = (JSONObject) parser.parse(location);
+			return getFromJson(json);
+		} catch (ParseException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 }

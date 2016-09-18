@@ -1,142 +1,93 @@
 package net.eithon.library.mysql;
 
-// This code was copied from https://github.com/Huskehhh/MySQL
-
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
-/**
- * Abstract Database class, serves as a base for any connection method (MySQL,
- * SQLite, etc.)
- * 
- * @author -_Husky_-
- * @author tips48
- */
-public abstract class Database {
+import net.eithon.library.exceptions.FatalException;
+import net.eithon.library.exceptions.ProgrammersErrorException;
+import net.eithon.library.exceptions.TryAgainException;
 
-	protected Connection connection;
+public class Database {
+	private String connectionUrl;
+	private String connectionUser;
+	private String connectionPassword;
+	private String driver = "com.mysql.jdbc.Driver";
 
-	/**
-	 * Creates a new Database
-	 *
-	 */
-	protected Database() {
-		this.connection = null;
+	public Database(String connectionUrl, String userName, String password){
+		this.connectionUrl = connectionUrl;
+		this.connectionUser = userName;
+		this.connectionPassword = password;
+	}
+	
+	public Database(String hostName, String port, String databaseName, String userName, String password){
+		this("jdbc:mysql://" + hostName + ":" + port + "/" + databaseName, userName, password);
 	}
 
-	/**
-	 * Opens a connection with the database
-	 * 
-	 * @return Opened connection
-	 * @throws SQLException
-	 *             if the connection can not be opened
-	 * @throws ClassNotFoundException
-	 *             if the driver cannot be found
-	 */
-	public abstract Connection openConnection() throws SQLException,
-			ClassNotFoundException;
-
-	/**
-	 * Checks if a connection is open with the database
-	 * 
-	 * @return true if the connection is open
-	 * @throws SQLException
-	 *             if the connection cannot be checked
-	 */
-	public boolean checkConnection() throws SQLException {
-		return this.connection != null && !this.connection.isClosed();
-	}
-
-	/**
-	 * Gets the connection with the database
-	 * 
-	 * @return Connection with the database, null if none
-	 */
-	public Connection getConnection() {
-		return this.connection;
-	}
-
-	/**
-	 * Gets or opens a connection with the database
-	 * 
-	 * @return Connection with the database, null if none
-	 * @throws SQLException
-	 *             if the connection can not be opened
-	 * @throws ClassNotFoundException
-	 *             if the driver cannot be found
-	 */
-	public Connection getOrOpenConnection() throws SQLException, ClassNotFoundException {
-		if (checkConnection()) return this.connection;
-		return openConnection();
-	}
-
-	/**
-	 * Closes the connection with the database
-	 * 
-	 * @return true if successful
-	 * @throws SQLException
-	 *             if the connection cannot be closed
-	 */
-	public boolean closeConnection() throws SQLException {
-		if (this.connection == null) {
-			return false;
+	public Connection getConnection() throws TryAgainException, FatalException{
+		try {
+			Class.forName(this.driver).newInstance();
+		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+			throw new FatalException(e);
 		}
-		this.connection.close();
-		return true;
+		try {
+			Connection connection = DriverManager.getConnection(this.connectionUrl, this.connectionUser, this.connectionPassword);
+			return connection;
+
+		} catch (SQLException e) {
+			throw new TryAgainException(String.format(
+					"Failed to connect to database %s@(%s)", this.connectionUser, this.connectionUrl),
+					e);
+		}
 	}
 
+	long executeInsert(String sql, Object ... objects) throws FatalException, TryAgainException {
+		try (Connection connection = getConnection()) {
+			try (PreparedStatement statement = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)){
+				setParameters(statement, objects);
 
-	/**
-	 * Executes a SQL Query<br>
-	 * 
-	 * If the connection is closed, it will be opened
-	 * 
-	 * @param query
-	 *            Query to be run
-	 * @return the results of the query
-	 * @throws SQLException
-	 *             If the query cannot be executed
-	 * @throws ClassNotFoundException
-	 *             If the driver cannot be found; see {@link #openConnection()}
-	 */
-	public ResultSet querySQL(String query) throws SQLException,
-			ClassNotFoundException {
-		if (!checkConnection()) {
-			openConnection();
+				int affectedRows = statement.executeUpdate();
+				if (affectedRows == 0) {
+					throw new ProgrammersErrorException("Could not create a database row!");
+				}else if (affectedRows > 1) {
+					throw new ProgrammersErrorException("Unexpected result. Database returned multiple rows");
+				}
+
+				try (ResultSet resultSet = statement.getGeneratedKeys()){
+					boolean found = resultSet.next();
+					if (!found){
+						throw new ProgrammersErrorException("Something is very wrong. Check to see if pigs are flying");
+					}
+					long newID = resultSet.getLong(1);
+					return newID;
+				}
+			}
+		} catch (SQLException e) {
+			throw new FatalException(e);
 		}
-
-		Statement statement = this.connection.createStatement();
-
-		ResultSet result = statement.executeQuery(query);
-
-		return result;
 	}
 
-	/**
-	 * Executes an Update SQL Query<br>
-	 * See {@link java.sql.Statement#executeUpdate(String)}<br>
-	 * If the connection is closed, it will be opened
-	 * 
-	 * @param query
-	 *            Query to be run
-	 * @return Result Code, see {@link java.sql.Statement#executeUpdate(String)}
-	 * @throws SQLException
-	 *             If the query cannot be executed
-	 * @throws ClassNotFoundException
-	 *             If the driver cannot be found; see {@link #openConnection()}
-	 */
-	public int updateSQL(String query) throws SQLException,
-			ClassNotFoundException {
-		if (!checkConnection()) {
-			openConnection();
+	public int executeUpdate(String sql, Object ... objects) throws FatalException, TryAgainException {
+		try (Connection connection = getConnection()) {
+			try (PreparedStatement statement = connection.prepareStatement(sql)){
+				setParameters(statement, objects);
+				return statement.executeUpdate();
+			}
+		} catch (SQLException e) {
+			throw new FatalException(e);
 		}
-
-		Statement statement = this.connection.createStatement();
-
-		int result = statement.executeUpdate(query);
-
-		return result;
+	}
+	
+	static void setParameters(PreparedStatement statement, Object... objects) throws FatalException {
+		int parameterIndex = 1;
+		for (Object object : objects) {
+			try {
+				statement.setObject(parameterIndex++, object);
+			} catch (SQLException e) {
+				throw new ProgrammersErrorException(String.format("Argument %d failed: %s", parameterIndex, e.getMessage()), e);
+			}
+		}
 	}
 }
