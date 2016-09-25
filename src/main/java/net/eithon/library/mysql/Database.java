@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import net.eithon.library.exceptions.FatalException;
 import net.eithon.library.exceptions.ProgrammersErrorException;
 import net.eithon.library.exceptions.TryAgainException;
+import net.eithon.library.plugin.Logger;
 
 public class Database {
 	private String connectionUrl;
@@ -21,7 +22,7 @@ public class Database {
 		this.connectionUser = userName;
 		this.connectionPassword = password;
 	}
-	
+
 	public Database(String hostName, String port, String databaseName, String userName, String password){
 		this("jdbc:mysql://" + hostName + ":" + port + "/" + databaseName, userName, password);
 	}
@@ -35,11 +36,14 @@ public class Database {
 		try {
 			Connection connection = DriverManager.getConnection(this.connectionUrl, this.connectionUser, this.connectionPassword);
 			return connection;
-
 		} catch (SQLException e) {
 			throw new TryAgainException(String.format(
 					"Failed to connect to database %s@(%s)", this.connectionUser, this.connectionUrl),
 					e);
+		} catch (Exception e) {
+			Logger.libraryError("Database.getConnection() %s", e.getMessage());
+			e.printStackTrace();
+			throw e;
 		}
 	}
 
@@ -65,7 +69,13 @@ public class Database {
 				}
 			}
 		} catch (SQLException e) {
+			Logger.libraryError("Database.executeInsert(\"%s\"): %s", sql, e.getMessage());
+			e.printStackTrace();
 			throw new FatalException(e);
+		} catch (Exception e) {
+			Logger.libraryError("Database.executeInsert(\"%s\"): %s", sql, e.getMessage());
+			e.printStackTrace();
+			throw e;
 		}
 	}
 
@@ -76,10 +86,15 @@ public class Database {
 				return statement.executeUpdate();
 			}
 		} catch (SQLException e) {
+			Logger.libraryError("Database.executeUpdate(\"%s\"): %s", sql, e.getMessage());
+			e.printStackTrace();
 			throw new FatalException(e);
+		} catch (Exception e) {
+			Logger.libraryError("Database.executeUpdate(\"%s\"): %s", sql, e.getMessage());
+			throw e;
 		}
 	}
-	
+
 	static void setParameters(PreparedStatement statement, Object... objects) throws FatalException {
 		int parameterIndex = 1;
 		for (Object object : objects) {
@@ -87,6 +102,10 @@ public class Database {
 				statement.setObject(parameterIndex++, object);
 			} catch (SQLException e) {
 				throw new ProgrammersErrorException(String.format("Argument %d failed: %s", parameterIndex, e.getMessage()), e);
+			} catch (Exception e) {
+				Logger.libraryError("Database.setParameters(\"%s\"): %s", statement.toString(), e.getMessage());
+				e.printStackTrace();
+				throw e;
 			}
 		}
 	}

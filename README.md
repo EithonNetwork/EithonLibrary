@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 6.1 (2016-09-18)
+
+* CHANGE: Database calls that fails are now logged better.
+
 ### 6.0 (2016-09-17)
 
 * NEW: Complete rewrite of the DB library.
