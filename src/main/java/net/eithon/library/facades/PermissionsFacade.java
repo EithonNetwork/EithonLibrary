@@ -14,12 +14,10 @@ import com.github.cheesesoftware.PowerfulPermsAPI.Group;
 import com.github.cheesesoftware.PowerfulPermsAPI.PermissionManager;
 import com.github.cheesesoftware.PowerfulPermsAPI.PermissionPlayer;
 import com.github.cheesesoftware.PowerfulPermsAPI.PowerfulPermsPlugin;
-import com.github.cheesesoftware.PowerfulPermsAPI.ResponseRunnable;
 
 public class PermissionsFacade {
 	private static PermissionManager permissionManager;
 	private static EithonPlugin eithonPlugin;
-	private static ResponseRunnable emptyResponseRunnable;
 
 	public static void initialize(EithonPlugin plugin) {
 		eithonPlugin = plugin;
@@ -30,9 +28,6 @@ public class PermissionsFacade {
 		catch (NoClassDefFoundError e) {
 			plugin.logWarn("EithonLibrary could not connect to the PowerfulPerms plugin when enabling the %s plugin.", plugin.getName());
 		}
-		emptyResponseRunnable = new ResponseRunnable() {
-			public void run() {}
-		};
 	}
 
 	public static boolean isConnected() {
@@ -48,23 +43,13 @@ public class PermissionsFacade {
 	public static void addPermissionGroup(OfflinePlayer player, Group group) {
 		if (!isConnectedOrError()) return;
 		verbose("addPermissionGroup", "Adding player %s to group %s", player.getName(), group.getName());
-		permissionManager.addPlayerGroup(player.getUniqueId(), group.getId(), new ResponseRunnable() {
-			@Override
-			public void run() {
-				verbose("addPermissionGroup", this.getResponse());
-			}
-		});
+		permissionManager.addPlayerGroup(player.getUniqueId(), group.getId());
 	}
 
 	public static void removePermissionGroup(OfflinePlayer player, Group group) {
 		if (!isConnectedOrError()) return;
 		verbose("removePermissionGroup", "Removing player %s from group %s", player.getName(), group);
-		permissionManager.removePlayerGroup(player.getUniqueId(), group.getId(), new ResponseRunnable() {
-			@Override
-			public void run() {
-				verbose("removePermissionGroup", this.getResponse());
-			}
-		});
+		permissionManager.removePlayerGroup(player.getUniqueId(), group.getId());
 	}
 
 	public static String[] getPlayerPermissionGroupNames(OfflinePlayer player) {
@@ -93,31 +78,29 @@ public class PermissionsFacade {
 	}
 
 	public static void addPlayerPermissionAsync(final OfflinePlayer player, final String permission) {
-		addPlayerPermissionAsync(player.getUniqueId(), player.getName(), permission, emptyResponseRunnable);
+		addPlayerPermissionAsync(player.getUniqueId(), player.getName(), permission);
 	}
 
 	public static void removePlayerPermissionAsync(final OfflinePlayer player, final String permission) {
-		removePlayerPermissionAsync(player.getUniqueId(), player.getName(), permission, emptyResponseRunnable);
+		removePlayerPermissionAsync(player.getUniqueId(), player.getName(), permission);
 	}
 
 	public static void addPlayerPermissionAsync(
 			final UUID playerId, 
 			final String playerName, 
-			final String permission, 
-			final ResponseRunnable response) {
+			final String permission) {
 		if (!isConnectedOrError()) return;
 		eithonPlugin.logInfo("PermissionsFacade: Adding permission %s to player %s", permission, playerName);
-		permissionManager.addPlayerPermission(playerId, playerName, permission, response);
+		permissionManager.addPlayerPermission(playerId, permission);
 	}
 
 	public static void removePlayerPermissionAsync(
 			final UUID playerId, 
 			final String playerName,
-			final String permission, 
-			final ResponseRunnable response) {
+			final String permission) {
 		if (!isConnectedOrError()) return;
 		eithonPlugin.logInfo("PermissionsFacade: Removing permission %s from player %s", permission, playerName);
-		permissionManager.removePlayerPermission(playerId, permission, response);
+		permissionManager.removePlayerPermission(playerId, permission);
 	}
 
 	public static boolean hasPermissionGroup(OfflinePlayer player, String groupName) {

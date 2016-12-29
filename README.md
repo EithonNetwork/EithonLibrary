@@ -13,6 +13,10 @@ Eithon java code library for Minecraft.
 
 ## Release history
 
+### 6.2 (2016-12-29)
+
+* CHANGE: New versions of bukkit (1.11) and PowerfulPerms.
+
 ### 6.1 (2016-09-18)
 
 * CHANGE: Database calls that fails are now logged better.

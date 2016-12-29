@@ -3,7 +3,7 @@
 	<groupId>net.eithon.plugin</groupId>
 	<artifactId>EithonLibrary</artifactId>
 	<name>EithonLibrary</name>
-	<version>6.1</version>
+	<version>6.2</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<powermock.version>1.6.3</powermock.version>
@@ -61,14 +61,14 @@
 		<dependency>
 			<groupId>org.bukkit</groupId>
 			<artifactId>bukkit</artifactId>
-			<version>[1.10.2-R0.1-SNAPSHOT,)</version>
+			<version>[1.11.2,)</version>
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.bukkit</groupId>
 			<artifactId>craftbukkit</artifactId>
-			<version>1.10.2-R0.1-SNAPSHOT</version>
+			<version>[1.11.2,)</version>
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
@@ -80,16 +80,16 @@
 		<dependency>
 			<groupId>io.puharesource.mc</groupId>
 			<artifactId>titlemanager</artifactId>
-			<version>1.5.9</version>
+			<version>1.5.13</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/dependencies/TitleManager-1.5.9.jar</systemPath>
+			<systemPath>${project.basedir}/dependencies/TitleManager-1.5.13.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>com.github.cheesesoftware</groupId>
 			<artifactId>PowerfulPermsAPI</artifactId>
-			<version>4.0.3</version>
+			<version>4.4.1</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/dependencies/PowerfulPerms-4.0.3.jar</systemPath>
+			<systemPath>${project.basedir}/dependencies/PowerfulPerms-4.4.1.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>net.milkbowl.vault</groupId>
